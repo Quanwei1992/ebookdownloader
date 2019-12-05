@@ -3,19 +3,19 @@ package main
 import (
 	"fmt"
 	"io/ioutil"
+	"log"
 	"os"
 	"os/exec"
 	"path"
-	"regexp"
 	"strings"
 	"sync"
+	"time"
 
 	"github.com/Aiicy/htmlquery"
 	"github.com/Unknwon/com"
+	"github.com/chain-zhang/pinyin"
 	pool "github.com/dgrr/GoSlaves"
-	iconv "github.com/djimenez/iconv-go"
-	//"golang.org/x/text/encoding/simplifiedchinese"
-	//"golang.org/x/text/transform"
+	"github.com/urfave/cli"
 )
 
 type BookInfo struct {
@@ -38,9 +38,6 @@ func ReadAllString(filename string) string {
 
 func WriteFile(filename string, data []byte) error {
 	os.MkdirAll(path.Dir(filename), os.ModePerm)
-	//转换成utf8格式，不管原来是什么格式的内容
-	//reader := transform.NewReader(bytes.NewReader(data), simplifiedchinese.GBK.NewDecoder())
-	//d, _ := ioutil.ReadAll(reader)
 	return ioutil.WriteFile(filename, data, 0655)
 }
 
@@ -67,7 +64,9 @@ func (this BookInfo) GenerateMobi() {
 	tpl_content := ReadAllString("./tpls/tpl_content.opf")
 	tpl_style := ReadAllString("./tpls/tpl_style.css")
 	tpl_toc := ReadAllString("./tpls/tpl_toc.ncx")
-	savepath := "./tmp/" + this.Name
+	//将文件名转换成拼音
+	strPinyin, _ := pinyin.New(this.Name).Split("-").Mode(pinyin.WithoutTone).Convert()
+	savepath := "./tmp/" + strPinyin
 	if com.IsExist(savepath) {
 		os.RemoveAll(savepath)
 	}
@@ -88,7 +87,7 @@ func (this BookInfo) GenerateMobi() {
 		cinfo := chapters[index]
 		tpl_chapter_tmp := tpl_chapter
 		chapterid := fmt.Sprintf("Chapter%d", index)
-		fmt.Printf("Chapterid =%s", chapterid)
+		//fmt.Printf("Chapterid =%s", chapterid)
 		chapter := strings.Replace(tpl_chapter_tmp, "___CHAPTER_ID___", chapterid, -1)
 		chapter = strings.Replace(chapter, "___CHAPTER_NAME___", cinfo.Title, -1)
 		content_tmp := cinfo.Content
@@ -100,8 +99,8 @@ func (this BookInfo) GenerateMobi() {
 		chapter = strings.Replace(chapter, "___CONTENT___", content, -1)
 		cpath := fmt.Sprintf("%s/chapter%d.html", savepath, index)
 		//for debug
-		fmt.Printf("cpath=%s", cpath)
-		fmt.Printf("chapter=%s", chapter)
+		//fmt.Printf("cpath=%s", cpath)
+		//fmt.Printf("chapter=%s", chapter)
 
 		WriteFile(cpath, []byte(chapter))
 
@@ -143,6 +142,9 @@ func (this BookInfo) GenerateMobi() {
 	opf_content = strings.Replace(opf_content, "___SPINE___", opf_spine, -1)
 	opf_content = strings.Replace(opf_content, "___BOOK_ID___", "11111", -1)
 	opf_content = strings.Replace(opf_content, "___BOOK_NAME___", this.Name, -1)
+	//设置初始时间
+	opf_content = strings.Replace(opf_content, "___CREATE_TIME___", time.Now().Format("2006-01-02 15:04:05"), -1)
+	opf_content = strings.Replace(opf_content, "___PUBLISHER___", "sndnvaps", -1)
 	WriteFile(savepath+"/content.opf", []byte(opf_content))
 
 	if !com.IsExist("./outputs") {
@@ -151,15 +153,11 @@ func (this BookInfo) GenerateMobi() {
 
 	// 生成
 	outfname := this.Name + "-" + this.Author + ".mobi"
-	cmd := exec.Command("cmd.exe", "/c", "/tools/kindlegen.exe", savepath+"/content.opf", "-c1", "-o", outfname)
-	err := cmd.Run()
-	if err != nil {
-		fmt.Printf("生成mobi出错 [%s]", err.Error())
-	} else {
-		fmt.Printf("生成mobi!")
-	}
+	//-dont_append_source ,禁止mobi 文件中附加源文件
+	cmd := exec.Command("./tools/kindlegen.exe", "-dont_append_source", savepath+"/content.opf", "-c1", "-o", outfname)
+	cmd.Run()
 
-	// copy
+	// 把生成的mobi文件复制到 outputs/目录下面
 	com.Copy(savepath+"/"+outfname, "./outputs/"+outfname)
 }
 
@@ -176,12 +174,12 @@ func GetBookInfo(bookid string) BookInfo {
 	//获取书名字
 	bookNameMeta, _ := htmlquery.FindOne(doc, "//meta[@property='og:novel:book_name']")
 	bookName := htmlquery.SelectAttr(bookNameMeta, "content")
-	fmt.Println("bookName = ", bookName)
+	fmt.Println("书名 = ", bookName)
 
 	//获取书作者
 	AuthorMeta, _ := htmlquery.FindOne(doc, "//meta[@property='og:novel:author']")
 	author := htmlquery.SelectAttr(AuthorMeta, "content")
-	fmt.Println("author = ", author)
+	fmt.Println("作者 = ", author)
 
 	//获取书章节列表
 	ddNode, _ := htmlquery.Find(doc, "//div[@id='list']//dl//dd")
@@ -203,24 +201,13 @@ func GetBookInfo(bookid string) BookInfo {
 }
 
 func GetChapterContent(C Chapter) Chapter {
-
 	pollURL := C.Link
 	doc, _ := htmlquery.LoadURL(pollURL)
 	contentNode, _ := htmlquery.FindOne(doc, "//div[@id='content']")
 	contentText := htmlquery.InnerText(contentNode)
-	//尝试转码为utf-8
-	out, _ := iconv.ConvertString(contentText, "gb2312", "utf-8")
 
-	reg := regexp.MustCompile(`[[:xdigit:]]`)
-
-	//替换字符串中的特殊字符 \xA0\XC2 为换行符 \n
-	tmp := strings.Replace(out, "\xA0\xC2", "\r\n", -1)
-	//把全部 16进制数字替换成 ""
-	//tmp = strings.Replace(tmp, "[[:xdigit:]]", "", -1)
-	tmp = reg.ReplaceAllString(tmp, "")
-	tmp = strings.Replace(tmp, "\xA0", "", -1)
-	tmp = strings.Replace(tmp, "\xC2", "", -1)
-	tmp = strings.Replace(tmp, "�", "", -1)
+	//替换字符串中的特殊字符 \xC2\xA0 为换行符 \n
+	tmp := strings.Replace(contentText, "\xC2\xA0", "\r\n", -1)
 
 	//把 readx(); 替换成 ""
 	tmp = strings.Replace(tmp, "readx();", "", -1)
@@ -246,12 +233,7 @@ func (this BookInfo) DownloadChapters() BookInfo {
 	chapters := this.Chapters
 	ch := make(chan Chapter, 1)
 	locker := sync.Mutex{}
-	/*
-		for index := 0; index < len(chapters); index++ {
-			temp := GetChapterContent(chapters[index])
-			chapters[index].Content = temp.Content
-		}
-	*/
+
 	sp := pool.NewPool(0, func(obj interface{}) {
 		locker.Lock()
 		tmp := obj.(Chapter)
@@ -280,20 +262,75 @@ func (this BookInfo) DownloadChapters() BookInfo {
 
 	return result
 }
-func main() {
-	bookid := "91_91345" //91_91345, 0_642
-	bookinfo := GetBookInfo(bookid)
-	//打印获取到的书籍信息
-	//fmt.Println(bookinfo)
-	//下载章节内容
-	bookinfo.DownloadChapters()
-	//生成txt文件
-	bookinfo.GenerateTxt()
-	//生成mobi格式电子书
-	//bookinfo.GenerateMobi()
 
-	//chapterLink := "https://www.xsbiquge.com//0_642/5776123.html"
-	//contentText := GetChapterContent(chapterLink)
-	//fmt.Println("chapterContent =", contentText)
+func EbookDownloader(c *cli.Context) error {
+	//bookid := "91_91345" //91_91345, 0_642
+	bookid := c.String("bookid")
+	if bookid == "" {
+		cli.ShowAppHelpAndExit(c, 0)
+		return nil
+	}
+
+	isTxt := c.Bool("txt")
+	isMobi := c.Bool("mobi")
+	//isTxt 或者 isMobi必须一个为真，或者两个都为真
+	if (isTxt || isMobi) || (isTxt && isMobi) {
+
+		bookinfo := GetBookInfo(bookid)
+		//下载章节内容
+		bookinfo.DownloadChapters()
+		//生成txt文件
+		if isTxt {
+			fmt.Printf("正在生成txt版本的电子书，请耐心等待！")
+			bookinfo.GenerateTxt()
+		}
+		//生成mobi格式电子书
+		if isMobi {
+			fmt.Printf("正在生成mobi版本的电子书，请耐心等待！")
+			bookinfo.GenerateMobi()
+		}
+	} else {
+		cli.ShowAppHelpAndExit(c, 0)
+		return nil
+	}
+	fmt.Printf("已经完成生成电子书！")
+
+	return nil
+}
+
+func main() {
+
+	app := cli.NewApp()
+	app.Name = "golang EBookDownloader"
+	app.Compiled = time.Now()
+	app.Version = "1.0.0"
+	app.Authors = []cli.Author{
+		cli.Author{
+			Name:  "Jimes Yang",
+			Email: "sndnvaps@gmail.com",
+		},
+	}
+	app.Copyright = "(c) 2019 Jimes Yang<sndnvaps@gmail.com>"
+	app.Usage = "用于下载 笔趣阁(https://www.xsbiquge.com) 上面的电子书，并保存为txt格式或者mobi格式的电子书"
+	app.Action = EbookDownloader
+	app.Flags = []cli.Flag{
+		cli.StringFlag{
+			Name:  "bookid,id",
+			Usage: "对应 笔趣阁上面的电子书的 id(https://www.xsbiquge.com/0_642/),其中0_642就是book_id",
+		},
+		cli.BoolFlag{
+			Name:  "txt",
+			Usage: "当使用的时候，生成txt文件",
+		},
+		cli.BoolFlag{
+			Name:  "mobi",
+			Usage: "当使用的时候，生成mobi文件",
+		},
+	}
+
+	err := app.Run(os.Args)
+	if err != nil {
+		log.Fatal(err)
+	}
 
 }
