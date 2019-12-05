@@ -281,19 +281,19 @@ func EbookDownloader(c *cli.Context) error {
 		bookinfo.DownloadChapters()
 		//生成txt文件
 		if isTxt {
-			fmt.Printf("正在生成txt版本的电子书，请耐心等待！")
+			fmt.Printf("正在生成txt版本的电子书，请耐心等待！\n")
 			bookinfo.GenerateTxt()
 		}
 		//生成mobi格式电子书
 		if isMobi {
-			fmt.Printf("正在生成mobi版本的电子书，请耐心等待！")
+			fmt.Printf("正在生成mobi版本的电子书，请耐心等待！\n")
 			bookinfo.GenerateMobi()
 		}
 	} else {
 		cli.ShowAppHelpAndExit(c, 0)
 		return nil
 	}
-	fmt.Printf("已经完成生成电子书！")
+	fmt.Printf("已经完成生成电子书！\n")
 
 	return nil
 }
