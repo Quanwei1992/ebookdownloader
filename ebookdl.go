@@ -16,6 +16,7 @@ import (
 	"github.com/chain-zhang/pinyin"
 	pool "github.com/dgrr/GoSlaves"
 	"github.com/urfave/cli"
+	"gopkg.in/schollz/progressbar.v2"
 )
 
 type BookInfo struct {
@@ -231,8 +232,10 @@ func excuteServe(p *pool.Pool, chapters []Chapter) {
 //根据每个章节的 url连接，下载每章对应的内容Content当中
 func (this BookInfo) DownloadChapters() BookInfo {
 	chapters := this.Chapters
+	NumChapter := len(chapters)
 	ch := make(chan Chapter, 1)
 	locker := sync.Mutex{}
+	var bar *progressbar.ProgressBar
 
 	sp := pool.NewPool(0, func(obj interface{}) {
 		locker.Lock()
@@ -245,12 +248,17 @@ func (this BookInfo) DownloadChapters() BookInfo {
 
 	go excuteServe(&sp, chapters)
 
+	//下载章节的时候显示进度条
+	bar = progressbar.New(NumChapter)
+	bar.RenderBlank()
+
 	for i := 0; i < len(chapters); {
 		select {
 		case c := <-ch:
 			chapters[i].Content = c.Content
 			i++
 		}
+		bar.Add(1)
 	}
 	sp.Close()
 
@@ -278,15 +286,16 @@ func EbookDownloader(c *cli.Context) error {
 
 		bookinfo := GetBookInfo(bookid)
 		//下载章节内容
+		fmt.Printf("正在下载电子书的相应章节，请耐心等待！\n")
 		bookinfo.DownloadChapters()
 		//生成txt文件
 		if isTxt {
-			fmt.Printf("正在生成txt版本的电子书，请耐心等待！\n")
+			fmt.Printf("\n正在生成txt版本的电子书，请耐心等待！\n")
 			bookinfo.GenerateTxt()
 		}
 		//生成mobi格式电子书
 		if isMobi {
-			fmt.Printf("正在生成mobi版本的电子书，请耐心等待！\n")
+			fmt.Printf("\n正在生成mobi版本的电子书，请耐心等待！\n")
 			bookinfo.GenerateMobi()
 		}
 	} else {

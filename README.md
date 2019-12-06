@@ -21,3 +21,11 @@
   ## 懒人模式，直接下载编译好的程序
   
   到[这里](https://github.com/sndnvaps/ebookdownloader/releases)下载你需要的版本
+
+  ## 更新日志
+
+      2019.12.6 go版本添加 进度条功能
+
+      2019.12.5 添加go语言版本支持
+      
+      2019.8.22 python版本初始化  
