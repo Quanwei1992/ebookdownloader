@@ -16,13 +16,17 @@
   ```
 
   ## 依赖程序 
-    1. kindlegen.exe ，所以目前只能在windows平台使用
+    1. kindlegen.exe 支持windows平台
+    2. kindlegenLinux 支持Linux 平台
+    3. kindlegenMac 支持 Mac平台
 
   ## 懒人模式，直接下载编译好的程序
   
   到[这里](https://github.com/sndnvaps/ebookdownloader/releases)下载你需要的版本
 
   ## 更新日志
+
+      2019.12.8 go版本添加 Linux,Mac系统支持
 
       2019.12.6 go版本添加 进度条功能
 

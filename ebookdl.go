@@ -312,7 +312,7 @@ func main() {
 	app := cli.NewApp()
 	app.Name = "golang EBookDownloader"
 	app.Compiled = time.Now()
-	app.Version = "1.1.0"
+	app.Version = "1.2.0"
 	app.Authors = []cli.Author{
 		cli.Author{
 			Name:  "Jimes Yang",
