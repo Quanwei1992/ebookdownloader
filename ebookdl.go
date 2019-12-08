@@ -5,7 +5,6 @@ import (
 	"io/ioutil"
 	"log"
 	"os"
-	"os/exec"
 	"path"
 	"strings"
 	"sync"
@@ -155,7 +154,8 @@ func (this BookInfo) GenerateMobi() {
 	// 生成
 	outfname := this.Name + "-" + this.Author + ".mobi"
 	//-dont_append_source ,禁止mobi 文件中附加源文件
-	cmd := exec.Command("./tools/kindlegen.exe", "-dont_append_source", savepath+"/content.opf", "-c1", "-o", outfname)
+	//cmd := exec.Command("./tools/kindlegen.exe", "-dont_append_source", savepath+"/content.opf", "-c1", "-o", outfname)
+	cmd := KindlegenCmd("-dont_append_source", savepath+"/content.opf", "-c1", "-o", outfname)
 	cmd.Run()
 
 	// 把生成的mobi文件复制到 outputs/目录下面
@@ -312,7 +312,7 @@ func main() {
 	app := cli.NewApp()
 	app.Name = "golang EBookDownloader"
 	app.Compiled = time.Now()
-	app.Version = "1.0.0"
+	app.Version = "1.1.0"
 	app.Authors = []cli.Author{
 		cli.Author{
 			Name:  "Jimes Yang",
