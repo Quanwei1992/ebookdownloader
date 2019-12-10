@@ -14,7 +14,7 @@ import (
 	"github.com/Unknwon/com"
 	"github.com/chain-zhang/pinyin"
 	pool "github.com/dgrr/GoSlaves"
-	"github.com/urfave/cli"
+	"gopkg.in/urfave/cli.v1"
 	"gopkg.in/schollz/progressbar.v2"
 )
 
