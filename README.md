@@ -1,6 +1,8 @@
 # ebookdownloader
 网文下载器
 
+[![Build Status](https://travis-ci.org/sndnvaps/ebookdownloader.svg?branch=master)](https://travis-ci.org/sndnvaps/ebookdownloader)
+
 # ebookdl 网文下载器，go语言版本
 
   ## 安装方法
