@@ -149,6 +149,7 @@ func (this BookInfo) GenerateMobi() {
 	opf_content = strings.Replace(opf_content, "___SPINE___", opf_spine, -1)
 	opf_content = strings.Replace(opf_content, "___BOOK_ID___", "11111", -1)
 	opf_content = strings.Replace(opf_content, "___BOOK_NAME___", this.Name, -1)
+	opf_content = strings.Replace(opf_content, "___BOOK_AUTHOR___", this.Author, -1)
 	//设置初始时间
 	opf_content = strings.Replace(opf_content, "___CREATE_TIME___", time.Now().Format("2006-01-02 15:04:05"), -1)
 	opf_content = strings.Replace(opf_content, "___PUBLISHER___", "sndnvaps", -1)

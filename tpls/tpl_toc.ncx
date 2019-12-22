@@ -14,7 +14,7 @@
 <text>___BOOK_NAME___</text>
 </docTitle>
 <docAuthor>
-<text></text>
+<text>___BOOK_AUTHOR___</text>
 </docAuthor>
 
 <navMap>
