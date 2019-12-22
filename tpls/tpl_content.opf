@@ -15,16 +15,14 @@
 <item id="ncxtoc" href="toc.ncx" media-type="application/x-dtbncx+xml"/>
 <item id="htmltoc"  href="book-toc.html" media-type="application/xhtml+xml"/>
 <item id="css" href="style.css" media-type="text/css"/>
-<item id="cover" href="cover.html" media-type="application/xhtml+xml"/>
 ___MANIFEST___
 </manifest>
 <spine toc="ncxtoc">
-<itemref idref="cover" linear="no"/>
 <itemref idref="htmltoc" linear="yes"/>
 ___SPINE___
 </spine>
 <guide>
-<reference href="cover.html" type="cover" title="Cover"/>
+<reference href="cover.jpg" type="cover" title="Cover"/>
 <reference href="book-toc.html" type="toc" title="Table Of Contents"/>
 <reference href="chapter0.html" type="text" title="Beginning"/>
 </guide>

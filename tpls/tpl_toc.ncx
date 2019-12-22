@@ -18,11 +18,6 @@
 </docAuthor>
 
 <navMap>
-<navPoint id="cover" playOrder="1">
-<navLabel><text>封面</text></navLabel>
-<content src="cover.html"/>
-</navPoint>
-
 <navPoint id="htmltoc" playOrder="2">
 <navLabel><text>目录</text></navLabel>
 <content src="book-toc.html"/>
