@@ -53,11 +53,12 @@ func GenerateCover(this BookInfo) {
 	f.SetDst(img)
 	f.SetSrc(image.Black) //设置字体颜色
 
-	pt := freetype.Pt(img.Bounds().Dx()-200, img.Bounds().Dy()-580) //字体出现的位置
+	pt := freetype.Pt(img.Bounds().Dx()-250, img.Bounds().Dy()-580) //字体出现的位置
 	f.DrawString(this.Name, pt)                                     //写入 小说名
 
 	//第二行字
-	pt.Y += f.PointToFixed(40)
+	pt.Y += f.PointToFixed(40)            //在第一行的基础下，往下移动40
+	pt.X += f.PointToFixed(25)            //在第一行的基础下，往右移动50
 	f.DrawString(this.Author+" (c)著", pt) //写入小说作者名
 
 	newfile, err := os.Create("cover.jpg")
