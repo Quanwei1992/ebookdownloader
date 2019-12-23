@@ -182,7 +182,7 @@ func GetBookInfo(bookid string, proxy string) BookInfo {
 
 	var bi BookInfo
 	var chapters []Chapter
-	pollURL := "https://www.xbiquge.com/" + bookid + "/"
+	pollURL := "https://www.xsbiquge.com/" + bookid + "/"
 
 	//当 proxy 不为空的时候，表示设置代理
 	if proxy != "" {
