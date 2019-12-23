@@ -5,26 +5,28 @@
 <dc-metadata xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:opf="http://www.idpf.org/2007/opf">
 <dc:identifier id="bookid">___BOOK_ID___</dc:identifier>
 <dc:title>___BOOK_NAME___</dc:title>
+<dc:creator opf:file-as="___BOOK_AUTHOR___" opf:role="aut">___BOOK_AUTHOR___</dc:creator>
 <dc:date>___CREATE_TIME___</dc:date>
 <dc:publisher>___PUBLISHER___</dc:publisher>
-<dc:rights>Created with EasyPub v1.50</dc:rights>
+<dc:rights>Created with Ebookdownloader v1.3.0</dc:rights>
 <dc:language>zh-CN</dc:language>
 </dc-metadata>
+<x-metadata>
+<output encoding="utf-8"></output>
+<EmbeddedCover>cover.jpg</EmbeddedCover>
+</x-metadata>
 </metadata>
 <manifest>
 <item id="ncxtoc" href="toc.ncx" media-type="application/x-dtbncx+xml"/>
 <item id="htmltoc"  href="book-toc.html" media-type="application/xhtml+xml"/>
 <item id="css" href="style.css" media-type="text/css"/>
-<item id="cover" href="cover.html" media-type="application/xhtml+xml"/>
 ___MANIFEST___
 </manifest>
 <spine toc="ncxtoc">
-<itemref idref="cover" linear="no"/>
 <itemref idref="htmltoc" linear="yes"/>
 ___SPINE___
 </spine>
 <guide>
-<reference href="cover.html" type="cover" title="Cover"/>
 <reference href="book-toc.html" type="toc" title="Table Of Contents"/>
 <reference href="chapter0.html" type="text" title="Beginning"/>
 </guide>

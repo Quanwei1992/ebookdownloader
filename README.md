@@ -14,6 +14,7 @@
   .\ebookdownloader.exe --bookid=0_642 --txt #只生成txt文本
   .\ebookdownloader.exe --bookid=0_642 --mobi #只生成mobi电子书
   .\ebookdownloader.exe --bookid=0_642 --txt --mobi #生成txt 和 mobi
+  .\ebookdownloader.exe --proxy="http://proxyip:proxyport" --bookid=0_642 --mobi #生成mobi电子书，在下载章节的过程中使用 Proxy
   .\ebookdownloader.exe --help #显示帮助信息
   ```
 
@@ -28,6 +29,10 @@
 
   ## 更新日志
 
+      2019.12.22 go版本添加 
+                 1. 简单代码测试
+                 2. 使用图片格式的封面，方便后面使用 calibre更换封面
+
       2019.12.9 go版本添加 代理支持
 
       2019.12.8 go版本添加 Linux,Mac系统支持
@@ -36,4 +41,9 @@
 
       2019.12.5 添加go语言版本支持
       
-      2019.8.22 python版本初始化  
+      2019.8.22 python版本初始化
+
+  ## To Do List
+
+     [√]  1.添加生成封面功能
+     [ ]  2. 添加不同平台的接口实现

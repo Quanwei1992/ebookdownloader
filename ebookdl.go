@@ -14,8 +14,8 @@ import (
 	"github.com/Unknwon/com"
 	"github.com/chain-zhang/pinyin"
 	pool "github.com/dgrr/GoSlaves"
-	"gopkg.in/urfave/cli.v1"
 	"gopkg.in/schollz/progressbar.v2"
+	"gopkg.in/urfave/cli.v1"
 )
 
 type BookInfo struct {
@@ -53,8 +53,8 @@ func (this BookInfo) GenerateTxt() {
 	outfpath := "./outputs/"
 	outfname := outfpath + this.Name + "-" + this.Author + ".txt"
 	for index := 0; index < len(chapters); index++ {
-		content = content + chapters[index].Title + "\n\n"
-		content = content + chapters[index].Content + "\n\n"
+		content = content + chapters[index].Title + "\n"
+		content = content + chapters[index].Content + "\n"
 	}
 
 	WriteFile(outfname, []byte(content))
@@ -63,7 +63,7 @@ func (this BookInfo) GenerateTxt() {
 //生成mobi格式电子书
 func (this BookInfo) GenerateMobi() {
 	chapters := this.Chapters
-	tpl_cover := ReadAllString("./tpls/tpl_cover.html")
+	//tpl_cover := ReadAllString("./tpls/tpl_cover.html")
 	tpl_book_toc := ReadAllString("./tpls/tpl_book_toc.html")
 	tpl_chapter := ReadAllString("./tpls/tpl_chapter.html")
 	tpl_content := ReadAllString("./tpls/tpl_content.opf")
@@ -77,10 +77,12 @@ func (this BookInfo) GenerateMobi() {
 	}
 	os.MkdirAll(path.Dir(savepath), os.ModePerm)
 
-	// 封面
-	cover := strings.Replace(tpl_cover, "___BOOK_NAME___", this.Name, -1)
-	cover = strings.Replace(cover, "___BOOK_AUTHOR___", this.Author, -1)
-	WriteFile(savepath+"/cover.html", []byte(cover))
+	// 生成封面
+	GenerateCover(this)
+
+	//cover := strings.Replace(tpl_cover, "___BOOK_NAME___", this.Name, -1)
+	//cover = strings.Replace(cover, "___BOOK_AUTHOR___", this.Author, -1)
+	//WriteFile(savepath+"/cover.html", []byte(cover))
 
 	// 章节
 	toc_content := ""
@@ -99,7 +101,7 @@ func (this BookInfo) GenerateMobi() {
 		content_lines := strings.Split(content_tmp, "\r")
 		content := ""
 		for _, v := range content_lines {
-			content = content + fmt.Sprintf("<p class=\"a\">    %s</p>", v)
+			content = content + fmt.Sprintf("<p class=\"a\">    %s</p>\n", v)
 		}
 		chapter = strings.Replace(chapter, "___CONTENT___", content, -1)
 		cpath := fmt.Sprintf("%s/chapter%d.html", savepath, index)
@@ -147,6 +149,7 @@ func (this BookInfo) GenerateMobi() {
 	opf_content = strings.Replace(opf_content, "___SPINE___", opf_spine, -1)
 	opf_content = strings.Replace(opf_content, "___BOOK_ID___", "11111", -1)
 	opf_content = strings.Replace(opf_content, "___BOOK_NAME___", this.Name, -1)
+	opf_content = strings.Replace(opf_content, "___BOOK_AUTHOR___", this.Author, -1)
 	//设置初始时间
 	opf_content = strings.Replace(opf_content, "___CREATE_TIME___", time.Now().Format("2006-01-02 15:04:05"), -1)
 	opf_content = strings.Replace(opf_content, "___PUBLISHER___", "sndnvaps", -1)
@@ -155,6 +158,14 @@ func (this BookInfo) GenerateMobi() {
 	if !com.IsExist("./outputs") {
 		os.MkdirAll(path.Dir("./outputs"), os.ModePerm)
 	}
+
+	//把封面复制到 tmp 目录当中
+	err := com.Copy("cover.jpg", savepath+"/cover.jpg")
+	if err != nil {
+		fmt.Println(err.Error())
+	}
+	//删除当前目前的cover.jpg文件
+	os.RemoveAll("cover.jpg")
 
 	// 生成
 	outfname := this.Name + "-" + this.Author + ".mobi"
@@ -257,7 +268,7 @@ func GetChapterContent(pc ProxyChapter) Chapter {
 
 		//把 readx(); 替换成 ""
 		tmp = strings.Replace(tmp, "readx();", "", -1)
-		tmp = tmp + "\r\n"
+		//tmp = tmp + "\r\n"
 		//返回数据，填写Content内容
 		result = Chapter{
 			Title:   pc.C.Title,
@@ -274,7 +285,7 @@ func GetChapterContent(pc ProxyChapter) Chapter {
 
 		//把 readx(); 替换成 ""
 		tmp = strings.Replace(tmp, "readx();", "", -1)
-		tmp = tmp + "\r\n"
+		//tmp = tmp + "\r\n"
 		//返回数据，填写Content内容
 		result = Chapter{
 			Title:   pc.C.Title,
@@ -381,7 +392,7 @@ func main() {
 	app := cli.NewApp()
 	app.Name = "golang EBookDownloader"
 	app.Compiled = time.Now()
-	app.Version = "1.2.0"
+	app.Version = "1.3.0"
 	app.Authors = []cli.Author{
 		cli.Author{
 			Name:  "Jimes Yang",
