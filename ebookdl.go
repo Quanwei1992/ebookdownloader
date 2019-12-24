@@ -53,8 +53,8 @@ func (this BookInfo) GenerateTxt() {
 	outfpath := "./outputs/"
 	outfname := outfpath + this.Name + "-" + this.Author + ".txt"
 	for index := 0; index < len(chapters); index++ {
-		content = content + chapters[index].Title + "\n"
-		content = content + chapters[index].Content + "\n"
+		content += "\n" + "### " + chapters[index].Title + " ###" + "\n" //每一章的标题，使用 ‘### 第n章 标题 ###’ 为格式
+		content += chapters[index].Content + "\n\n"                      //每一章内容的结尾，使用两个换行符
 	}
 
 	WriteFile(outfname, []byte(content))
