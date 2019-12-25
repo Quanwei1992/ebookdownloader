@@ -12,7 +12,7 @@ import (
 )
 
 const (
-	fontSize = 20 //字体尺寸
+	fontSize = 45 //字体尺寸
 )
 
 //生成封面 cover.jpg
@@ -53,13 +53,18 @@ func GenerateCover(this BookInfo) {
 	f.SetDst(img)
 	f.SetSrc(image.Black) //设置字体颜色
 
-	pt := freetype.Pt(img.Bounds().Dx()-250, img.Bounds().Dy()-580) //字体出现的位置
-	f.DrawString(this.Name, pt)                                     //写入 小说名
+	pt := freetype.Pt(img.Bounds().Dx()-370, img.Bounds().Dy()-590) //字体出现的位置
+	//尝试把字符串，坚着写入图片中
+	NameRune := []rune(this.Name)
+	f.DrawString(string(NameRune[0]), pt) // 第一个中文字符
+	for index := 1; index < len(NameRune); index++ {
+		pt.Y += f.PointToFixed(60)
+		f.DrawString(string(NameRune[index]), pt) //写入 小说名
+	}
 
-	//第二行字
-	pt.Y += f.PointToFixed(40)            //在第一行的基础下，往下移动40
-	pt.X += f.PointToFixed(25)            //在第一行的基础下，往右移动50
-	f.DrawString(this.Author+" (c)著", pt) //写入小说作者名
+	f.SetFontSize(35)                                                     //重新设置 字体大小为35
+	ptAuthor := freetype.Pt(img.Bounds().Dx()-320, img.Bounds().Dy()-500) //字体出现的位置
+	f.DrawString(this.Author+" (c)著", ptAuthor)                           //写入小说作者名
 
 	newfile, err := os.Create("cover.jpg")
 	if err != nil {
