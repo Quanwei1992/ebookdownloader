@@ -7,6 +7,7 @@
 <dc:title>___BOOK_NAME___</dc:title>
 <dc:creator opf:file-as="___BOOK_AUTHOR___" opf:role="aut">___BOOK_AUTHOR___</dc:creator>
 <dc:date>___CREATE_TIME___</dc:date>
+<dc:description>___DESCRIPTION___</dc:description>
 <dc:publisher>___PUBLISHER___</dc:publisher>
 <dc:rights>Created with Ebookdownloader v1.3.0</dc:rights>
 <dc:language>zh-CN</dc:language>
