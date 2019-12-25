@@ -8,9 +8,10 @@ import (
 )
 
 var testbi = BookInfo{
-	Name:     "我是谁",
-	Author:   "sndnvaps",
-	Chapters: C,
+	Name:        "我是谁",
+	Author:      "sndnvaps",
+	Description: "这是我随便写的测试内容简介！",
+	Chapters:    C,
 }
 
 var C = []Chapter{

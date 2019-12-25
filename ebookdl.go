@@ -19,9 +19,10 @@ import (
 )
 
 type BookInfo struct {
-	Name     string
-	Author   string
-	Chapters []Chapter
+	Name        string
+	Author      string
+	Description string
+	Chapters    []Chapter
 }
 
 type Chapter struct {
@@ -152,6 +153,9 @@ func (this BookInfo) GenerateMobi() {
 	opf_content = strings.Replace(opf_content, "___BOOK_AUTHOR___", this.Author, -1)
 	//设置初始时间
 	opf_content = strings.Replace(opf_content, "___CREATE_TIME___", time.Now().Format("2006-01-02 15:04:05"), -1)
+	//写入简介信息
+	opf_content = strings.Replace(opf_content, "___DESCRIPTION___", this.Description, -1)
+	//写入发布者信息
 	opf_content = strings.Replace(opf_content, "___PUBLISHER___", "sndnvaps", -1)
 	WriteFile(savepath+"/content.opf", []byte(opf_content))
 
@@ -201,6 +205,11 @@ func GetBookInfo(bookid string, proxy string) BookInfo {
 		author := htmlquery.SelectAttr(AuthorMeta, "content")
 		fmt.Println("作者 = ", author)
 
+		//获取书的描述信息
+		DescriptionMeta, _ := htmlquery.FindOne(doc, "//meta[@property='og:description']")
+		description := htmlquery.SelectAttr(DescriptionMeta, "content")
+		fmt.Println("简介 = ", description)
+
 		//获取书章节列表
 		ddNode, _ := htmlquery.Find(doc, "//div[@id='list']//dl//dd")
 		for i := 0; i < len(ddNode); i++ {
@@ -213,9 +222,10 @@ func GetBookInfo(bookid string, proxy string) BookInfo {
 
 		//导入信息
 		bi = BookInfo{
-			Name:     bookName,
-			Author:   author,
-			Chapters: chapters,
+			Name:        bookName,
+			Author:      author,
+			Description: description,
+			Chapters:    chapters,
 		}
 	} else { //没有设置代理
 		doc, err := htmlquery.LoadURL(pollURL)
@@ -233,6 +243,11 @@ func GetBookInfo(bookid string, proxy string) BookInfo {
 		author := htmlquery.SelectAttr(AuthorMeta, "content")
 		fmt.Println("作者 = ", author)
 
+		//获取书的描述信息
+		DescriptionMeta, _ := htmlquery.FindOne(doc, "//meta[@property='og:description']")
+		description := htmlquery.SelectAttr(DescriptionMeta, "content")
+		fmt.Println("简介 = ", description)
+
 		//获取书章节列表
 		ddNode, _ := htmlquery.Find(doc, "//div[@id='list']//dl//dd")
 		for i := 0; i < len(ddNode); i++ {
@@ -245,9 +260,10 @@ func GetBookInfo(bookid string, proxy string) BookInfo {
 
 		//导入信息
 		bi = BookInfo{
-			Name:     bookName,
-			Author:   author,
-			Chapters: chapters,
+			Name:        bookName,
+			Author:      author,
+			Description: description,
+			Chapters:    chapters,
 		}
 	}
 	return bi
@@ -341,9 +357,10 @@ func (this BookInfo) DownloadChapters(proxy string) BookInfo {
 	sp.Close()
 
 	result := BookInfo{
-		Name:     this.Name,
-		Author:   this.Author,
-		Chapters: chapters,
+		Name:        this.Name,
+		Author:      this.Author,
+		Description: this.Description,
+		Chapters:    chapters,
 	}
 
 	return result
