@@ -15,6 +15,8 @@
   .\ebookdownloader.exe --bookid=0_642 --mobi #只生成mobi电子书
   .\ebookdownloader.exe --bookid=0_642 --txt --mobi #生成txt 和 mobi
   .\ebookdownloader.exe --proxy="http://proxyip:proxyport" --bookid=0_642 --mobi #生成mobi电子书，在下载章节的过程中使用 Proxy
+  .\ebookdownloader.exe --ebhost=xsbiquge.com --bookid=0_642 --txt --mobi #使用xsbiquge.com做为下载源，生成txt 和 mobi
+    .\ebookdownloader.exe --ebhost=999xs.com --bookid=0_642 --txt --mobi #使用999xs.com做为下载源，生成txt 和 mobi
   .\ebookdownloader.exe --help #显示帮助信息
   ```
 
@@ -28,6 +30,10 @@
   到[这里](https://github.com/sndnvaps/ebookdownloader/releases)下载你需要的版本
 
   ## 更新日志
+
+      2019.12.29 go版本 完成实现 999xs.com平台的小说下载接口
+
+      2019.12.27 go版本 实现不同小说平台的interface{}接口，方便加入新的小说网站
 
       2019.12.25 go版本 修改小说名字排版方式为坚排
 
@@ -48,4 +54,4 @@
   ## To Do List
 
      [√]  1.添加生成封面功能
-     [ ]  2. 添加不同平台的接口实现
+     [√]  2. 添加不同平台的接口实现

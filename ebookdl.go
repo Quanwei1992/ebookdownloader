@@ -7,14 +7,10 @@ import (
 	"os"
 	"path"
 	"strings"
-	"sync"
 	"time"
 
-	"github.com/Aiicy/htmlquery"
 	"github.com/Unknwon/com"
 	"github.com/chain-zhang/pinyin"
-	pool "github.com/dgrr/GoSlaves"
-	"gopkg.in/schollz/progressbar.v2"
 	"gopkg.in/urfave/cli.v1"
 )
 
@@ -34,6 +30,13 @@ type Chapter struct {
 type ProxyChapter struct {
 	Proxy string
 	C     Chapter
+}
+
+//interface
+type EBookDLInterface interface {
+	GetBookInfo(bookid string, proxy string) BookInfo //获取小说的所有信息，包含小说名，作者，简介等信息
+	GetChapterContent(pc ProxyChapter) Chapter
+	DownloadChapters(Bi BookInfo, proxy string) BookInfo
 }
 
 //读取文件内容，并存入string,最终返回
@@ -182,190 +185,6 @@ func (this BookInfo) GenerateMobi() {
 	com.Copy(savepath+"/"+outfname, "./outputs/"+outfname)
 }
 
-func GetBookInfo(bookid string, proxy string) BookInfo {
-
-	var bi BookInfo
-	var chapters []Chapter
-	pollURL := "https://www.xsbiquge.com/" + bookid + "/"
-
-	//当 proxy 不为空的时候，表示设置代理
-	if proxy != "" {
-		doc, err := htmlquery.LoadURLWithProxy(pollURL, proxy)
-		if err != nil {
-			fmt.Println(err.Error())
-		}
-
-		//获取书名字
-		bookNameMeta, _ := htmlquery.FindOne(doc, "//meta[@property='og:novel:book_name']")
-		bookName := htmlquery.SelectAttr(bookNameMeta, "content")
-		fmt.Println("书名 = ", bookName)
-
-		//获取书作者
-		AuthorMeta, _ := htmlquery.FindOne(doc, "//meta[@property='og:novel:author']")
-		author := htmlquery.SelectAttr(AuthorMeta, "content")
-		fmt.Println("作者 = ", author)
-
-		//获取书的描述信息
-		DescriptionMeta, _ := htmlquery.FindOne(doc, "//meta[@property='og:description']")
-		description := htmlquery.SelectAttr(DescriptionMeta, "content")
-		fmt.Println("简介 = ", description)
-
-		//获取书章节列表
-		ddNode, _ := htmlquery.Find(doc, "//div[@id='list']//dl//dd")
-		for i := 0; i < len(ddNode); i++ {
-			var tmp Chapter
-			aNode, _ := htmlquery.Find(ddNode[i], "//a")
-			tmp.Link = "https://www.xsbiquge.com" + htmlquery.SelectAttr(aNode[0], "href")
-			tmp.Title = htmlquery.InnerText(aNode[0])
-			chapters = append(chapters, tmp)
-		}
-
-		//导入信息
-		bi = BookInfo{
-			Name:        bookName,
-			Author:      author,
-			Description: description,
-			Chapters:    chapters,
-		}
-	} else { //没有设置代理
-		doc, err := htmlquery.LoadURL(pollURL)
-		if err != nil {
-			fmt.Println(err.Error())
-		}
-
-		//获取书名字
-		bookNameMeta, _ := htmlquery.FindOne(doc, "//meta[@property='og:novel:book_name']")
-		bookName := htmlquery.SelectAttr(bookNameMeta, "content")
-		fmt.Println("书名 = ", bookName)
-
-		//获取书作者
-		AuthorMeta, _ := htmlquery.FindOne(doc, "//meta[@property='og:novel:author']")
-		author := htmlquery.SelectAttr(AuthorMeta, "content")
-		fmt.Println("作者 = ", author)
-
-		//获取书的描述信息
-		DescriptionMeta, _ := htmlquery.FindOne(doc, "//meta[@property='og:description']")
-		description := htmlquery.SelectAttr(DescriptionMeta, "content")
-		fmt.Println("简介 = ", description)
-
-		//获取书章节列表
-		ddNode, _ := htmlquery.Find(doc, "//div[@id='list']//dl//dd")
-		for i := 0; i < len(ddNode); i++ {
-			var tmp Chapter
-			aNode, _ := htmlquery.Find(ddNode[i], "//a")
-			tmp.Link = "https://www.xsbiquge.com" + htmlquery.SelectAttr(aNode[0], "href")
-			tmp.Title = htmlquery.InnerText(aNode[0])
-			chapters = append(chapters, tmp)
-		}
-
-		//导入信息
-		bi = BookInfo{
-			Name:        bookName,
-			Author:      author,
-			Description: description,
-			Chapters:    chapters,
-		}
-	}
-	return bi
-}
-
-func GetChapterContent(pc ProxyChapter) Chapter {
-	pollURL := pc.C.Link
-	proxy := pc.Proxy
-	var result Chapter
-
-	if proxy != "" {
-		doc, _ := htmlquery.LoadURLWithProxy(pollURL, proxy)
-		contentNode, _ := htmlquery.FindOne(doc, "//div[@id='content']")
-		contentText := htmlquery.InnerText(contentNode)
-
-		//替换字符串中的特殊字符 \xC2\xA0 为换行符 \n
-		tmp := strings.Replace(contentText, "\xC2\xA0", "\r\n", -1)
-
-		//把 readx(); 替换成 ""
-		tmp = strings.Replace(tmp, "readx();", "", -1)
-		//tmp = tmp + "\r\n"
-		//返回数据，填写Content内容
-		result = Chapter{
-			Title:   pc.C.Title,
-			Link:    pc.C.Link,
-			Content: tmp,
-		}
-	} else {
-		doc, _ := htmlquery.LoadURL(pollURL)
-		contentNode, _ := htmlquery.FindOne(doc, "//div[@id='content']")
-		contentText := htmlquery.InnerText(contentNode)
-
-		//替换字符串中的特殊字符 \xC2\xA0 为换行符 \n
-		tmp := strings.Replace(contentText, "\xC2\xA0", "\r\n", -1)
-
-		//把 readx(); 替换成 ""
-		tmp = strings.Replace(tmp, "readx();", "", -1)
-		//tmp = tmp + "\r\n"
-		//返回数据，填写Content内容
-		result = Chapter{
-			Title:   pc.C.Title,
-			Link:    pc.C.Link,
-			Content: tmp,
-		}
-	}
-
-	return result
-}
-
-func excuteServe(p *pool.Pool, chapters []Chapter, proxy string) {
-	for i := 0; i < len(chapters); i++ {
-		tmp := ProxyChapter{
-			Proxy: proxy,
-			C:     chapters[i],
-		}
-		p.Serve(tmp)
-	}
-}
-
-//根据每个章节的 url连接，下载每章对应的内容Content当中
-func (this BookInfo) DownloadChapters(proxy string) BookInfo {
-	chapters := this.Chapters
-	NumChapter := len(chapters)
-	ch := make(chan Chapter, 1)
-	locker := sync.Mutex{}
-	var bar *progressbar.ProgressBar
-
-	sp := pool.NewPool(0, func(obj interface{}) {
-		locker.Lock()
-		tmp := obj.(ProxyChapter)
-		content := GetChapterContent(tmp)
-		locker.Unlock()
-		ch <- content
-
-	})
-
-	go excuteServe(&sp, chapters, proxy)
-
-	//下载章节的时候显示进度条
-	bar = progressbar.New(NumChapter)
-	bar.RenderBlank()
-
-	for i := 0; i < len(chapters); {
-		select {
-		case c := <-ch:
-			chapters[i].Content = c.Content
-			i++
-		}
-		bar.Add(1)
-	}
-	sp.Close()
-
-	result := BookInfo{
-		Name:        this.Name,
-		Author:      this.Author,
-		Description: this.Description,
-		Chapters:    chapters,
-	}
-
-	return result
-}
-
 func EbookDownloader(c *cli.Context) error {
 	//bookid := "91_91345" //91_91345, 0_642
 	bookid := c.String("bookid")
@@ -373,18 +192,34 @@ func EbookDownloader(c *cli.Context) error {
 		cli.ShowAppHelpAndExit(c, 0)
 		return nil
 	}
+	//对应下载小说的网站，默认值为xsbiquge.com
+	ebhost := c.String("ebhost")
 
 	proxy := c.String("proxy")
 
 	isTxt := c.Bool("txt")
 	isMobi := c.Bool("mobi")
+
+	var bookinfo BookInfo              //初始化变量
+	var EBDLInterface EBookDLInterface //初始化接口
 	//isTxt 或者 isMobi必须一个为真，或者两个都为真
 	if (isTxt || isMobi) || (isTxt && isMobi) {
 
-		bookinfo := GetBookInfo(bookid, proxy)
+		if ebhost == "xsbiquge.com" {
+			xsbiquge := NewXSBiquge()
+			EBDLInterface = xsbiquge //实例化接口
+		} else if ebhost == "999xs.com" {
+			xs999 := New999XS()
+			EBDLInterface = xs999 //实例化接口
+		} else {
+			cli.ShowAppHelpAndExit(c, 0)
+			return nil
+		}
+		bookinfo = EBDLInterface.GetBookInfo(bookid, proxy)
+
 		//下载章节内容
 		fmt.Printf("正在下载电子书的相应章节，请耐心等待！\n")
-		bookinfo.DownloadChapters(proxy)
+		bookinfo = EBDLInterface.DownloadChapters(bookinfo, proxy)
 		//生成txt文件
 		if isTxt {
 			fmt.Printf("\n正在生成txt版本的电子书，请耐心等待！\n")
@@ -417,12 +252,17 @@ func main() {
 		},
 	}
 	app.Copyright = "(c) 2019 Jimes Yang<sndnvaps@gmail.com>"
-	app.Usage = "用于下载 笔趣阁(https://www.xsbiquge.com) 上面的电子书，并保存为txt格式或者mobi格式的电子书"
+	app.Usage = "用于下载 笔趣阁(https://www.xsbiquge.com),999小说网(https://www.999xs.com/) 上面的电子书，并保存为txt格式或者mobi格式的电子书"
 	app.Action = EbookDownloader
 	app.Flags = []cli.Flag{
 		cli.StringFlag{
+			Name:  "ebhost",
+			Value: "xsbiquge.com",
+			Usage: "定义下载ebook的网站地址(可选择xsbiquge.com,999xs.com)",
+		},
+		cli.StringFlag{
 			Name:  "bookid,id",
-			Usage: "对应 笔趣阁上面的电子书的 id(https://www.xsbiquge.com/0_642/),其中0_642就是book_id",
+			Usage: "对应 笔趣阁id(https://www.xsbiquge.com/0_642/),其中0_642就是book_id;对应999小说网id(https://www.999xs.com/files/article/html/0/591/),其中591为book_id",
 		},
 		cli.StringFlag{
 			Name:  "proxy,p",
