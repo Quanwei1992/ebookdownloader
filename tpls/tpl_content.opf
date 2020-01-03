@@ -9,12 +9,12 @@
 <dc:date>___CREATE_TIME___</dc:date>
 <dc:description>___DESCRIPTION___</dc:description>
 <dc:publisher>___PUBLISHER___</dc:publisher>
-<dc:rights>Created with Ebookdownloader v1.3.0</dc:rights>
+<dc:rights>Created with Ebookdownloader v1.5.0</dc:rights>
 <dc:language>zh-CN</dc:language>
 </dc-metadata>
+<meta name="cover" content="Cover" />
 <x-metadata>
 <output encoding="utf-8"></output>
-<EmbeddedCover>cover.jpg</EmbeddedCover>
 </x-metadata>
 </metadata>
 <manifest>
@@ -22,6 +22,7 @@
 <item id="htmltoc"  href="book-toc.html" media-type="application/xhtml+xml"/>
 <item id="css" href="style.css" media-type="text/css"/>
 ___MANIFEST___
+<item id="Cover" media-type="image/jpeg" href="cover.jpg"/>
 </manifest>
 <spine toc="ncxtoc">
 <itemref idref="htmltoc" linear="yes"/>

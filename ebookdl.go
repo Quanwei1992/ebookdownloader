@@ -18,6 +18,8 @@ type BookInfo struct {
 	Name        string
 	Author      string
 	Description string
+	IsMobi      bool //当为true的时候生成mobi
+	IsAwz3      bool //当为true的时候生成awz3,
 	Chapters    []Chapter
 }
 
@@ -48,6 +50,13 @@ func ReadAllString(filename string) string {
 func WriteFile(filename string, data []byte) error {
 	os.MkdirAll(path.Dir(filename), os.ModePerm)
 	return ioutil.WriteFile(filename, data, 0655)
+}
+
+//设置生成mobi格式，或者生成awz3格式
+//现在设置，mobi和awz3格式不能同时设置为true
+func (this *BookInfo) SetKindleEbookType(isMobi bool, isAwz3 bool) {
+	this.IsMobi = isMobi
+	this.IsAwz3 = isAwz3
 }
 
 //生成txt电子书
@@ -160,6 +169,7 @@ func (this BookInfo) GenerateMobi() {
 	opf_content = strings.Replace(opf_content, "___DESCRIPTION___", this.Description, -1)
 	//写入发布者信息
 	opf_content = strings.Replace(opf_content, "___PUBLISHER___", "sndnvaps", -1)
+	//把修改内容写入到content.opf文件中
 	WriteFile(savepath+"/content.opf", []byte(opf_content))
 
 	if !com.IsExist("./outputs") {
@@ -175,10 +185,16 @@ func (this BookInfo) GenerateMobi() {
 	os.RemoveAll("cover.jpg")
 
 	// 生成
-	outfname := this.Name + "-" + this.Author + ".mobi"
+	outfname := this.Name + "-" + this.Author
+	if this.IsMobi {
+		outfname += ".mobi"
+	}
+	if this.IsAwz3 {
+		outfname += ".awz3"
+	}
 	//-dont_append_source ,禁止mobi 文件中附加源文件
-	//cmd := exec.Command("./tools/kindlegen.exe", "-dont_append_source", savepath+"/content.opf", "-c1", "-o", outfname)
-	cmd := KindlegenCmd("-dont_append_source", savepath+"/content.opf", "-c1", "-o", outfname)
+	//cmd := exec.Command("./tools/kindlegen.exe", "-dont_append_source", savepath+"/content.opf", "-c2", "-o", outfname)
+	cmd := KindlegenCmd("-dont_append_source", savepath+"/content.opf", "-c2", "-o", outfname)
 	cmd.Run()
 
 	// 把生成的mobi文件复制到 outputs/目录下面
@@ -199,11 +215,12 @@ func EbookDownloader(c *cli.Context) error {
 
 	isTxt := c.Bool("txt")
 	isMobi := c.Bool("mobi")
+	isAwz3 := c.Bool("awz3")
 
 	var bookinfo BookInfo              //初始化变量
 	var EBDLInterface EBookDLInterface //初始化接口
 	//isTxt 或者 isMobi必须一个为真，或者两个都为真
-	if (isTxt || isMobi) || (isTxt && isMobi) {
+	if (isTxt || isMobi || isAwz3) || (isTxt && isMobi) || (isTxt && isAwz3) {
 
 		if ebhost == "xsbiquge.com" {
 			xsbiquge := NewXSBiquge()
@@ -212,6 +229,11 @@ func EbookDownloader(c *cli.Context) error {
 			xs999 := New999XS()
 			EBDLInterface = xs999 //实例化接口
 		} else {
+			cli.ShowAppHelpAndExit(c, 0)
+			return nil
+		}
+		// isMobi && isAwz3 当同时为真的时候，退出进程
+		if isMobi && isAwz3 {
 			cli.ShowAppHelpAndExit(c, 0)
 			return nil
 		}
@@ -228,8 +250,16 @@ func EbookDownloader(c *cli.Context) error {
 		//生成mobi格式电子书
 		if isMobi {
 			fmt.Printf("\n正在生成mobi版本的电子书，请耐心等待！\n")
+			bookinfo.SetKindleEbookType(true /* isMobi */, false /* isAwz3 */)
 			bookinfo.GenerateMobi()
 		}
+		//生成awz3格式电子书
+		if isAwz3 {
+			fmt.Printf("\n正在生成Awz3版本的电子书，请耐心等待！\n")
+			bookinfo.SetKindleEbookType(false /* isMobi */, true /* isAwz3 */)
+			bookinfo.GenerateMobi()
+		}
+
 	} else {
 		cli.ShowAppHelpAndExit(c, 0)
 		return nil
@@ -244,15 +274,15 @@ func main() {
 	app := cli.NewApp()
 	app.Name = "golang EBookDownloader"
 	app.Compiled = time.Now()
-	app.Version = "1.4.0"
+	app.Version = "1.5.0"
 	app.Authors = []cli.Author{
 		cli.Author{
 			Name:  "Jimes Yang",
 			Email: "sndnvaps@gmail.com",
 		},
 	}
-	app.Copyright = "(c) 2019 Jimes Yang<sndnvaps@gmail.com>"
-	app.Usage = "用于下载 笔趣阁(https://www.xsbiquge.com),999小说网(https://www.999xs.com/) 上面的电子书，并保存为txt格式或者mobi格式的电子书"
+	app.Copyright = "(c) 2019 - 2020 Jimes Yang<sndnvaps@gmail.com>"
+	app.Usage = "用于下载 笔趣阁(https://www.xsbiquge.com),999小说网(https://www.999xs.com/) 上面的电子书，并保存为txt格式或者(mobi格式,awz3格式)的电子书"
 	app.Action = EbookDownloader
 	app.Flags = []cli.Flag{
 		cli.StringFlag{
@@ -274,7 +304,11 @@ func main() {
 		},
 		cli.BoolFlag{
 			Name:  "mobi",
-			Usage: "当使用的时候，生成mobi文件",
+			Usage: "当使用的时候，生成mobi文件(不可与--awz3同时使用)",
+		},
+		cli.BoolFlag{
+			Name:  "awz3",
+			Usage: "当使用的时候，生成awz3文件(不可与--mobi同时使用)",
 		},
 	}
 
