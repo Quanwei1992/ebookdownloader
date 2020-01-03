@@ -51,13 +51,23 @@ func TestGenerateTxt(t *testing.T) {
 	savename := "./outputs/" + testbi.Name + "-" + testbi.Author + ".txt"
 
 	assert.True(t, true, isExist(savename))
-	os.RemoveAll(savename)
+	//os.RemoveAll(savename)
 
 }
 
 func TestGenerateMobi(t *testing.T) {
+	testbi.SetKindleEbookType(true /* isMobi */, false /* isAwz3 */)
 	testbi.GenerateMobi()
 	savename := "./outputs/" + testbi.Name + "-" + testbi.Author + ".mobi"
+
+	assert.True(t, true, isExist(savename))
+	//os.RemoveAll(savename)
+}
+
+func TestGenerateAwz3(t *testing.T) {
+	testbi.SetKindleEbookType(false /* isMobi */, true /* isAwz3 */)
+	testbi.GenerateMobi()
+	savename := "./outputs/" + testbi.Name + "-" + testbi.Author + ".awz3"
 
 	assert.True(t, true, isExist(savename))
 	//os.RemoveAll(savename)

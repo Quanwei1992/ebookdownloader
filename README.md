@@ -14,6 +14,7 @@
   .\ebookdownloader.exe --bookid=0_642 --txt #只生成txt文本
   .\ebookdownloader.exe --bookid=0_642 --mobi #只生成mobi电子书
   .\ebookdownloader.exe --bookid=0_642 --txt --mobi #生成txt 和 mobi
+    .\ebookdownloader.exe --bookid=0_642 --txt --awz3 #生成txt 和 awz3
   .\ebookdownloader.exe --proxy="http://proxyip:proxyport" --bookid=0_642 --mobi #生成mobi电子书，在下载章节的过程中使用 Proxy
   .\ebookdownloader.exe --ebhost=xsbiquge.com --bookid=0_642 --txt --mobi #使用xsbiquge.com做为下载源，生成txt 和 mobi
     .\ebookdownloader.exe --ebhost=999xs.com --bookid=0_642 --txt --mobi #使用999xs.com做为下载源，生成txt 和 mobi
@@ -30,6 +31,11 @@
   到[这里](https://github.com/sndnvaps/ebookdownloader/releases)下载你需要的版本
 
   ## 更新日志
+
+      2020.01.03 go版本 更新
+                  1. 修改生成电子书的压缩比为-c2,使生成的文件更小
+                  2. 添加生成awz3格式支持(注意，--mobi,--awz3只能使用一个，不能同时使用)
+                  3. 修改封面的引用方法
 
       2019.12.29 go版本 完成实现 999xs.com平台的小说下载接口
 
