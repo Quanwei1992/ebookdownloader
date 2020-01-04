@@ -11,9 +11,22 @@ var testbi = BookInfo{
 	Name:        "我是谁",
 	Author:      "sndnvaps",
 	Description: "这是我随便写的测试内容简介！",
+	Volumes:     V, //分卷信息
 	Chapters:    C,
 }
 
+var V = []Volume{
+	{
+		PrevChapterId: 0,
+		CurrentVolume: "第一卷", //插入位置，第一章前面
+		NextChapterId: 2,
+	},
+	{
+		PrevChapterId: 2,
+		CurrentVolume: "第二卷", //插入位置，第三章前面
+		NextChapterId: 3,
+	},
+}
 var C = []Chapter{
 	{
 		Title:   "第一章",

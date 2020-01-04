@@ -18,11 +18,17 @@ type BookInfo struct {
 	Name        string
 	Author      string
 	Description string
-	IsMobi      bool //当为true的时候生成mobi
-	IsAwz3      bool //当为true的时候生成awz3,
-	Chapters    []Chapter
+	IsMobi      bool      //当为true的时候生成mobi
+	IsAwz3      bool      //当为true的时候生成awz3,
+	Volumes     []Volume  //小说分卷信息，一般不设置
+	Chapters    []Chapter //小说章节信息
 }
 
+type Volume struct {
+	PrevChapterId int
+	CurrentVolume string
+	NextChapterId int
+}
 type Chapter struct {
 	Title   string
 	Content string
@@ -61,13 +67,31 @@ func (this *BookInfo) SetKindleEbookType(isMobi bool, isAwz3 bool) {
 
 //生成txt电子书
 func (this BookInfo) GenerateTxt() {
-	chapters := this.Chapters
-	content := "" //用于存放章节内容
+	chapters := this.Chapters //小说的章节信息
+	volumes := this.Volumes   //小说的分卷信息
+	content := ""             //用于存放（分卷、）章节内容
 	outfpath := "./outputs/"
 	outfname := outfpath + this.Name + "-" + this.Author + ".txt"
-	for index := 0; index < len(chapters); index++ {
-		content += "\n" + "### " + chapters[index].Title + " ###" + "\n" //每一章的标题，使用 ‘### 第n章 标题 ###’ 为格式
-		content += chapters[index].Content + "\n\n"                      //每一章内容的结尾，使用两个换行符
+	if len(volumes) > 0 {
+		for index := 0; index < len(chapters); index++ {
+			for vindex := 0; vindex < len(volumes); vindex++ {
+
+				if volumes[vindex].PrevChapterId == index {
+					//fmt.Printf("volumes[vindex].PrevChapterId= %d\n", volumes[vindex].PrevChapterId) //用于测试
+					//fmt.Printf("ChapterIndex =  %d\n", index)                                        //用于测试
+					content += "\n" + "## " + volumes[vindex].CurrentVolume + " ##" + "\n"
+				}
+			}
+			content += "\n" + "### " + chapters[index].Title + " ###" + "\n" //每一章的标题，使用 ‘### 第n章 标题 ###’ 为格式
+			content += chapters[index].Content + "\n\n"                      //每一章内容的结尾，使用两个换行符
+
+		}
+
+	} else {
+		for index := 0; index < len(chapters); index++ {
+			content += "\n" + "### " + chapters[index].Title + " ###" + "\n" //每一章的标题，使用 ‘### 第n章 标题 ###’ 为格式
+			content += chapters[index].Content + "\n\n"                      //每一章内容的结尾，使用两个换行符
+		}
 	}
 
 	WriteFile(outfname, []byte(content))
