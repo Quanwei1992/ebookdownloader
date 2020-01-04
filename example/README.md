@@ -9,4 +9,4 @@ cd example\wo-shi-shui
 
 ##　最终显示效果
 
-![效果图](/pic1.PNG)
+![效果图](/example/pic1.PNG)
