@@ -173,23 +173,15 @@ func (this BookInfo) GenerateMobi() {
 
 		WriteFile(cpath, []byte(chapter))
 
-		//分卷信息,在book-toc.html中插入分卷信息
+		//分卷信息
 		if this.HasVolume && len(Volumes) > 0 {
 			for vindex := 0; vindex < len(Volumes); vindex++ {
 				if Volumes[vindex].PrevChapterId == index {
+					//分卷信息,在book-toc.html中插入分卷信息
 					toc_line = fmt.Sprintf("<dt class=\"tocl1\"><a href=\"volume%d.html\">%s</a></dt>\n", vindex, Volumes[vindex].CurrentVolume)
 					toc_content = toc_content + toc_line
-				}
-			}
-		}
-		toc_line = fmt.Sprintf("<dt class=\"tocl2\"><a href=\"chapter%d.html\">%s</a></dt>\n", index, cinfo.Title)
-		toc_content = toc_content + toc_line
 
-		// nax_toc
-		//分卷信息,在book-toc.html中插入分卷信息
-		if this.HasVolume && len(Volumes) > 0 {
-			for vindex := 0; vindex < len(Volumes); vindex++ {
-				if Volumes[vindex].PrevChapterId == index {
+					//分卷信息，在toc.ncx中插入分卷信息
 					nax_toc_line = fmt.Sprintf("<navPoint id=\"volume%d\" playOrder=\"%d\">\n", vindex, vindex+1)
 					nax_toc_content = nax_toc_content + nax_toc_line
 
@@ -198,21 +190,8 @@ func (this BookInfo) GenerateMobi() {
 
 					nax_toc_line = fmt.Sprintf("<content src=\"volume%d.html\"/>\n</navPoint>\n", vindex)
 					nax_toc_content = nax_toc_content + nax_toc_line
-				}
-			}
-		}
-		nax_toc_line = fmt.Sprintf("<navPoint id=\"chapter%d\" playOrder=\"%d\">\n", index, index+1)
-		nax_toc_content = nax_toc_content + nax_toc_line
 
-		nax_toc_line = fmt.Sprintf("<navLabel><text>%s</text></navLabel>\n", cinfo.Title)
-		nax_toc_content = nax_toc_content + nax_toc_line
-
-		nax_toc_line = fmt.Sprintf("<content src=\"chapter%d.html\"/>\n</navPoint>\n", index)
-		nax_toc_content = nax_toc_content + nax_toc_line
-		//分卷信息,在content.opf中插入分卷信息
-		if this.HasVolume && len(Volumes) > 0 {
-			for vindex := 0; vindex < len(Volumes); vindex++ {
-				if Volumes[vindex].PrevChapterId == index {
+					//分卷信息,在content.opf中插入分卷信息
 					opf_toc_line = fmt.Sprintf("<item id=\"volume%d\" href=\"volume%d.html\" media-type=\"application/xhtml+xml\"/>\n", vindex, vindex)
 					opf_toc = opf_toc + opf_toc_line
 
@@ -221,6 +200,19 @@ func (this BookInfo) GenerateMobi() {
 				}
 			}
 		}
+		toc_line = fmt.Sprintf("<dt class=\"tocl2\"><a href=\"chapter%d.html\">%s</a></dt>\n", index, cinfo.Title)
+		toc_content = toc_content + toc_line
+
+		// nax_toc
+		nax_toc_line = fmt.Sprintf("<navPoint id=\"chapter%d\" playOrder=\"%d\">\n", index, index+1)
+		nax_toc_content = nax_toc_content + nax_toc_line
+
+		nax_toc_line = fmt.Sprintf("<navLabel><text>%s</text></navLabel>\n", cinfo.Title)
+		nax_toc_content = nax_toc_content + nax_toc_line
+
+		nax_toc_line = fmt.Sprintf("<content src=\"chapter%d.html\"/>\n</navPoint>\n", index)
+		nax_toc_content = nax_toc_content + nax_toc_line
+
 		opf_toc_line = fmt.Sprintf("<item id=\"chapter%d\" href=\"chapter%d.html\" media-type=\"application/xhtml+xml\"/>\n", index, index)
 		opf_toc = opf_toc + opf_toc_line
 
