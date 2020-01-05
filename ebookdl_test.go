@@ -26,6 +26,11 @@ var V = []Volume{
 		CurrentVolume: "第二卷", //插入位置，第三章前面
 		NextChapterId: 3,
 	},
+	{
+		PrevChapterId: 5,
+		CurrentVolume: "第三卷", //插入位置，第六章前面
+		NextChapterId: 6,
+	},
 }
 var C = []Chapter{
 	{
@@ -43,6 +48,41 @@ var C = []Chapter{
 		Content: "这是第三章\r\n内容测试\r\n",
 		Link:    "https://github.com/sndnvaps/ebookdownloader",
 	},
+	{
+		Title:   "第四章",
+		Content: "这是第四章\r\n内容测试\r\n",
+		Link:    "https://github.com/sndnvaps/ebookdownloader",
+	},
+	{
+		Title:   "第五章",
+		Content: "这是第五章\r\n内容测试\r\n",
+		Link:    "https://github.com/sndnvaps/ebookdownloader",
+	},
+	{
+		Title:   "第六章",
+		Content: "这是第六章\r\n内容测试\r\n",
+		Link:    "https://github.com/sndnvaps/ebookdownloader",
+	},
+	{
+		Title:   "第七章",
+		Content: "这是第七章\r\n内容测试\r\n",
+		Link:    "https://github.com/sndnvaps/ebookdownloader",
+	},
+	{
+		Title:   "第八章",
+		Content: "这是第八章\r\n内容测试\r\n",
+		Link:    "https://github.com/sndnvaps/ebookdownloader",
+	},
+	{
+		Title:   "第九章",
+		Content: "这是第九章\r\n内容测试\r\n",
+		Link:    "https://github.com/sndnvaps/ebookdownloader",
+	},
+	{
+		Title:   "第十章",
+		Content: "这是第十章\r\n内容测试\r\n",
+		Link:    "https://github.com/sndnvaps/ebookdownloader",
+	},
 }
 
 func TestBookInfo(t *testing.T) {
@@ -53,13 +93,14 @@ func TestBookInfo(t *testing.T) {
 	assert.Equal(t, author, testbi.Author)
 
 	Size := len(testbi.Chapters)
-	assert.Equal(t, 3, Size)
+	assert.Equal(t, 10, Size)
 
 	link := "https://github.com/sndnvaps/ebookdownloader"
 	assert.Equal(t, link, testbi.Chapters[0].Link)
 }
 
 func TestGenerateTxt(t *testing.T) {
+	testbi.ChangeVolumeState(true /* hasVolume */)
 	testbi.GenerateTxt()
 	savename := "./outputs/" + testbi.Name + "-" + testbi.Author + ".txt"
 
@@ -69,6 +110,7 @@ func TestGenerateTxt(t *testing.T) {
 }
 
 func TestGenerateMobi(t *testing.T) {
+	testbi.ChangeVolumeState(true /* hasVolume */)
 	testbi.SetKindleEbookType(true /* isMobi */, false /* isAwz3 */)
 	testbi.GenerateMobi()
 	savename := "./outputs/" + testbi.Name + "-" + testbi.Author + ".mobi"
@@ -78,6 +120,7 @@ func TestGenerateMobi(t *testing.T) {
 }
 
 func TestGenerateAwz3(t *testing.T) {
+	testbi.ChangeVolumeState(true /* hasVolume */)
 	testbi.SetKindleEbookType(false /* isMobi */, true /* isAwz3 */)
 	testbi.GenerateMobi()
 	savename := "./outputs/" + testbi.Name + "-" + testbi.Author + ".awz3"

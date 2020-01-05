@@ -20,6 +20,7 @@ type BookInfo struct {
 	Description string
 	IsMobi      bool      //当为true的时候生成mobi
 	IsAwz3      bool      //当为true的时候生成awz3,
+	HasVolume   bool      //是否有小说分卷，默认为false；当设置为true的时候，Volumes里面需要包含分卷信息
 	Volumes     []Volume  //小说分卷信息，一般不设置
 	Chapters    []Chapter //小说章节信息
 }
@@ -65,6 +66,12 @@ func (this *BookInfo) SetKindleEbookType(isMobi bool, isAwz3 bool) {
 	this.IsAwz3 = isAwz3
 }
 
+//设置 是否包含分卷信息
+// func ChangeVolumeState
+func (this *BookInfo) ChangeVolumeState(hasVolume bool) {
+	this.HasVolume = hasVolume
+}
+
 //生成txt电子书
 func (this BookInfo) GenerateTxt() {
 	chapters := this.Chapters //小说的章节信息
@@ -72,7 +79,7 @@ func (this BookInfo) GenerateTxt() {
 	content := ""             //用于存放（分卷、）章节内容
 	outfpath := "./outputs/"
 	outfname := outfpath + this.Name + "-" + this.Author + ".txt"
-	if len(volumes) > 0 {
+	if len(volumes) > 0 && this.HasVolume {
 		for index := 0; index < len(chapters); index++ {
 			for vindex := 0; vindex < len(volumes); vindex++ {
 
@@ -99,10 +106,12 @@ func (this BookInfo) GenerateTxt() {
 
 //生成mobi格式电子书
 func (this BookInfo) GenerateMobi() {
-	chapters := this.Chapters
+	chapters := this.Chapters //章节信息
+	Volumes := this.Volumes   //分卷信息
 	//tpl_cover := ReadAllString("./tpls/tpl_cover.html")
 	tpl_book_toc := ReadAllString("./tpls/tpl_book_toc.html")
 	tpl_chapter := ReadAllString("./tpls/tpl_chapter.html")
+	tpl_volume := ReadAllString("./tpls/tpl_volume.html")
 	tpl_content := ReadAllString("./tpls/tpl_content.opf")
 	tpl_style := ReadAllString("./tpls/tpl_style.css")
 	tpl_toc := ReadAllString("./tpls/tpl_toc.ncx")
@@ -121,11 +130,27 @@ func (this BookInfo) GenerateMobi() {
 	//cover = strings.Replace(cover, "___BOOK_AUTHOR___", this.Author, -1)
 	//WriteFile(savepath+"/cover.html", []byte(cover))
 
+	//分卷
+	if this.HasVolume && len(Volumes) > 0 {
+		for index := 0; index < len(Volumes); index++ {
+			vinfo := Volumes[index] //vinfo表示第一分卷信息
+			tpl_volume_tmp := tpl_volume
+			volumeid := fmt.Sprintf("Volume%d", index)
+			volume := strings.Replace(tpl_volume_tmp, "___VOLUME_ID___", volumeid, -1)
+			volume = strings.Replace(volume, "___VOLUME_NAME___", vinfo.CurrentVolume, -1)
+			cpath := fmt.Sprintf("%s/volume%d.html", savepath, index)
+			WriteFile(cpath, []byte(volume))
+		}
+	}
+
 	// 章节
 	toc_content := ""
 	nax_toc_content := ""
 	opf_toc := ""
 	opf_spine := ""
+	toc_line := ""
+	nax_toc_line := ""
+	opf_toc_line := ""
 	for index := 0; index < len(chapters); index++ {
 		// cinfo表示第一个章节的内容
 		cinfo := chapters[index]
@@ -148,11 +173,35 @@ func (this BookInfo) GenerateMobi() {
 
 		WriteFile(cpath, []byte(chapter))
 
-		toc_line := fmt.Sprintf("<dt class=\"tocl2\"><a href=\"chapter%d.html\">%s</a></dt>\n", index, cinfo.Title)
+		//分卷信息,在book-toc.html中插入分卷信息
+		if this.HasVolume && len(Volumes) > 0 {
+			for vindex := 0; vindex < len(Volumes); vindex++ {
+				if Volumes[vindex].PrevChapterId == index {
+					toc_line = fmt.Sprintf("<dt class=\"tocl1\"><a href=\"volume%d.html\">%s</a></dt>\n", vindex, Volumes[vindex].CurrentVolume)
+					toc_content = toc_content + toc_line
+				}
+			}
+		}
+		toc_line = fmt.Sprintf("<dt class=\"tocl2\"><a href=\"chapter%d.html\">%s</a></dt>\n", index, cinfo.Title)
 		toc_content = toc_content + toc_line
 
 		// nax_toc
-		nax_toc_line := fmt.Sprintf("<navPoint id=\"chapter%d\" playOrder=\"%d\">\n", index, index+1)
+		//分卷信息,在book-toc.html中插入分卷信息
+		if this.HasVolume && len(Volumes) > 0 {
+			for vindex := 0; vindex < len(Volumes); vindex++ {
+				if Volumes[vindex].PrevChapterId == index {
+					nax_toc_line = fmt.Sprintf("<navPoint id=\"volume%d\" playOrder=\"%d\">\n", vindex, vindex+1)
+					nax_toc_content = nax_toc_content + nax_toc_line
+
+					nax_toc_line = fmt.Sprintf("<navLabel><text>%s</text></navLabel>\n", Volumes[vindex].CurrentVolume)
+					nax_toc_content = nax_toc_content + nax_toc_line
+
+					nax_toc_line = fmt.Sprintf("<content src=\"volume%d.html\"/>\n</navPoint>\n", vindex)
+					nax_toc_content = nax_toc_content + nax_toc_line
+				}
+			}
+		}
+		nax_toc_line = fmt.Sprintf("<navPoint id=\"chapter%d\" playOrder=\"%d\">\n", index, index+1)
 		nax_toc_content = nax_toc_content + nax_toc_line
 
 		nax_toc_line = fmt.Sprintf("<navLabel><text>%s</text></navLabel>\n", cinfo.Title)
@@ -160,8 +209,19 @@ func (this BookInfo) GenerateMobi() {
 
 		nax_toc_line = fmt.Sprintf("<content src=\"chapter%d.html\"/>\n</navPoint>\n", index)
 		nax_toc_content = nax_toc_content + nax_toc_line
+		//分卷信息,在content.opf中插入分卷信息
+		if this.HasVolume && len(Volumes) > 0 {
+			for vindex := 0; vindex < len(Volumes); vindex++ {
+				if Volumes[vindex].PrevChapterId == index {
+					opf_toc_line = fmt.Sprintf("<item id=\"volume%d\" href=\"volume%d.html\" media-type=\"application/xhtml+xml\"/>\n", vindex, vindex)
+					opf_toc = opf_toc + opf_toc_line
 
-		opf_toc_line := fmt.Sprintf("<item id=\"chapter%d\" href=\"chapter%d.html\" media-type=\"application/xhtml+xml\"/>\n", index, index)
+					opf_spine_line := fmt.Sprintf("<itemref idref=\"volume%d\" linear=\"yes\"/>\n", vindex)
+					opf_spine = opf_spine + opf_spine_line
+				}
+			}
+		}
+		opf_toc_line = fmt.Sprintf("<item id=\"chapter%d\" href=\"chapter%d.html\" media-type=\"application/xhtml+xml\"/>\n", index, index)
 		opf_toc = opf_toc + opf_toc_line
 
 		opf_spine_line := fmt.Sprintf("<itemref idref=\"chapter%d\" linear=\"yes\"/>\n", index)
