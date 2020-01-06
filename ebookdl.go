@@ -27,6 +27,7 @@ type BookInfo struct {
 
 type Volume struct {
 	PrevChapterId int
+	PrevChapter   Chapter
 	CurrentVolume string
 	NextChapterId int
 }
@@ -70,6 +71,16 @@ func (this *BookInfo) SetKindleEbookType(isMobi bool, isAwz3 bool) {
 // func ChangeVolumeState
 func (this *BookInfo) ChangeVolumeState(hasVolume bool) {
 	this.HasVolume = hasVolume
+}
+
+func (this BookInfo) PrintVolumeInfo() {
+	volumes := this.Volumes
+	for index := 0; index < len(volumes); index++ {
+		fmt.Printf("index = %d\n", index)
+		fmt.Printf("PrevChapterId= %d\n", volumes[index].PrevChapterId)
+		fmt.Printf("PrevChapter.Title = %s\n", volumes[index].PrevChapter.Title)
+		fmt.Printf("CurrentVolume = %s\n", volumes[index].CurrentVolume)
+	}
 }
 
 //生成txt电子书
@@ -292,11 +303,12 @@ func EbookDownloader(c *cli.Context) error {
 	isTxt := c.Bool("txt")
 	isMobi := c.Bool("mobi")
 	isAwz3 := c.Bool("awz3")
+	isPV := c.Bool("printvolume") //打印分卷信息，只用做调试时使用
 
 	var bookinfo BookInfo              //初始化变量
 	var EBDLInterface EBookDLInterface //初始化接口
 	//isTxt 或者 isMobi必须一个为真，或者两个都为真
-	if (isTxt || isMobi || isAwz3) || (isTxt && isMobi) || (isTxt && isAwz3) {
+	if (isTxt || isMobi || isAwz3) || (isTxt && isMobi) || (isTxt && isAwz3) || isPV {
 
 		if ebhost == "xsbiquge.com" {
 			xsbiquge := NewXSBiquge()
@@ -304,6 +316,9 @@ func EbookDownloader(c *cli.Context) error {
 		} else if ebhost == "999xs.com" {
 			xs999 := New999XS()
 			EBDLInterface = xs999 //实例化接口
+		} else if ebhost == "23us.la" {
+			xs23 := New23US()
+			EBDLInterface = xs23 //实例化接口
 		} else {
 			cli.ShowAppHelpAndExit(c, 0)
 			return nil
@@ -315,9 +330,14 @@ func EbookDownloader(c *cli.Context) error {
 		}
 		bookinfo = EBDLInterface.GetBookInfo(bookid, proxy)
 
-		//下载章节内容
-		fmt.Printf("正在下载电子书的相应章节，请耐心等待！\n")
-		bookinfo = EBDLInterface.DownloadChapters(bookinfo, proxy)
+		//打印分卷信息，只用于调试
+		if isPV {
+			bookinfo.PrintVolumeInfo()
+		} else {
+			//下载章节内容
+			fmt.Printf("正在下载电子书的相应章节，请耐心等待！\n")
+			bookinfo = EBDLInterface.DownloadChapters(bookinfo, proxy)
+		}
 		//生成txt文件
 		if isTxt {
 			fmt.Printf("\n正在生成txt版本的电子书，请耐心等待！\n")
@@ -358,17 +378,17 @@ func main() {
 		},
 	}
 	app.Copyright = "(c) 2019 - 2020 Jimes Yang<sndnvaps@gmail.com>"
-	app.Usage = "用于下载 笔趣阁(https://www.xsbiquge.com),999小说网(https://www.999xs.com/) 上面的电子书，并保存为txt格式或者(mobi格式,awz3格式)的电子书"
+	app.Usage = "用于下载 笔趣阁(https://www.xsbiquge.com),999小说网(https://www.999xs.com/) ,顶点小说网(https://www.23us.la) 上面的电子书，并保存为txt格式或者(mobi格式,awz3格式)的电子书"
 	app.Action = EbookDownloader
 	app.Flags = []cli.Flag{
 		cli.StringFlag{
 			Name:  "ebhost",
 			Value: "xsbiquge.com",
-			Usage: "定义下载ebook的网站地址(可选择xsbiquge.com,999xs.com)",
+			Usage: "定义下载ebook的网站地址(可选择xsbiquge.com,999xs.com,23us.la)",
 		},
 		cli.StringFlag{
 			Name:  "bookid,id",
-			Usage: "对应 笔趣阁id(https://www.xsbiquge.com/0_642/),其中0_642就是book_id;对应999小说网id(https://www.999xs.com/files/article/html/0/591/),其中591为book_id",
+			Usage: "对应笔趣阁id(https://www.xsbiquge.com/0_642/),其中0_642就是book_id;\n对应999小说网id(https://www.999xs.com/files/article/html/0/591/),其中591为book_id;\n对应顶点小说网id(https://www.23us.la/html/113/113444/),其中113444为bookid",
 		},
 		cli.StringFlag{
 			Name:  "proxy,p",
@@ -385,6 +405,10 @@ func main() {
 		cli.BoolFlag{
 			Name:  "awz3",
 			Usage: "当使用的时候，生成awz3文件(不可与--mobi同时使用)",
+		},
+		cli.BoolFlag{
+			Name:  "printvolume,pv",
+			Usage: "打印分卷信息，只于调试时使用！(使用此功能的时候，不会下载章节内容)",
 		},
 	}
 

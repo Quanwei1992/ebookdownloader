@@ -14,10 +14,11 @@
   .\ebookdownloader.exe --bookid=0_642 --txt #只生成txt文本
   .\ebookdownloader.exe --bookid=0_642 --mobi #只生成mobi电子书
   .\ebookdownloader.exe --bookid=0_642 --txt --mobi #生成txt 和 mobi
-    .\ebookdownloader.exe --bookid=0_642 --txt --awz3 #生成txt 和 awz3
+  .\ebookdownloader.exe --bookid=0_642 --txt --awz3 #生成txt 和 awz3
   .\ebookdownloader.exe --proxy="http://proxyip:proxyport" --bookid=0_642 --mobi #生成mobi电子书，在下载章节的过程中使用 Proxy
   .\ebookdownloader.exe --ebhost=xsbiquge.com --bookid=0_642 --txt --mobi #使用xsbiquge.com做为下载源，生成txt 和 mobi
-    .\ebookdownloader.exe --ebhost=999xs.com --bookid=0_642 --txt --mobi #使用999xs.com做为下载源，生成txt 和 mobi
+  .\ebookdownloader.exe --ebhost=999xs.com --bookid=0_642 --txt --mobi #使用999xs.com做为下载源，生成txt 和 mobi
+  .\ebookdownloader.exe --ebhost=23us.la --bookid=127064 --pv #新功能，用于打印小说的分卷信息，此时不下载小说任何内容
   .\ebookdownloader.exe --help #显示帮助信息
   ```
 
@@ -32,6 +33,10 @@
 
   ## 更新日志
 
+      2020.01.06 go版本 更新
+                 1. 添加顶点小说 23us.la支持
+                 2. 初始支持把分卷信息写入相应的volumes结构体当中（还没有正式测试生成二级目录功能)
+                 
       2020.01.05 go版本 更新
                  1. 实现二级目录直接写入 tpl_*.html文件当中
                  2. 添加tpl/tpl_volume.html 用于生成目录分卷
