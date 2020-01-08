@@ -7,6 +7,7 @@ import (
 	"os"
 	"path"
 	"strings"
+	"sync"
 	"time"
 
 	"github.com/Unknwon/com"
@@ -30,6 +31,7 @@ type Volume struct {
 	PrevChapter   Chapter
 	CurrentVolume string
 	NextChapterId int
+	NextChapter   Chapter
 }
 type Chapter struct {
 	Title   string
@@ -45,7 +47,7 @@ type ProxyChapter struct {
 //interface
 type EBookDLInterface interface {
 	GetBookInfo(bookid string, proxy string) BookInfo //获取小说的所有信息，包含小说名，作者，简介等信息
-	GetChapterContent(pc ProxyChapter) Chapter
+	DownloaderChapter(ResultChan chan chan Chapter, pc ProxyChapter, wg *sync.WaitGroup)
 	DownloadChapters(Bi BookInfo, proxy string) BookInfo
 }
 
@@ -73,13 +75,24 @@ func (this *BookInfo) ChangeVolumeState(hasVolume bool) {
 	this.HasVolume = hasVolume
 }
 
+//返回 HasVolume的状态，true,false
+func (this BookInfo) VolumeState() bool {
+	return this.HasVolume
+}
+
 func (this BookInfo) PrintVolumeInfo() {
 	volumes := this.Volumes
-	for index := 0; index < len(volumes); index++ {
-		fmt.Printf("index = %d\n", index)
-		fmt.Printf("PrevChapterId= %d\n", volumes[index].PrevChapterId)
-		fmt.Printf("PrevChapter.Title = %s\n", volumes[index].PrevChapter.Title)
-		fmt.Printf("CurrentVolume = %s\n", volumes[index].CurrentVolume)
+	if this.VolumeState() {
+		for index := 0; index < len(volumes); index++ {
+			fmt.Printf("index = %d\n", index)
+			fmt.Printf("PrevChapterId= %d\n", volumes[index].PrevChapterId)
+			fmt.Printf("PrevChapter.Title = %s\n", volumes[index].PrevChapter.Title)
+			fmt.Printf("CurrentVolume = %s\n", volumes[index].CurrentVolume)
+			fmt.Printf("NextChapterId= %d\n", volumes[index].NextChapterId)
+			fmt.Printf("NextChapter.Title = %s\n", volumes[index].NextChapter.Title)
+		}
+	} else {
+		fmt.Printf("没有找到本书的分卷信息")
 	}
 }
 
@@ -90,26 +103,24 @@ func (this BookInfo) GenerateTxt() {
 	content := ""             //用于存放（分卷、）章节内容
 	outfpath := "./outputs/"
 	outfname := outfpath + this.Name + "-" + this.Author + ".txt"
-	if len(volumes) > 0 && this.HasVolume {
-		for index := 0; index < len(chapters); index++ {
+
+	for index := 0; index < len(chapters); index++ {
+		if len(volumes) > 0 && this.VolumeState() {
 			for vindex := 0; vindex < len(volumes); vindex++ {
 
 				if volumes[vindex].PrevChapterId == index {
-					//fmt.Printf("volumes[vindex].PrevChapterId= %d\n", volumes[vindex].PrevChapterId) //用于测试
+					//fmt.Printf("volumes[vindex].NextChapterId= %d\n", volumes[vindex].PrevChapterId) //用于测试
 					//fmt.Printf("ChapterIndex =  %d\n", index)                                        //用于测试
+					//fmt.Printf("CurrentVolume = %s\n", volumes[vindex].CurrentVolume)                //用于测试
 					content += "\n" + "## " + volumes[vindex].CurrentVolume + " ##" + "\n"
 				}
 			}
-			content += "\n" + "### " + chapters[index].Title + " ###" + "\n" //每一章的标题，使用 ‘### 第n章 标题 ###’ 为格式
-			content += chapters[index].Content + "\n\n"                      //每一章内容的结尾，使用两个换行符
-
 		}
+		//fmt.Printf("Title = %s\n", chapters[index].Title)                //用于测试
+		//fmt.Printf("Content = %s\n", chapters[index].Content)            //用于测试
+		content += "\n" + "### " + chapters[index].Title + " ###" + "\n" //每一章的标题，使用 ‘### 第n章 标题 ###’ 为格式
+		content += chapters[index].Content + "\n\n"                      //每一章内容的结尾，使用两个换行符
 
-	} else {
-		for index := 0; index < len(chapters); index++ {
-			content += "\n" + "### " + chapters[index].Title + " ###" + "\n" //每一章的标题，使用 ‘### 第n章 标题 ###’ 为格式
-			content += chapters[index].Content + "\n\n"                      //每一章内容的结尾，使用两个换行符
-		}
 	}
 
 	WriteFile(outfname, []byte(content))
@@ -142,7 +153,7 @@ func (this BookInfo) GenerateMobi() {
 	//WriteFile(savepath+"/cover.html", []byte(cover))
 
 	//分卷
-	if this.HasVolume && len(Volumes) > 0 {
+	if this.VolumeState() && len(Volumes) > 0 {
 		for index := 0; index < len(Volumes); index++ {
 			vinfo := Volumes[index] //vinfo表示第一分卷信息
 			tpl_volume_tmp := tpl_volume
@@ -185,7 +196,7 @@ func (this BookInfo) GenerateMobi() {
 		WriteFile(cpath, []byte(chapter))
 
 		//分卷信息
-		if this.HasVolume && len(Volumes) > 0 {
+		if this.VolumeState() && len(Volumes) > 0 {
 			for vindex := 0; vindex < len(Volumes); vindex++ {
 				if Volumes[vindex].PrevChapterId == index {
 					//分卷信息,在book-toc.html中插入分卷信息
@@ -280,8 +291,8 @@ func (this BookInfo) GenerateMobi() {
 		outfname += ".awz3"
 	}
 	//-dont_append_source ,禁止mobi 文件中附加源文件
-	//cmd := exec.Command("./tools/kindlegen.exe", "-dont_append_source", savepath+"/content.opf", "-c2", "-o", outfname)
-	cmd := KindlegenCmd("-dont_append_source", savepath+"/content.opf", "-c2", "-o", outfname)
+	//cmd := exec.Command("./tools/kindlegen.exe", "-dont_append_source", savepath+"/content.opf", "-c1", "-o", outfname)
+	cmd := KindlegenCmd("-dont_append_source", savepath+"/content.opf", "-c1", "-o", outfname)
 	cmd.Run()
 
 	// 把生成的mobi文件复制到 outputs/目录下面
@@ -333,6 +344,7 @@ func EbookDownloader(c *cli.Context) error {
 		//打印分卷信息，只用于调试
 		if isPV {
 			bookinfo.PrintVolumeInfo()
+			return nil
 		} else {
 			//下载章节内容
 			fmt.Printf("正在下载电子书的相应章节，请耐心等待！\n")
@@ -365,12 +377,22 @@ func EbookDownloader(c *cli.Context) error {
 	return nil
 }
 
+//AsycChapter
+func AsycChapter(ResultChan chan chan Chapter, chapter chan Chapter) {
+	for {
+		c := <-ResultChan
+		tmp := <-c
+		chapter <- tmp
+	}
+
+}
+
 func main() {
 
 	app := cli.NewApp()
 	app.Name = "golang EBookDownloader"
 	app.Compiled = time.Now()
-	app.Version = "1.5.0"
+	app.Version = "1.6.0"
 	app.Authors = []cli.Author{
 		cli.Author{
 			Name:  "Jimes Yang",
