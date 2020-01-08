@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8" standalone="no"?>
+
+<package version="2.0" xmlns="http://www.idpf.org/2007/opf" unique-identifier="bookid">
+<metadata>
+<dc-metadata xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:opf="http://www.idpf.org/2007/opf">
+<dc:identifier id="bookid">11111</dc:identifier>
+<dc:title>我是谁</dc:title>
+<dc:creator opf:file-as="sndnvaps" opf:role="aut">sndnvaps</dc:creator>
+<dc:date>2020-01-03 23:31:10</dc:date>
+<dc:description>这是我随便写的测试内容简介！</dc:description>
+<dc:publisher>sndnvaps</dc:publisher>
+<dc:rights>Created with Ebookdownloader v1.4.0</dc:rights>
+<dc:language>zh-CN</dc:language>
+</dc-metadata>
+<meta name="cover" content="Cover" />
+<x-metadata>
+<output encoding="utf-8"></output>
+</x-metadata>
+</metadata>
+<manifest>
+<item id="ncxtoc" href="toc.ncx" media-type="application/x-dtbncx+xml"/>
+<item id="htmltoc"  href="book-toc.html" media-type="application/xhtml+xml"/>
+<item id="css" href="style.css" media-type="text/css"/>
+<item id="volume0" href="volume0.html" media-type="application/xhtml+xml"/>
+<item id="chapter0" href="chapter0.html" media-type="application/xhtml+xml"/>
+<item id="chapter1" href="chapter1.html" media-type="application/xhtml+xml"/>
+<item id="volume1" href="volume1.html" media-type="application/xhtml+xml"/>
+<item id="chapter2" href="chapter2.html" media-type="application/xhtml+xml"/>
+
+<item id="Cover" media-type="image/jpeg" href="cover.jpg"/>
+</manifest>
+<spine toc="ncxtoc">
+<itemref idref="htmltoc" linear="yes"/>
+<itemref idref="volume0" linear="yes"/>
+<itemref idref="chapter0" linear="yes"/>
+<itemref idref="chapter1" linear="yes"/>
+<itemref idref="volume1" linear="yes"/>
+<itemref idref="chapter2" linear="yes"/>
+
+</spine>
+<guide>
+<reference href="book-toc.html" type="toc" title="Table Of Contents"/>
+<reference href="volume0.html" type="text" title="Beginning"/>
+</guide>
+</package>

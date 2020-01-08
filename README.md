@@ -14,10 +14,11 @@
   .\ebookdownloader.exe --bookid=0_642 --txt #只生成txt文本
   .\ebookdownloader.exe --bookid=0_642 --mobi #只生成mobi电子书
   .\ebookdownloader.exe --bookid=0_642 --txt --mobi #生成txt 和 mobi
-    .\ebookdownloader.exe --bookid=0_642 --txt --awz3 #生成txt 和 awz3
+  .\ebookdownloader.exe --bookid=0_642 --txt --awz3 #生成txt 和 awz3
   .\ebookdownloader.exe --proxy="http://proxyip:proxyport" --bookid=0_642 --mobi #生成mobi电子书，在下载章节的过程中使用 Proxy
   .\ebookdownloader.exe --ebhost=xsbiquge.com --bookid=0_642 --txt --mobi #使用xsbiquge.com做为下载源，生成txt 和 mobi
-    .\ebookdownloader.exe --ebhost=999xs.com --bookid=0_642 --txt --mobi #使用999xs.com做为下载源，生成txt 和 mobi
+  .\ebookdownloader.exe --ebhost=999xs.com --bookid=0_642 --txt --mobi #使用999xs.com做为下载源，生成txt 和 mobi
+  .\ebookdownloader.exe --ebhost=23us.la --bookid=127064 --pv #新功能，用于打印小说的分卷信息，此时不下载小说任何内容
   .\ebookdownloader.exe --help #显示帮助信息
   ```
 
@@ -32,6 +33,24 @@
 
   ## 更新日志
 
+      2019.01.08 go版本 更新
+                 1. 版本升级为 v1.6.0
+                 2. 完成生成二级目录功能(目前只有顶点小说网支持这个功能)
+                 3. 修改下载章节的方法，现在使用 gorountine,多并发下载
+                 
+      2020.01.06 go版本 更新
+                 1. 添加顶点小说 23us.la支持
+                 2. 初始支持把分卷信息写入相应的volumes结构体当中（还没有正式测试生成二级目录功能)
+                 
+      2020.01.05 go版本 更新
+                 1. 实现二级目录直接写入 tpl_*.html文件当中
+                 2. 添加tpl/tpl_volume.html 用于生成目录分卷
+                 3. 实现mobi格式二级目录的生成（网站捉取二级目录部分，正在努力实现）
+
+      2020.01.04 go版本 更新
+                 1. 初始化 kindle二级目录支持代码(具体功能还在实现)
+                 2. 更新ebookdl_test.go: 实例化 二级目录txt支持
+                 
       2020.01.03 go版本 更新
                   1. 修改生成电子书的压缩比为-c2,使生成的文件更小
                   2. 添加生成awz3格式支持(注意，--mobi,--awz3只能使用一个，不能同时使用)
@@ -61,3 +80,4 @@
 
      [√]  1.添加生成封面功能
      [√]  2. 添加不同平台的接口实现
+     [√]  3. 添加生成二级目录的方法(已经添加相应的实例)

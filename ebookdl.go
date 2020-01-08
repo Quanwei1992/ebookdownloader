@@ -7,6 +7,7 @@ import (
 	"os"
 	"path"
 	"strings"
+	"sync"
 	"time"
 
 	"github.com/Unknwon/com"
@@ -18,11 +19,20 @@ type BookInfo struct {
 	Name        string
 	Author      string
 	Description string
-	IsMobi      bool //当为true的时候生成mobi
-	IsAwz3      bool //当为true的时候生成awz3,
-	Chapters    []Chapter
+	IsMobi      bool      //当为true的时候生成mobi
+	IsAwz3      bool      //当为true的时候生成awz3,
+	HasVolume   bool      //是否有小说分卷，默认为false；当设置为true的时候，Volumes里面需要包含分卷信息
+	Volumes     []Volume  //小说分卷信息，一般不设置
+	Chapters    []Chapter //小说章节信息
 }
 
+type Volume struct {
+	PrevChapterId int
+	PrevChapter   Chapter
+	CurrentVolume string
+	NextChapterId int
+	NextChapter   Chapter
+}
 type Chapter struct {
 	Title   string
 	Content string
@@ -37,7 +47,7 @@ type ProxyChapter struct {
 //interface
 type EBookDLInterface interface {
 	GetBookInfo(bookid string, proxy string) BookInfo //获取小说的所有信息，包含小说名，作者，简介等信息
-	GetChapterContent(pc ProxyChapter) Chapter
+	DownloaderChapter(ResultChan chan chan Chapter, pc ProxyChapter, wg *sync.WaitGroup)
 	DownloadChapters(Bi BookInfo, proxy string) BookInfo
 }
 
@@ -59,15 +69,58 @@ func (this *BookInfo) SetKindleEbookType(isMobi bool, isAwz3 bool) {
 	this.IsAwz3 = isAwz3
 }
 
+//设置 是否包含分卷信息
+// func ChangeVolumeState
+func (this *BookInfo) ChangeVolumeState(hasVolume bool) {
+	this.HasVolume = hasVolume
+}
+
+//返回 HasVolume的状态，true,false
+func (this BookInfo) VolumeState() bool {
+	return this.HasVolume
+}
+
+func (this BookInfo) PrintVolumeInfo() {
+	volumes := this.Volumes
+	if this.VolumeState() {
+		for index := 0; index < len(volumes); index++ {
+			fmt.Printf("index = %d\n", index)
+			fmt.Printf("PrevChapterId= %d\n", volumes[index].PrevChapterId)
+			fmt.Printf("PrevChapter.Title = %s\n", volumes[index].PrevChapter.Title)
+			fmt.Printf("CurrentVolume = %s\n", volumes[index].CurrentVolume)
+			fmt.Printf("NextChapterId= %d\n", volumes[index].NextChapterId)
+			fmt.Printf("NextChapter.Title = %s\n", volumes[index].NextChapter.Title)
+		}
+	} else {
+		fmt.Printf("没有找到本书的分卷信息")
+	}
+}
+
 //生成txt电子书
 func (this BookInfo) GenerateTxt() {
-	chapters := this.Chapters
-	content := "" //用于存放章节内容
+	chapters := this.Chapters //小说的章节信息
+	volumes := this.Volumes   //小说的分卷信息
+	content := ""             //用于存放（分卷、）章节内容
 	outfpath := "./outputs/"
 	outfname := outfpath + this.Name + "-" + this.Author + ".txt"
+
 	for index := 0; index < len(chapters); index++ {
+		if len(volumes) > 0 && this.VolumeState() {
+			for vindex := 0; vindex < len(volumes); vindex++ {
+
+				if volumes[vindex].PrevChapterId == index {
+					//fmt.Printf("volumes[vindex].NextChapterId= %d\n", volumes[vindex].PrevChapterId) //用于测试
+					//fmt.Printf("ChapterIndex =  %d\n", index)                                        //用于测试
+					//fmt.Printf("CurrentVolume = %s\n", volumes[vindex].CurrentVolume)                //用于测试
+					content += "\n" + "## " + volumes[vindex].CurrentVolume + " ##" + "\n"
+				}
+			}
+		}
+		//fmt.Printf("Title = %s\n", chapters[index].Title)                //用于测试
+		//fmt.Printf("Content = %s\n", chapters[index].Content)            //用于测试
 		content += "\n" + "### " + chapters[index].Title + " ###" + "\n" //每一章的标题，使用 ‘### 第n章 标题 ###’ 为格式
 		content += chapters[index].Content + "\n\n"                      //每一章内容的结尾，使用两个换行符
+
 	}
 
 	WriteFile(outfname, []byte(content))
@@ -75,10 +128,12 @@ func (this BookInfo) GenerateTxt() {
 
 //生成mobi格式电子书
 func (this BookInfo) GenerateMobi() {
-	chapters := this.Chapters
+	chapters := this.Chapters //章节信息
+	Volumes := this.Volumes   //分卷信息
 	//tpl_cover := ReadAllString("./tpls/tpl_cover.html")
 	tpl_book_toc := ReadAllString("./tpls/tpl_book_toc.html")
 	tpl_chapter := ReadAllString("./tpls/tpl_chapter.html")
+	tpl_volume := ReadAllString("./tpls/tpl_volume.html")
 	tpl_content := ReadAllString("./tpls/tpl_content.opf")
 	tpl_style := ReadAllString("./tpls/tpl_style.css")
 	tpl_toc := ReadAllString("./tpls/tpl_toc.ncx")
@@ -97,11 +152,27 @@ func (this BookInfo) GenerateMobi() {
 	//cover = strings.Replace(cover, "___BOOK_AUTHOR___", this.Author, -1)
 	//WriteFile(savepath+"/cover.html", []byte(cover))
 
+	//分卷
+	if this.VolumeState() && len(Volumes) > 0 {
+		for index := 0; index < len(Volumes); index++ {
+			vinfo := Volumes[index] //vinfo表示第一分卷信息
+			tpl_volume_tmp := tpl_volume
+			volumeid := fmt.Sprintf("Volume%d", index)
+			volume := strings.Replace(tpl_volume_tmp, "___VOLUME_ID___", volumeid, -1)
+			volume = strings.Replace(volume, "___VOLUME_NAME___", vinfo.CurrentVolume, -1)
+			cpath := fmt.Sprintf("%s/volume%d.html", savepath, index)
+			WriteFile(cpath, []byte(volume))
+		}
+	}
+
 	// 章节
 	toc_content := ""
 	nax_toc_content := ""
 	opf_toc := ""
 	opf_spine := ""
+	toc_line := ""
+	nax_toc_line := ""
+	opf_toc_line := ""
 	for index := 0; index < len(chapters); index++ {
 		// cinfo表示第一个章节的内容
 		cinfo := chapters[index]
@@ -124,11 +195,38 @@ func (this BookInfo) GenerateMobi() {
 
 		WriteFile(cpath, []byte(chapter))
 
-		toc_line := fmt.Sprintf("<dt class=\"tocl2\"><a href=\"chapter%d.html\">%s</a></dt>\n", index, cinfo.Title)
+		//分卷信息
+		if this.VolumeState() && len(Volumes) > 0 {
+			for vindex := 0; vindex < len(Volumes); vindex++ {
+				if Volumes[vindex].PrevChapterId == index {
+					//分卷信息,在book-toc.html中插入分卷信息
+					toc_line = fmt.Sprintf("<dt class=\"tocl1\"><a href=\"volume%d.html\">%s</a></dt>\n", vindex, Volumes[vindex].CurrentVolume)
+					toc_content = toc_content + toc_line
+
+					//分卷信息，在toc.ncx中插入分卷信息
+					nax_toc_line = fmt.Sprintf("<navPoint id=\"volume%d\" playOrder=\"%d\">\n", vindex, vindex+1)
+					nax_toc_content = nax_toc_content + nax_toc_line
+
+					nax_toc_line = fmt.Sprintf("<navLabel><text>%s</text></navLabel>\n", Volumes[vindex].CurrentVolume)
+					nax_toc_content = nax_toc_content + nax_toc_line
+
+					nax_toc_line = fmt.Sprintf("<content src=\"volume%d.html\"/>\n</navPoint>\n", vindex)
+					nax_toc_content = nax_toc_content + nax_toc_line
+
+					//分卷信息,在content.opf中插入分卷信息
+					opf_toc_line = fmt.Sprintf("<item id=\"volume%d\" href=\"volume%d.html\" media-type=\"application/xhtml+xml\"/>\n", vindex, vindex)
+					opf_toc = opf_toc + opf_toc_line
+
+					opf_spine_line := fmt.Sprintf("<itemref idref=\"volume%d\" linear=\"yes\"/>\n", vindex)
+					opf_spine = opf_spine + opf_spine_line
+				}
+			}
+		}
+		toc_line = fmt.Sprintf("<dt class=\"tocl2\"><a href=\"chapter%d.html\">%s</a></dt>\n", index, cinfo.Title)
 		toc_content = toc_content + toc_line
 
 		// nax_toc
-		nax_toc_line := fmt.Sprintf("<navPoint id=\"chapter%d\" playOrder=\"%d\">\n", index, index+1)
+		nax_toc_line = fmt.Sprintf("<navPoint id=\"chapter%d\" playOrder=\"%d\">\n", index, index+1)
 		nax_toc_content = nax_toc_content + nax_toc_line
 
 		nax_toc_line = fmt.Sprintf("<navLabel><text>%s</text></navLabel>\n", cinfo.Title)
@@ -137,7 +235,7 @@ func (this BookInfo) GenerateMobi() {
 		nax_toc_line = fmt.Sprintf("<content src=\"chapter%d.html\"/>\n</navPoint>\n", index)
 		nax_toc_content = nax_toc_content + nax_toc_line
 
-		opf_toc_line := fmt.Sprintf("<item id=\"chapter%d\" href=\"chapter%d.html\" media-type=\"application/xhtml+xml\"/>\n", index, index)
+		opf_toc_line = fmt.Sprintf("<item id=\"chapter%d\" href=\"chapter%d.html\" media-type=\"application/xhtml+xml\"/>\n", index, index)
 		opf_toc = opf_toc + opf_toc_line
 
 		opf_spine_line := fmt.Sprintf("<itemref idref=\"chapter%d\" linear=\"yes\"/>\n", index)
@@ -216,11 +314,12 @@ func EbookDownloader(c *cli.Context) error {
 	isTxt := c.Bool("txt")
 	isMobi := c.Bool("mobi")
 	isAwz3 := c.Bool("awz3")
+	isPV := c.Bool("printvolume") //打印分卷信息，只用做调试时使用
 
 	var bookinfo BookInfo              //初始化变量
 	var EBDLInterface EBookDLInterface //初始化接口
 	//isTxt 或者 isMobi必须一个为真，或者两个都为真
-	if (isTxt || isMobi || isAwz3) || (isTxt && isMobi) || (isTxt && isAwz3) {
+	if (isTxt || isMobi || isAwz3) || (isTxt && isMobi) || (isTxt && isAwz3) || isPV {
 
 		if ebhost == "xsbiquge.com" {
 			xsbiquge := NewXSBiquge()
@@ -228,6 +327,9 @@ func EbookDownloader(c *cli.Context) error {
 		} else if ebhost == "999xs.com" {
 			xs999 := New999XS()
 			EBDLInterface = xs999 //实例化接口
+		} else if ebhost == "23us.la" {
+			xs23 := New23US()
+			EBDLInterface = xs23 //实例化接口
 		} else {
 			cli.ShowAppHelpAndExit(c, 0)
 			return nil
@@ -239,9 +341,15 @@ func EbookDownloader(c *cli.Context) error {
 		}
 		bookinfo = EBDLInterface.GetBookInfo(bookid, proxy)
 
-		//下载章节内容
-		fmt.Printf("正在下载电子书的相应章节，请耐心等待！\n")
-		bookinfo = EBDLInterface.DownloadChapters(bookinfo, proxy)
+		//打印分卷信息，只用于调试
+		if isPV {
+			bookinfo.PrintVolumeInfo()
+			return nil
+		} else {
+			//下载章节内容
+			fmt.Printf("正在下载电子书的相应章节，请耐心等待！\n")
+			bookinfo = EBDLInterface.DownloadChapters(bookinfo, proxy)
+		}
 		//生成txt文件
 		if isTxt {
 			fmt.Printf("\n正在生成txt版本的电子书，请耐心等待！\n")
@@ -269,12 +377,22 @@ func EbookDownloader(c *cli.Context) error {
 	return nil
 }
 
+//AsycChapter
+func AsycChapter(ResultChan chan chan Chapter, chapter chan Chapter) {
+	for {
+		c := <-ResultChan
+		tmp := <-c
+		chapter <- tmp
+	}
+
+}
+
 func main() {
 
 	app := cli.NewApp()
 	app.Name = "golang EBookDownloader"
 	app.Compiled = time.Now()
-	app.Version = "1.5.0"
+	app.Version = "1.6.0"
 	app.Authors = []cli.Author{
 		cli.Author{
 			Name:  "Jimes Yang",
@@ -282,17 +400,17 @@ func main() {
 		},
 	}
 	app.Copyright = "(c) 2019 - 2020 Jimes Yang<sndnvaps@gmail.com>"
-	app.Usage = "用于下载 笔趣阁(https://www.xsbiquge.com),999小说网(https://www.999xs.com/) 上面的电子书，并保存为txt格式或者(mobi格式,awz3格式)的电子书"
+	app.Usage = "用于下载 笔趣阁(https://www.xsbiquge.com),999小说网(https://www.999xs.com/) ,顶点小说网(https://www.23us.la) 上面的电子书，并保存为txt格式或者(mobi格式,awz3格式)的电子书"
 	app.Action = EbookDownloader
 	app.Flags = []cli.Flag{
 		cli.StringFlag{
 			Name:  "ebhost",
 			Value: "xsbiquge.com",
-			Usage: "定义下载ebook的网站地址(可选择xsbiquge.com,999xs.com)",
+			Usage: "定义下载ebook的网站地址(可选择xsbiquge.com,999xs.com,23us.la)",
 		},
 		cli.StringFlag{
 			Name:  "bookid,id",
-			Usage: "对应 笔趣阁id(https://www.xsbiquge.com/0_642/),其中0_642就是book_id;对应999小说网id(https://www.999xs.com/files/article/html/0/591/),其中591为book_id",
+			Usage: "对应笔趣阁id(https://www.xsbiquge.com/0_642/),其中0_642就是book_id;\n对应999小说网id(https://www.999xs.com/files/article/html/0/591/),其中591为book_id;\n对应顶点小说网id(https://www.23us.la/html/113/113444/),其中113444为bookid",
 		},
 		cli.StringFlag{
 			Name:  "proxy,p",
@@ -309,6 +427,10 @@ func main() {
 		cli.BoolFlag{
 			Name:  "awz3",
 			Usage: "当使用的时候，生成awz3文件(不可与--mobi同时使用)",
+		},
+		cli.BoolFlag{
+			Name:  "printvolume,pv",
+			Usage: "打印分卷信息，只于调试时使用！(使用此功能的时候，不会下载章节内容)",
 		},
 	}
 

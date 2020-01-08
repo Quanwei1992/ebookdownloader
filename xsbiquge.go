@@ -166,42 +166,102 @@ func excuteServe(p *pool.Pool, chapters []Chapter, proxy string) {
 //根据每个章节的 url连接，下载每章对应的内容Content当中
 func (this EbookXSBiquge) DownloadChapters(Bi BookInfo, proxy string) BookInfo {
 	chapters := Bi.Chapters
+
 	NumChapter := len(chapters)
-	ch := make(chan Chapter, 1)
-	locker := sync.Mutex{}
+	tmpChapter := make(chan Chapter, NumChapter)
+	ResultCh := make(chan chan Chapter, NumChapter)
+	wg := sync.WaitGroup{}
+	var c []Chapter
 	var bar *progressbar.ProgressBar
+	go AsycChapter(ResultCh, tmpChapter)
+	for index := 0; index < NumChapter; index++ {
+		tmp := ProxyChapter{
+			Proxy: proxy,
+			C:     chapters[index],
+		}
+		this.DownloaderChapter(ResultCh, tmp, &wg)
+	}
 
-	sp := pool.NewPool(0, func(obj interface{}) {
-		locker.Lock()
-		tmp := obj.(ProxyChapter)
-		content := this.GetChapterContent(tmp)
-		locker.Unlock()
-		ch <- content
-
-	})
-
-	go excuteServe(&sp, chapters, proxy)
+	wg.Wait()
 
 	//下载章节的时候显示进度条
 	bar = progressbar.New(NumChapter)
 	bar.RenderBlank()
 
-	for i := 0; i < len(chapters); {
+	for index := 0; index < NumChapter; {
 		select {
-		case c := <-ch:
-			chapters[i].Content = c.Content
-			i++
+		case tmp := <-tmpChapter:
+			//fmt.Printf("tmp.Title = %s\n", tmp.Title)
+			//fmt.Printf("tmp.Content= %s\n", tmp.Content)
+			c = append(c, tmp)
+			index++
+			if index == (NumChapter - 1) {
+				goto ForEnd
+			}
 		}
 		bar.Add(1)
+
 	}
-	sp.Close()
+ForEnd:
 
 	result := BookInfo{
 		Name:        Bi.Name,
 		Author:      Bi.Author,
 		Description: Bi.Description,
-		Chapters:    chapters,
+		Volumes:     Bi.Volumes,       //小说分卷信息在 GetBookInfo()的时候已经下载完成
+		HasVolume:   Bi.VolumeState(), //小说分卷信息在 GetBookInfo()的时候已经定义
+		Chapters:    c,
 	}
 
 	return result
+}
+
+//func DownloaderChapter(ResultChan chan chan Chapter)
+func (this EbookXSBiquge) DownloaderChapter(ResultChan chan chan Chapter, pc ProxyChapter, wg *sync.WaitGroup) {
+	c := make(chan Chapter)
+	ResultChan <- c
+	wg.Add(1)
+	go func(pc ProxyChapter) {
+		pollURL := pc.C.Link
+		proxy := pc.Proxy
+		var result Chapter
+
+		if proxy != "" {
+			doc, _ := htmlquery.LoadURLWithProxy(pollURL, proxy)
+			contentNode, _ := htmlquery.FindOne(doc, "//div[@id='content']")
+			contentText := htmlquery.InnerText(contentNode)
+
+			//替换字符串中的特殊字符 \xC2\xA0 为换行符 \n
+			tmp := strings.Replace(contentText, "\xC2\xA0", "\r\n", -1)
+
+			//把 readx(); 替换成 ""
+			tmp = strings.Replace(tmp, "readx();", "", -1)
+			//tmp = tmp + "\r\n"
+			//返回数据，填写Content内容
+			result = Chapter{
+				Title:   pc.C.Title,
+				Link:    pc.C.Link,
+				Content: tmp,
+			}
+		} else {
+			doc, _ := htmlquery.LoadURL(pollURL)
+			contentNode, _ := htmlquery.FindOne(doc, "//div[@id='content']")
+			contentText := htmlquery.InnerText(contentNode)
+
+			//替换字符串中的特殊字符 \xC2\xA0 为换行符 \n
+			tmp := strings.Replace(contentText, "\xC2\xA0", "\r\n", -1)
+
+			//把 readx(); 替换成 ""
+			tmp = strings.Replace(tmp, "readx();", "", -1)
+			//tmp = tmp + "\r\n"
+			//返回数据，填写Content内容
+			result = Chapter{
+				Title:   pc.C.Title,
+				Link:    pc.C.Link,
+				Content: tmp,
+			}
+		}
+		c <- result
+		wg.Done()
+	}(pc)
 }
