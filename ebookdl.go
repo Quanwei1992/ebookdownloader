@@ -20,7 +20,7 @@ type BookInfo struct {
 	Author      string
 	Description string
 	IsMobi      bool      //当为true的时候生成mobi
-	IsAwz3      bool      //当为true的时候生成awz3,
+	IsAzw3      bool      //当为true的时候生成azw3,
 	HasVolume   bool      //是否有小说分卷，默认为false；当设置为true的时候，Volumes里面需要包含分卷信息
 	Volumes     []Volume  //小说分卷信息，一般不设置
 	Chapters    []Chapter //小说章节信息
@@ -64,9 +64,9 @@ func WriteFile(filename string, data []byte) error {
 
 //设置生成mobi格式，或者生成awz3格式
 //现在设置，mobi和awz3格式不能同时设置为true
-func (this *BookInfo) SetKindleEbookType(isMobi bool, isAwz3 bool) {
+func (this *BookInfo) SetKindleEbookType(isMobi bool, isAzw3 bool) {
 	this.IsMobi = isMobi
-	this.IsAwz3 = isAwz3
+	this.IsAzw3 = isAzw3
 }
 
 //设置 是否包含分卷信息
@@ -270,8 +270,8 @@ func (this BookInfo) GenerateMobi() {
 	//把修改内容写入到content.opf文件中
 	WriteFile(savepath+"/content.opf", []byte(opf_content))
 
-	if !com.IsExist("./outputs") {
-		os.MkdirAll(path.Dir("./outputs"), os.ModePerm)
+	if !com.IsExist("./outputs/") {
+		os.MkdirAll(path.Dir("./outputs/"), os.ModePerm)
 	}
 
 	//把封面复制到 tmp 目录当中
@@ -287,8 +287,8 @@ func (this BookInfo) GenerateMobi() {
 	if this.IsMobi {
 		outfname += ".mobi"
 	}
-	if this.IsAwz3 {
-		outfname += ".awz3"
+	if this.IsAzw3 {
+		outfname += ".azw3"
 	}
 	//-dont_append_source ,禁止mobi 文件中附加源文件
 	//cmd := exec.Command("./tools/kindlegen.exe", "-dont_append_source", savepath+"/content.opf", "-c2", "-o", outfname)
@@ -313,13 +313,13 @@ func EbookDownloader(c *cli.Context) error {
 
 	isTxt := c.Bool("txt")
 	isMobi := c.Bool("mobi")
-	isAwz3 := c.Bool("awz3")
+	isAzw3 := c.Bool("azw3")
 	isPV := c.Bool("printvolume") //打印分卷信息，只用做调试时使用
 
 	var bookinfo BookInfo              //初始化变量
 	var EBDLInterface EBookDLInterface //初始化接口
 	//isTxt 或者 isMobi必须一个为真，或者两个都为真
-	if (isTxt || isMobi || isAwz3) || (isTxt && isMobi) || (isTxt && isAwz3) || isPV {
+	if (isTxt || isMobi || isAzw3) || (isTxt && isMobi) || (isTxt && isAzw3) || isPV {
 
 		if ebhost == "xsbiquge.com" {
 			xsbiquge := NewXSBiquge()
@@ -334,8 +334,8 @@ func EbookDownloader(c *cli.Context) error {
 			cli.ShowAppHelpAndExit(c, 0)
 			return nil
 		}
-		// isMobi && isAwz3 当同时为真的时候，退出进程
-		if isMobi && isAwz3 {
+		// isMobi && isAzw3 当同时为真的时候，退出进程
+		if isMobi && isAzw3 {
 			cli.ShowAppHelpAndExit(c, 0)
 			return nil
 		}
@@ -358,13 +358,13 @@ func EbookDownloader(c *cli.Context) error {
 		//生成mobi格式电子书
 		if isMobi {
 			fmt.Printf("\n正在生成mobi版本的电子书，请耐心等待！\n")
-			bookinfo.SetKindleEbookType(true /* isMobi */, false /* isAwz3 */)
+			bookinfo.SetKindleEbookType(true /* isMobi */, false /* isAzw3 */)
 			bookinfo.GenerateMobi()
 		}
 		//生成awz3格式电子书
-		if isAwz3 {
-			fmt.Printf("\n正在生成Awz3版本的电子书，请耐心等待！\n")
-			bookinfo.SetKindleEbookType(false /* isMobi */, true /* isAwz3 */)
+		if isAzw3 {
+			fmt.Printf("\n正在生成Azw3版本的电子书，请耐心等待！\n")
+			bookinfo.SetKindleEbookType(false /* isMobi */, true /* isAzw3 */)
 			bookinfo.GenerateMobi()
 		}
 
@@ -422,11 +422,11 @@ func main() {
 		},
 		cli.BoolFlag{
 			Name:  "mobi",
-			Usage: "当使用的时候，生成mobi文件(不可与--awz3同时使用)",
+			Usage: "当使用的时候，生成mobi文件(不可与--azw3同时使用)",
 		},
 		cli.BoolFlag{
-			Name:  "awz3",
-			Usage: "当使用的时候，生成awz3文件(不可与--mobi同时使用)",
+			Name:  "azw3",
+			Usage: "当使用的时候，生成azw3文件(不可与--mobi同时使用)",
 		},
 		cli.BoolFlag{
 			Name:  "printvolume,pv",
