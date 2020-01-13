@@ -291,8 +291,8 @@ func (this BookInfo) GenerateMobi() {
 		outfname += ".azw3"
 	}
 	//-dont_append_source ,禁止mobi 文件中附加源文件
-	//cmd := exec.Command("./tools/kindlegen.exe", "-dont_append_source", savepath+"/content.opf", "-c2", "-o", outfname)
-	cmd := KindlegenCmd("-dont_append_source", savepath+"/content.opf", "-c2", "-o", outfname)
+	//cmd := exec.Command("./tools/kindlegen.exe", "-dont_append_source", savepath+"/content.opf", "-c1", "-o", outfname)
+	cmd := KindlegenCmd("-dont_append_source", savepath+"/content.opf", "-c1", "-o", outfname)
 	cmd.Run()
 
 	// 把生成的mobi文件复制到 outputs/目录下面
