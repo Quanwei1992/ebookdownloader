@@ -26,6 +26,7 @@
     1. kindlegen.exe 支持windows平台
     2. kindlegenLinux 支持Linux 平台
     3. kindlegenMac 支持 Mac平台
+    4. cli/gui 两个项目，都需要在运行目录里面放置 fonts/fzytk.ttf 字体
 
   ## 懒人模式，直接下载编译好的程序
   
@@ -33,8 +34,12 @@
 
   ## 更新日志
 
+      2020.01.23 go版本 更新
+                 1. 使用 github.com/AllenDang/giu 库，重新构建 gui界面
+                 2. 编译命令 cd gui;build.[cmd|sh]。文件生成后，会复制到根目录
+                 
       2020.01.22 go版本 更新
-                 1. 分离出命令行版本cli,编译命令 cd cli;build.[cmd|sh]
+                 1. 分离出命令行版本cli,编译命令 cd cli;build.[cmd|sh]。文件生成后，会复制到根目录
                  2. 界面版本gui,立项目
                  3. 添加go mod支持
 
