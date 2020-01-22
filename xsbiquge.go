@@ -1,4 +1,4 @@
-package main
+package ebookdownloader
 
 import (
 	"fmt"
@@ -7,8 +7,7 @@ import (
 	"strings"
 
 	"github.com/Aiicy/htmlquery"
-	pool "github.com/dgrr/goslaves"
-	"gopkg.in/schollz/progressbar.v2"
+	"github.com/schollz/progressbar/v2"
 )
 
 //新笔趣阁 xsbiquge.com
@@ -151,16 +150,6 @@ func (this EbookXSBiquge) GetChapterContent(pc ProxyChapter) Chapter {
 	}
 
 	return result
-}
-
-func excuteServe(p *pool.Pool, chapters []Chapter, proxy string) {
-	for i := 0; i < len(chapters); i++ {
-		tmp := ProxyChapter{
-			Proxy: proxy,
-			C:     chapters[i],
-		}
-		p.Serve(tmp)
-	}
 }
 
 //根据每个章节的 url连接，下载每章对应的内容Content当中

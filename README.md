@@ -7,7 +7,7 @@
 
   ## 安装方法
   ```bash
-  go get github.com/sndnvaps/ebookdownloader
+  go get github.com/sndnvaps/ebookdownloader/cli
   ```
   ## 使用方法
   ```bash
@@ -32,6 +32,11 @@
   到[这里](https://github.com/sndnvaps/ebookdownloader/releases)下载你需要的版本
 
   ## 更新日志
+
+      2020.01.22 go版本 更新
+                 1. 分离出命令行版本cli,编译命令 cd cli;build.[cmd|sh]
+                 2. 界面版本gui,立项目
+                 3. 添加go mod支持
 
       2020.01.13 go版本 更新
                  1. 修复潜在问题，无法生成 ./outputs目录
@@ -87,3 +92,4 @@
      [√]  1.添加生成封面功能
      [√]  2. 添加不同平台的接口实现
      [√]  3. 添加生成二级目录的方法(已经添加相应的实例)
+     [ ]  4. 添加界面版本gui
