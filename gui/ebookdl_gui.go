@@ -76,6 +76,8 @@ func EbookDownloaderRun() {
 	author = bookinfo.Author
 	multiline = bookinfo.Description
 
+	bookinfo = EBDLInterface.DownloadChapters(bookinfo, proxy)
+
 	if isTxt {
 		bookinfo.GenerateTxt()
 	}

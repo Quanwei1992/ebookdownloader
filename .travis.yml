@@ -16,11 +16,11 @@ before_script:
    - git config --global user.email sndnvaps@gmail.com
 
 script:
-   - if [ "$TRAVIS_OS_NAME" = "linux" ]; then GOOS=linux  GOARCH=amd64 go build -o ebookdownloader-linux-amd64;fi
-   - if [ "TRAVIS_OS_NAME" = "osx" ]; then GOOS=darwin GOARCH=amd64 go build -o ebookdownloader-darwin-amd64;fi
-   - if [ "TRAVIS_OS_NAME" = "windows" ]; then GOOS=windows GOARCH=amd64 go build -o ebookdownloader-windows-amd64.exe;fi
+   - if [ "$TRAVIS_OS_NAME" = "linux" ]; then cd cli && GOOS=linux  GOARCH=amd64 go build -ldflags "-X main.Commit=$(git rev-parse --short HEAD) -X 'main.BuildTime=${date +%Y-%m-%d\ %H:%M}'" -o ebookdownloader_cli && cp ebookdownloader_linux_-amd64-cli ../ ;fi
+   - if [ "TRAVIS_OS_NAME" = "osx" ]; then cd cli && GOOS=darwin  GOARCH=amd64 go build -ldflags "-X main.Commit=$(git rev-parse --short HEAD) -X 'main.BuildTime=${date +%Y-%m-%d\ %H:%M}'" -o ebookdownloader_cli && cp ebookdownloader_darwin_-amd64-cli ../ ;fi
+   - if [ "TRAVIS_OS_NAME" = "windows" ]; then set GOOS=windows && set GOARCH=amd64 && set CURRENT_DATE=%date:~0,4%-%date:~5,2%-%date:~8,2% && set  set CURRENT_TIME=%time:~0,2%:%time:~3,2%:%time:~6,2% && set buildtime=%CURRENT_DATE%-%CURRENT_TIME% && for /F %%i in ('git rev-parse --short HEAD') do ( set commitid=%%i) &&  go build -ldflags "-X main.Commit=%commitid% -X main.BuildTime=%buildtime%" -o ebookdownloader_windows_-amd64-cli.exe;fi
 
 after_success:
-   - if [ "$TRAVIS_OS_NAME" = "linux" ]; then 7z a -tzip ebookdownloader-linux-amd64.zip tools/kindlegenLinux tpls/*  LICENSE README.md ebookdownloader-linux-amd64;fi
-   - if [ "TRAVIS_OS_NAME" = "osx" ]; then 7z a -tzip ebookdownloader-darwin-amd64.zip tools/kindlegenMac tpls/* LICENSE README.md ebookdownloader-darwin-amd64;fi
-   - if [ "TRAVIS_OS_NAME" = "windows" ]; then 7z a -tzip ebookdownloader-windows-amd64.zip tools/kindlegen.exe tpls/* LICENSE README.md ebookdownloader-windows-amd64;fi
+   - if [ "$TRAVIS_OS_NAME" = "linux" ]; then 7z a -tzip ebookdownloader-linux-amd64.zip tools/kindlegenLinux tpls/*  LICENSE README.md ebookdownloader_linux_-amd64-cli;fi
+   - if [ "TRAVIS_OS_NAME" = "osx" ]; then 7z a -tzip ebookdownloader-darwin-amd64.zip tools/kindlegenMac tpls/* LICENSE README.md ebookdownloader_darwin_-amd64-cli;fi
+   - if [ "TRAVIS_OS_NAME" = "windows" ]; then 7z a -tzip ebookdownloader-windows-amd64.zip tools/kindlegen.exe tpls/* LICENSE README.md ebookdownloader_windows_-amd64-cli.exe;fi
