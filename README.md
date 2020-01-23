@@ -8,6 +8,7 @@
   ## 安装方法
   ```bash
   go get github.com/sndnvaps/ebookdownloader/cli
+  go get github.com/sndnvaps/ebookdownloader/gui
   ```
   ## 使用方法
   ```bash
@@ -26,7 +27,8 @@
     1. kindlegen.exe 支持windows平台
     2. kindlegenLinux 支持Linux 平台
     3. kindlegenMac 支持 Mac平台
-    4. cli/gui 两个项目，都需要在运行目录里面放置 fonts/fzytk.ttf 字体
+    4. cli/gui 两个项目，都需要在当前项目的根目录运行
+    5. gui程序，需要依赖 https://github.com/akavel/rsrc ，项目来生成图标
 
   ## 懒人模式，直接下载编译好的程序
   

@@ -17,5 +17,7 @@ if "%hour_ten%" == " " (
    set BuildTime=%year%%month%%day%%hour_ten%%hour_one%%minute%%second%
 )
 
+rsrc manifest ebookdownloader_gui.manifest -ico ebookdownloader.ico -arch amd64 -o rsrc.syso
+
 go build -ldflags "-H windowsgui -w -s -X main.Commit=%commitid% -X main.BuildTime=%buildtime%" -o ebookdownloader_gui.exe
 copy ebookdownloader_gui.exe ..\

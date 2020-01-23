@@ -4,7 +4,9 @@ go 1.13
 
 require (
 	github.com/Aiicy/htmlquery v0.0.0-20191217151354-e656ce3100dc
+	github.com/AllenDang/giu v0.0.0-20200122082656-c72804e6577a
 	github.com/Chain-Zhang/pinyin v0.1.3
+	github.com/akavel/rsrc v0.8.0 // indirect
 	github.com/antchfx/xpath v1.1.4 // indirect
 	github.com/goki/freetype v0.0.0-20181231101311-fa8a33aabaff
 	github.com/schollz/progressbar/v2 v2.15.0
