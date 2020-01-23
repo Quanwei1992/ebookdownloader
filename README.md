@@ -7,7 +7,8 @@
 
   ## 安装方法
   ```bash
-  go get github.com/sndnvaps/ebookdownloader
+  go get github.com/sndnvaps/ebookdownloader/cli
+  go get github.com/sndnvaps/ebookdownloader/gui
   ```
   ## 使用方法
   ```bash
@@ -26,12 +27,23 @@
     1. kindlegen.exe 支持windows平台
     2. kindlegenLinux 支持Linux 平台
     3. kindlegenMac 支持 Mac平台
+    4. cli/gui 两个项目，都需要在当前项目的根目录运行
+    5. gui程序，需要依赖 https://github.com/akavel/rsrc ，项目来生成图标
 
   ## 懒人模式，直接下载编译好的程序
   
   到[这里](https://github.com/sndnvaps/ebookdownloader/releases)下载你需要的版本
 
   ## 更新日志
+
+      2020.01.23 go版本 更新
+                 1. 使用 github.com/AllenDang/giu 库，重新构建 gui界面
+                 2. 编译命令 cd gui;build.[cmd|sh]。文件生成后，会复制到根目录
+                 
+      2020.01.22 go版本 更新
+                 1. 分离出命令行版本cli,编译命令 cd cli;build.[cmd|sh]。文件生成后，会复制到根目录
+                 2. 界面版本gui,立项目
+                 3. 添加go mod支持
 
       2020.01.13 go版本 更新
                  1. 修复潜在问题，无法生成 ./outputs目录
@@ -87,3 +99,4 @@
      [√]  1.添加生成封面功能
      [√]  2. 添加不同平台的接口实现
      [√]  3. 添加生成二级目录的方法(已经添加相应的实例)
+     [ ]  4. 添加界面版本gui

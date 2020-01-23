@@ -1,4 +1,4 @@
-package main
+package ebookdownloader
 
 import (
 	"fmt"
@@ -6,7 +6,7 @@ import (
 	"sync"
 
 	"github.com/Aiicy/htmlquery"
-	"gopkg.in/schollz/progressbar.v2"
+	"github.com/schollz/progressbar/v2"
 )
 
 // https://www.999xs.com/
