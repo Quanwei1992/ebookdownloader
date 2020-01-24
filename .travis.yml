@@ -37,29 +37,29 @@ script: |-
   case $TRAVIS_OS_NAME in
     linux)
       cd $TRAVIS_BUILD_DIR/cli
-      GOOS=linux  GOARCH=amd64 go build -ldflags "-X main.Commit=${TRAVIS_COMMIT} -X main.BuildTime=$(date +'%Y-%m-%d_%T')" -o ebookdownloader_linux_-amd64-cli
+      GOOS=linux  GOARCH=amd64 go build -ldflags "-X main.Version=${TRAVIS_TAG} -X main.Commit=${TRAVIS_COMMIT} -X main.BuildTime=$(date +'%Y-%m-%d_%T')" -o ebookdownloader_linux_-amd64-cli
       cp ebookdownloader_linux_-amd64-cli ../
       cd $TRAVIS_BUILD_DIR/gui
-      GOOS=linux  GOARCH=amd64 go build -ldflags "-X main.Commit=${TRAVIS_COMMIT} -X main.BuildTime=$(date +'%Y-%m-%d_%T')" -o ebookdownloader_linux_-amd64-gui
+      GOOS=linux  GOARCH=amd64 go build -ldflags "-X main.Version=${TRAVIS_TAG} -X main.Commit=${TRAVIS_COMMIT} -X main.BuildTime=$(date +'%Y-%m-%d_%T')" -o ebookdownloader_linux_-amd64-gui
       cp ebookdownloader_linux_-amd64-gui ../
       ;;
     osx)
       cd $TRAVIS_BUILD_DIR/cli
-      GOOS=darwin  GOARCH=amd64 go build -ldflags "-X main.Commit=${TRAVIS_COMMIT} -X main.BuildTime=$(date +'%Y-%m-%d_%T')" -o ebookdownloader_darwin_-amd64-cli
+      GOOS=darwin  GOARCH=amd64 go build -ldflags "-X main.Version=${TRAVIS_TAG} -X main.Commit=${TRAVIS_COMMIT} -X main.BuildTime=$(date +'%Y-%m-%d_%T')" -o ebookdownloader_darwin_-amd64-cli
       cp ebookdownloader_darwin_-amd64-cli ../
       cd $TRAVIS_BUILD_DIR/gui
-      GOOS=darwin  GOARCH=amd64 go build -ldflags "-X main.Commit=${TRAVIS_COMMIT} -X main.BuildTime=$(date +'%Y-%m-%d_%T')" -o ebookdownloader_darwin_-amd64-gui
+      GOOS=darwin  GOARCH=amd64 go build -ldflags "-X main.Version=${TRAVIS_TAG} -X main.Commit=${TRAVIS_COMMIT} -X main.BuildTime=$(date +'%Y-%m-%d_%T')" -o ebookdownloader_darwin_-amd64-gui
       cp ebookdownloader_darwin_-amd64-gui ../
       ;;
    windows)
       cd $TRAVIS_BUILD_DIR/cli
       powershell ls
-      GOOS=windows  GOARCH=amd64 go build -ldflags "-H windowsgui -w -s -X main.Commit=${TRAVIS_COMMIT} -X main.BuildTime=$(date +'%Y-%m-%d_%T')" -o ebookdownloader_windows_-amd64-cli.exe
+      GOOS=windows  GOARCH=amd64 go build -ldflags "-H windowsgui -w -s -X main.Version=${TRAVIS_TAG} -X main.Commit=${TRAVIS_COMMIT} -X main.BuildTime=$(date +'%Y-%m-%d_%T')" -o ebookdownloader_windows_-amd64-cli.exe
       powershell copy-item ebookdownloader_windows_-amd64-cli.exe ../
       cd $TRAVIS_BUILD_DIR/gui
       powershell ls
       rsrc -manifest ./ebookdownloader_gui.manifest -ico ./ebookdownloader.ico -arch amd64 -o rsrc_x64.syso
-      GOOS=windows  GOARCH=amd64 go build -ldflags "-H windowsgui -w -s -X main.Commit=${TRAVIS_COMMIT} -X main.BuildTime=$(date +'%Y-%m-%d_%T') -linkmode external -extldflags '-static'" -o ebookdownloader_windows_-amd64-gui.exe
+      GOOS=windows  GOARCH=amd64 go build -ldflags "-H windowsgui -w -s -X main.Version=${TRAVIS_TAG} -X main.Commit=${TRAVIS_COMMIT} -X main.BuildTime=$(date +'%Y-%m-%d_%T') -linkmode external -extldflags '-static'" -o ebookdownloader_windows_-amd64-gui.exe
       powershell copy-item ebookdownloader_windows_-amd64-gui.exe ../
       powershell remove-item rsrc_x64.syso
       ;;

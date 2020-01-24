@@ -23,7 +23,7 @@ var (
 )
 
 var (
-	Version   string = "v1.6.4"
+	Version   string = "v1.6.5"
 	Commit    string = ""
 	BuildTime string = ""
 )
