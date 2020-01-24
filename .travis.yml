@@ -5,7 +5,7 @@ language:
 
 os: 
    - windows
-   - linux
+   - linux 
    - osx
 
 git:
@@ -15,9 +15,19 @@ before_script: |-
     git config --global user.name sndnvaps
     git config --global user.email sndnvaps@gmail.com
     case $TRAVIS_OS_NAME in
+      linux)
+       export GO111MODULE=on
+       apt-get install -y libgl1-mesa-dev xorg-dev
+       ;;
      windows)
-     go get github.com/akavel/rsrc
-     ;;
+       set GO111MODULE=on
+       go get github.com/akavel/rsrc
+       ;;
+      osx)
+       export GO111MODULE=on
+       brew install glew
+       brew install glfw3
+       ;;
    esac
 
 script: |-
