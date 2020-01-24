@@ -16,6 +16,10 @@ var (
 	BuildTime string = ""
 )
 
+func init() {
+	BuildTime = fmt.Sprintf("%s", time.Now().Format("2006/01/02 15:04:05"))
+}
+
 func EbookDownloader(c *cli.Context) error {
 	//bookid := "91_91345" //91_91345, 0_642
 	bookid := c.String("bookid")
@@ -98,7 +102,6 @@ func main() {
 
 	app := cli.NewApp()
 	app.Name = "golang EBookDownloader"
-	app.Compiled = time.Now()
 	app.Version = Version + "-" + Commit + "-" + BuildTime
 	app.Authors = []cli.Author{
 		cli.Author{

@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"time"
 
 	g "github.com/AllenDang/giu"
 	"github.com/AllenDang/giu/imgui"
@@ -27,6 +28,10 @@ var (
 	Commit    string = ""
 	BuildTime string = ""
 )
+
+func init() {
+	BuildTime = fmt.Sprintf("%s", time.Now().Format("2006/01/02 15:04:05"))
+}
 
 func btnClickMeClicked() {
 	fmt.Println("输入内容为=", bookid)
