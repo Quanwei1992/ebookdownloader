@@ -15,7 +15,7 @@ git:
 before_install: |-
    case $TRAVIS_OS_NAME in
       linux)
-      sudo apt-get install -y libgl1-mesa-dev xorg-dev
+      sudo apt-get install -y libgl1-mesa-dev xorg-dev p7zip-full
        ;;
      windows)
        go get github.com/akavel/rsrc
@@ -61,7 +61,7 @@ script: |-
       rsrc -manifest ebookdownloader_gui.manifest -ico ebookdownloader.ico -arch amd64 -o rsrc_x64.syso
       go build -ldflags "-H windowsgui -w -s -X main.Commit=${TRAVIS_COMMIT} -linkmode external -extldflags '-static'" -o ebookdownloader_windows_-amd64-gui.exe
       powershell copy-item ebookdownloader_windows_-amd64-gui.exe ../
-      del rsrc_x64.syso
+      powershell remove-item rsrc_x64.syso
       ;;
      esac
 
