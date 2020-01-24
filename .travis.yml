@@ -40,7 +40,7 @@ script: |-
       GOOS=linux  GOARCH=amd64 go build -ldflags "-X main.Version=${TRAVIS_TAG} -X main.Commit=${TRAVIS_COMMIT} -X main.BuildTime=$(date +'%Y-%m-%d_%T')" -o ebookdownloader_linux_-amd64-cli
       cp ebookdownloader_linux_-amd64-cli ../
       cd $TRAVIS_BUILD_DIR/gui
-      GOOS=linux  GOARCH=amd64 go build -ldflags "-H windowsgui -X main.Version=${TRAVIS_TAG} -X main.Commit=${TRAVIS_COMMIT} -X main.BuildTime=$(date +'%Y-%m-%d_%T')" -o ebookdownloader_linux_-amd64-gui
+      GOOS=linux  GOARCH=amd64 go build -ldflags "-X main.Version=${TRAVIS_TAG} -X main.Commit=${TRAVIS_COMMIT} -X main.BuildTime=$(date +'%Y-%m-%d_%T')" -o ebookdownloader_linux_-amd64-gui
       cp ebookdownloader_linux_-amd64-gui ../
       ;;
     osx)
@@ -48,7 +48,7 @@ script: |-
       GOOS=darwin  GOARCH=amd64 go build -ldflags "-X main.Version=${TRAVIS_TAG} -X main.Commit=${TRAVIS_COMMIT} -X main.BuildTime=$(date +'%Y-%m-%d_%T')" -o ebookdownloader_darwin_-amd64-cli
       cp ebookdownloader_darwin_-amd64-cli ../
       cd $TRAVIS_BUILD_DIR/gui
-      GOOS=darwin  GOARCH=amd64 go build -ldflags "-H windowsgui -X main.Version=${TRAVIS_TAG} -X main.Commit=${TRAVIS_COMMIT} -X main.BuildTime=$(date +'%Y-%m-%d_%T')" -o ebookdownloader_darwin_-amd64-gui
+      GOOS=darwin  GOARCH=amd64 go build -ldflags "-X main.Version=${TRAVIS_TAG} -X main.Commit=${TRAVIS_COMMIT} -X main.BuildTime=$(date +'%Y-%m-%d_%T')" -o ebookdownloader_darwin_-amd64-gui
       cp ebookdownloader_darwin_-amd64-gui ../
       ;;
    windows)
