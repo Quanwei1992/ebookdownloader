@@ -1,3 +1,4 @@
+set commitid=""
 for /F %%i in ('git rev-parse --short HEAD') do ( set commitid=%%i)
 echo commitid=%commitid%
 
