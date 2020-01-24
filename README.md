@@ -38,6 +38,7 @@
 
       2020.01.24 go版本
                 1. 版本更新到 v1.6.3
+                2. 更新到 v1.6.4 用于测试 Travis-ci
       2020.01.23 go版本 更新
                  1. 使用 github.com/AllenDang/giu 库，重新构建 gui界面
                  2. 编译命令 cd gui;build.[cmd|sh]。文件生成后，会复制到根目录
