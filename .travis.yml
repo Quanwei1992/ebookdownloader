@@ -53,12 +53,12 @@ script: |-
       ;;
    windows)
       cd $TRAVIS_BUILD_DIR/cli
-      powershell get-item *
+      powershell ls
       go build -ldflags "-H windowsgui -w -s -X main.Commit=${TRAVIS_COMMIT} " -o ebookdownloader_windows_-amd64-cli.exe
       powershell copy-item ebookdownloader_windows_-amd64-cli.exe ../
       cd $TRAVIS_BUILD_DIR/gui
-      powershell get-item *
-      rsrc -manifest ebookdownloader_gui.manifest -ico ebookdownloader.ico -arch amd64 -o rsrc_x64.syso
+      powershell ls
+      rsrc -manifest ./ebookdownloader_gui.manifest -ico ./ebookdownloader.ico -arch amd64 -o rsrc_x64.syso
       go build -ldflags "-H windowsgui -w -s -X main.Commit=${TRAVIS_COMMIT} -linkmode external -extldflags '-static'" -o ebookdownloader_windows_-amd64-gui.exe
       powershell copy-item ebookdownloader_windows_-amd64-gui.exe ../
       powershell remove-item rsrc_x64.syso
@@ -80,4 +80,7 @@ after_success: |-
      7z a -tzip ebookdownloader-windows-amd64.zip tools/kindlegen.exe tpls/* fonts/* LICENSE README.md ebookdownloader_windows_-amd64-cli.exe ebookdownloader_windows_-amd64-gui.exe
       ;;
   esac
-  
+
+before_deploy: |-
+     git config --global user.name sndnvaps
+     git config --global user.email sndnvaps@gmail.com
