@@ -19,6 +19,7 @@ before_install:
        ;;
      windows)
        go get github.com/akavel/rsrc &&
+       dir &&
        %TRAVIS_BUILD_DIR%\SetupBuildTime.cmd
        ;;
       osx)
@@ -38,7 +39,7 @@ script:
     linux)
       cd $TRAVIS_BUILD_DIR/cli &&
       GOOS=linux  GOARCH=amd64 go build -ldflags "-X main.Commit=${TRAVIS_COMMIT} -X 'main.BuildTime=${date +%Y-%m-%d\ %H:%M}'" -o ebookdownloader_linux_-amd64-cli &&
-      cp ebookdownloader_linux_-amd64-cli ../
+      cp ebookdownloader_linux_-amd64-cli ../ &&
       cd $TRAVIS_BUILD_DIR/gui &&
       GOOS=linux  GOARCH=amd64 go build -ldflags "-X main.Commit=${TRAVIS_COMMIT} -X 'main.BuildTime=${date +%Y-%m-%d\ %H:%M}'" -o ebookdownloader_linux_-amd64-gui &&
       cp ebookdownloader_linux_-amd64-gui ../
