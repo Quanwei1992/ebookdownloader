@@ -39,25 +39,25 @@ script:
       GOOS=linux  GOARCH=amd64 go build -ldflags "-X main.Commit=${TRAVIS_COMMIT}" -o ebookdownloader_linux_-amd64-cli &&
       cp ebookdownloader_linux_-amd64-cli ../ &&
       cd $TRAVIS_BUILD_DIR/gui &&
-      GOOS=linux  GOARCH=amd64 go build -ldflags "-X main.Commit=${TRAVIS_COMMIT} -linkmode external -extldflags '-static'" -o ebookdownloader_linux_-amd64-gui &&
+      GOOS=linux  GOARCH=amd64 go build -ldflags "-X main.Commit=${TRAVIS_COMMIT}" -o ebookdownloader_linux_-amd64-gui &&
       cp ebookdownloader_linux_-amd64-gui ../
       ;;
     osx)
       cd $TRAVIS_BUILD_DIR/cli &&
       GOOS=darwin  GOARCH=amd64 go build -ldflags "-X main.Commit=${TRAVIS_COMMIT}" -o ebookdownloader_darwin_-amd64-cli &&
-      cp ebookdownloader_darwin_-amd64-cli ../
+      cp ebookdownloader_darwin_-amd64-cli ../ &&
       cd $TRAVIS_BUILD_DIR/gui &&
       GOOS=darwin  GOARCH=amd64 go build -ldflags "-X main.Commit=${TRAVIS_COMMIT} -linkmode external -extldflags '-static'" -o ebookdownloader_darwin_-amd64-gui &&
       cp ebookdownloader_darwin_-amd64-gui ../
       ;;
    windows)
-      cd %TRAVIS_BUILD_DIR%\cli &&
+      cd %TRAVIS_BUILD_DIR%/cli &&
       go build -ldflags "-H windowsgui -w -s -X main.Commit=%TRAVIS_COMMIT% " -o ebookdownloader_windows_-amd64-cli.exe &&
-      copy ebookdownloader_windows_-amd64-cli.exe ..\ &&
-      cd %TRAVIS_BUILD_DIR%\gui &&
+      copy ebookdownloader_windows_-amd64-cli.exe ../ &&
+      cd %TRAVIS_BUILD_DIR%/gui &&
       rsrc -manifest ebookdownloader_gui.manifest -ico ebookdownloader.ico -arch amd64 -o rsrc_x64.syso &&
       go build -ldflags "-H windowsgui -w -s -X main.Commit=%TRAVIS_COMMIT% -linkmode external -extldflags '-static'" -o ebookdownloader_windows_-amd64-gui.exe &&
-      copy ebookdownloader_windows_-amd64-gui.exe ..\ &&
+      copy ebookdownloader_windows_-amd64-gui.exe ../ &&
       del rsrc_x64.syso
       ;;
      esac
@@ -73,7 +73,7 @@ after_success:
      7z a -tzip ebookdownloader-darwin-amd64.zip tools/kindlegenMac tpls/* fonts/* LICENSE README.md ebookdownloader_darwin_-amd64-cli ebookdownloader_darwin_-amd64-gui
       ;;
    windows)
-     cd %TRAVIS_BUILD_DIR%\ &&
+     cd %TRAVIS_BUILD_DIR%/ &&
      7z a -tzip ebookdownloader-windows-amd64.zip tools/kindlegen.exe tpls/* fonts/* LICENSE README.md ebookdownloader_windows_-amd64-cli.exe ebookdownloader_windows_-amd64-gui.exe
       ;;
   esac
