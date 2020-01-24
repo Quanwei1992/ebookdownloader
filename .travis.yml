@@ -5,7 +5,7 @@ language:
 
 os: 
    - windows
-   - linux 
+   - linux
    - osx
 
 git:
