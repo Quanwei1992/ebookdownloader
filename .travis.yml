@@ -4,29 +4,34 @@ os:
    - windows
    - linux
    - osx
+  
+env:
+   - GO111MODULE=on
 
 git:
    depth: 1
 
-before_script:
-   - git config --global user.name sndnvaps
-   - git config --global user.email sndnvaps@gmail.com
+# 安装依赖程序
+before_install:
    - case $TRAVIS_OS_NAME in
       linux)
-       export GO111MODULE=on &&
        apt-get install -y libgl1-mesa-dev xorg-dev
        ;;
      windows)
-       set GO111MODULE=on &&
        go get github.com/akavel/rsrc
        ;;
       osx)
-       export GO111MODULE=on &&
        brew install glew &&
        brew install glfw3
        ;;
      esac
 
+# 运行脚本前
+before_script:
+   - git config --global user.name sndnvaps
+   - git config --global user.email sndnvaps@gmail.com
+
+# 运行脚本进行编译
 script:
   - case $TRAVIS_OS_NAME in
     linux)
@@ -34,16 +39,16 @@ script:
       GOOS=linux  GOARCH=amd64 go build -ldflags "-X main.Commit=${TRAVIS_COMMIT} -X 'main.BuildTime=${date +%Y-%m-%d\ %H:%M}'" -o ebookdownloader_linux_-amd64-cli &&
       cp ebookdownloader_linux_-amd64-cli ../
 
-      cd $TRAVIS_BUILD_DIR/gui
+      cd $TRAVIS_BUILD_DIR/gui &&
       GOOS=linux  GOARCH=amd64 go build -ldflags "-X main.Commit=${TRAVIS_COMMIT} -X 'main.BuildTime=${date +%Y-%m-%d\ %H:%M}'" -o ebookdownloader_linux_-amd64-gui &&
       cp ebookdownloader_linux_-amd64-gui ../
       ;;
     osx)
-      cd $TRAVIS_BUILD_DIR/cli
+      cd $TRAVIS_BUILD_DIR/cli &&
       GOOS=darwin  GOARCH=amd64 go build -ldflags "-X main.Commit=${TRAVIS_COMMIT} -X 'main.BuildTime=${date +%Y-%m-%d\ %H:%M}'" -o ebookdownloader_darwin_-amd64-cli &&
       cp ebookdownloader_darwin_-amd64-cli ../
 
-      cd $TRAVIS_BUILD_DIR/gui
+      cd $TRAVIS_BUILD_DIR/gui &&
       GOOS=darwin  GOARCH=amd64 go build -ldflags "-X main.Commit=${TRAVIS_COMMIT} -X 'main.BuildTime=${date +%Y-%m-%d\ %H:%M}'" -o ebookdownloader_darwin_-amd64-gui &&
       cp ebookdownloader_darwin_-amd64-gui ../
       ;;
