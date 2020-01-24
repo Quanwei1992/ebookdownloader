@@ -1,5 +1,4 @@
 language: go
-sudo: required
 
 os:
    - windows
@@ -16,7 +15,7 @@ git:
 before_install:
    - case $TRAVIS_OS_NAME in
       linux)
-       apt-get install -y libgl1-mesa-dev xorg-dev
+      sudo apt-get install -y libgl1-mesa-dev xorg-dev
        ;;
      windows)
        go get github.com/akavel/rsrc &&
