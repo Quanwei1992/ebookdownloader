@@ -95,6 +95,6 @@ deploy:
     - "$TRAVIS_BUILD_DIR/ebookdownloader-linux-amd64.zip"
     - "$TRAVIS_BUILD_DIR/ebookdownloader-darwin-amd64.zip"
     - "$TRAVIS_BUILD_DIR/ebookdownloader-windows-amd64.zip"
-  cleanup: false
+  skip_cleanup: true
   on:
     tags: true
