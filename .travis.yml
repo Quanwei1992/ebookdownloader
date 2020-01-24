@@ -11,83 +11,83 @@ os:
 git:
    depth: 1
 
-before_script: |-
-    git config --global user.name sndnvaps
-    git config --global user.email sndnvaps@gmail.com
-    case $TRAVIS_OS_NAME in
+before_script:
+   - git config --global user.name sndnvaps
+   - git config --global user.email sndnvaps@gmail.com
+   - case $TRAVIS_OS_NAME in
       linux)
-       export GO111MODULE=on
+       export GO111MODULE=on &&
        apt-get install -y libgl1-mesa-dev xorg-dev
        ;;
      windows)
-       set GO111MODULE=on
+       set GO111MODULE=on &&
        go get github.com/akavel/rsrc
        ;;
       osx)
-       export GO111MODULE=on
-       brew install glew
+       export GO111MODULE=on &&
+       brew install glew &&
        brew install glfw3
        ;;
    esac
 
-script: |-
-  case $TRAVIS_OS_NAME in
+script:
+  - case $TRAVIS_OS_NAME in
     linux)
-      cd cli
-      GOOS=linux  GOARCH=amd64 go build -ldflags "-X main.Commit=$(git rev-parse --short HEAD) -X 'main.BuildTime=${date +%Y-%m-%d\ %H:%M}'" -o ebookdownloader_linux_-amd64-cli
+      cd $TRAVIS_BUILD_DIR/cli &&
+      GOOS=linux  GOARCH=amd64 go build -ldflags "-X main.Commit=${TRAVIS_COMMIT} -X 'main.BuildTime=${date +%Y-%m-%d\ %H:%M}'" -o ebookdownloader_linux_-amd64-cli &&
       cp ebookdownloader_linux_-amd64-cli ../
-      cd ../
-      cd gui
-      GOOS=linux  GOARCH=amd64 go build -ldflags "-X main.Commit=$(git rev-parse --short HEAD) -X 'main.BuildTime=${date +%Y-%m-%d\ %H:%M}'" -o ebookdownloader_linux_-amd64-gui
+
+      cd $TRAVIS_BUILD_DIR/gui
+      GOOS=linux  GOARCH=amd64 go build -ldflags "-X main.Commit=${TRAVIS_COMMIT} -X 'main.BuildTime=${date +%Y-%m-%d\ %H:%M}'" -o ebookdownloader_linux_-amd64-gui &&
       cp ebookdownloader_linux_-amd64-gui ../
       ;;
     osx)
-      cd cli
-      GOOS=darwin  GOARCH=amd64 go build -ldflags "-X main.Commit=$(git rev-parse --short HEAD) -X 'main.BuildTime=${date +%Y-%m-%d\ %H:%M}'" -o ebookdownloader_darwin_-amd64-cli
+      cd $TRAVIS_BUILD_DIR/cli
+      GOOS=darwin  GOARCH=amd64 go build -ldflags "-X main.Commit=${TRAVIS_COMMIT} -X 'main.BuildTime=${date +%Y-%m-%d\ %H:%M}'" -o ebookdownloader_darwin_-amd64-cli &&
       cp ebookdownloader_darwin_-amd64-cli ../
-      cd ../
-      cd gui
-      GOOS=darwin  GOARCH=amd64 go build -ldflags "-X main.Commit=$(git rev-parse --short HEAD) -X 'main.BuildTime=${date +%Y-%m-%d\ %H:%M}'" -o ebookdownloader_darwin_-amd64-gui
+
+      cd $TRAVIS_BUILD_DIR/gui
+      GOOS=darwin  GOARCH=amd64 go build -ldflags "-X main.Commit=${TRAVIS_COMMIT} -X 'main.BuildTime=${date +%Y-%m-%d\ %H:%M}'" -o ebookdownloader_darwin_-amd64-gui &&
       cp ebookdownloader_darwin_-amd64-gui ../
       ;;
    windows)
-      set commitid=""
-      for /F %%i in ('git rev-parse --short HEAD') do ( set commitid=%%i)
-      echo commitid=%commitid%
-      set BuildTime = ""
-      set "year=%date:~0,4%"
-      set "month=%date:~5,2%"
-      set "day=%date:~8,2%"
-      set "hour_ten=%time:~0,1%"
-      set "hour_one=%time:~1,1%"
-      set "minute=%time:~3,2%"
-      set "second=%time:~6,2%"
+      echo commitid=%TRAVIS_COMMIT% &&
+      set BuildTime = "" &&
+      set "year=%date:~0,4%" &&
+      set "month=%date:~5,2%" &&
+      set "day=%date:~8,2%" &&
+      set "hour_ten=%time:~0,1%" &&
+      set "hour_one=%time:~1,1%" &&
+      set "minute=%time:~3,2%" &&
+      set "second=%time:~6,2%" &&
       if "%hour_ten%" == " " (
          set BuildTime=%year%%month%%day%0%hour_one%%minute%%second%
       ) else (
          set BuildTime=%year%%month%%day%%hour_ten%%hour_one%%minute%%second%
-      )
-      cd cli
-      go build -ldflags "-H windowsgui -w -s -X main.Commit=%commitid% -X main.BuildTime=%buildtime%" -o ebookdownloader_windows_-amd64-cli.exe
-      copy ebookdownloader_windows_-amd64-cli.exe ..\
-      cd ..\
-      cd gui
-      rsrc -manifest ebookdownloader_gui.manifest -ico ebookdownloader.ico -arch amd64 -o rsrc_x64.syso
-      go build -ldflags "-H windowsgui -w -s -X main.Commit=%commitid% -X main.BuildTime=%buildtime%" -o ebookdownloader_windows_-amd64-gui.exe
-      copy ebookdownloader_windows_-amd64-gui.exe ..\
+      ) &&
+      cd %TRAVIS_BUILD_DIR%\cli &&
+      go build -ldflags "-H windowsgui -w -s -X main.Commit=%TRAVIS_COMMIT% -X main.BuildTime=%buildtime%" -o ebookdownloader_windows_-amd64-cli.exe &&
+      copy ebookdownloader_windows_-amd64-cli.exe ..\ &&
+      cd %TRAVIS_BUILD_DIR%\gui &&
+      rsrc -manifest ebookdownloader_gui.manifest -ico ebookdownloader.ico -arch amd64 -o rsrc_x64.syso &&
+      go build -ldflags "-H windowsgui -w -s -X main.Commit=%TRAVIS_COMMIT% -X main.BuildTime=%buildtime%" -o ebookdownloader_windows_-amd64-gui.exe &&
+      copy ebookdownloader_windows_-amd64-gui.exe ..\ &&
       del rsrc_x64.syso
       ;;
   esac
 
-after_success: |-
-  case $TRAVIS_OS_NAME in
+after_success:
+ - case $TRAVIS_OS_NAME in
     linux)
+      cd $TRAVIS_BUILD_DIR/ &&
       7z a -tzip ebookdownloader-linux-amd64.zip tools/kindlegenLinux tpls/* fonts/* LICENSE README.md ebookdownloader_linux_-amd64-cli ebookdownloader_linux_-amd64-gui
       ;;
     osx)
+     cd $TRAVIS_BUILD_DIR/ &&
      7z a -tzip ebookdownloader-darwin-amd64.zip tools/kindlegenMac tpls/* fonts/* LICENSE README.md ebookdownloader_darwin_-amd64-cli ebookdownloader_darwin_-amd64-gui
       ;;
    windows)
+     cd %TRAVIS_BUILD_DIR%\ &&
      7z a -tzip ebookdownloader-windows-amd64.zip tools/kindlegen.exe tpls/* fonts/* LICENSE README.md ebookdownloader_windows_-amd64-cli.exe ebookdownloader_windows_-amd64-gui.exe
       ;;
   esac
