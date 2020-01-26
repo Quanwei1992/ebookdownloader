@@ -12,8 +12,10 @@ jobs:
   include:
     - os: linux
       arch: amd64
+      env: TRAVIS_ARCH="amd64"
     - os: linux
       arch: arm64
+      env: TRAVIS_ARCH="arm64"
     - os: windows
       arch: amd64
     - os: osx
@@ -27,6 +29,7 @@ git:
    depth: 1
 
 env:
+ global:
     - GO111MODULE=on
 
 # 安装依赖程序
@@ -119,25 +122,25 @@ after_success: |-
        amd64)
           cd $TRAVIS_BUILD_DIR/
           $TRAVIS_BUILD_DIR/ebookdownloader_linux_-amd64-cli
-          7z a -tzip ebookdownloader-linux-amd64.zip tools/kindlegenLinux tpls/* fonts/* conf/* LICENSE README.md ebookdownloader_linux_-amd64-cli ebookdownloader_linux_-amd64-gui ebookdownloader_linux_-amd64-http-server
+          7z a -tzip ebookdownloader-${TRAVIS_TAG}-linux-amd64.zip tools/kindlegenLinux tpls/* fonts/* conf/* LICENSE README.md ebookdownloader_linux_-amd64-cli ebookdownloader_linux_-amd64-gui ebookdownloader_linux_-amd64-http-server
           ;;
        arm64)
           cd $TRAVIS_BUILD_DIR/
           $TRAVIS_BUILD_DIR/ebookdownloader_linux_-arm64-cli
-          7z a -tzip ebookdownloader-linux-arm64.zip tools/kindlegenLinux tools/qemu-user-static-arm64 tpls/* fonts/* conf/* LICENSE README.md ebookdownloader_linux_-arm64-cli ebookdownloader_linux_-arm64-gui ebookdownloader_linux_-arm64-http-server
-          7z a -tzip ebookdownloader-linux-armv7.zip tools/kindlegenLinux tools/qemu-user-static-armhf tpls/* fonts/* conf/* LICENSE README.md ebookdownloader_linux_-armv7-cli ebookdownloader_linux_-armv7-gui ebookdownloader_linux_-armv7-http-server
+          7z a -tzip ebookdownloader-${TRAVIS_TAG}-linux-arm64.zip tools/kindlegenLinux tools/qemu-i386-static-arm64 tpls/* fonts/* conf/* LICENSE README.md ebookdownloader_linux_-arm64-cli ebookdownloader_linux_-arm64-gui ebookdownloader_linux_-arm64-http-server
+          7z a -tzip ebookdownloader-${TRAVIS_TAG}-linux-armv7.zip tools/kindlegenLinux tools/qemu-i386-static-armhf tpls/* fonts/* conf/* LICENSE README.md ebookdownloader_linux_-armv7-cli ebookdownloader_linux_-armv7-gui ebookdownloader_linux_-armv7-http-server
           ;;
        esac
       ;;
     osx)
      cd $TRAVIS_BUILD_DIR/
      $TRAVIS_BUILD_DIR/ebookdownloader_darwin_-amd64-cli
-     7z a -tzip ebookdownloader-darwin-amd64.zip tools/kindlegenMac tpls/* fonts/* conf/* LICENSE README.md ebookdownloader_darwin_-amd64-cli ebookdownloader_darwin_-amd64-gui ebookdownloader_darwin_-amd64-http-server
+     7z a -tzip ebookdownloader-${TRAVIS_TAG}-darwin-amd64.zip tools/kindlegenMac tpls/* fonts/* conf/* LICENSE README.md ebookdownloader_darwin_-amd64-cli ebookdownloader_darwin_-amd64-gui ebookdownloader_darwin_-amd64-http-server
       ;;
    windows)
      cd $TRAVIS_BUILD_DIR/
      $TRAVIS_BUILD_DIR/ebookdownloader_windows_-amd64-cli.exe
-     7z a -tzip ebookdownloader-windows-amd64.zip tools/kindlegen.exe tpls/* fonts/* conf/* LICENSE README.md ebookdownloader_windows_-amd64-cli.exe ebookdownloader_windows_-amd64-gui.exe ebookdownloader_windows_-amd64-http-server.exe
+     7z a -tzip ebookdownloader-${TRAVIS_TAG}-windows-amd64.zip tools/kindlegen.exe tpls/* fonts/* conf/* LICENSE README.md ebookdownloader_windows_-amd64-cli.exe ebookdownloader_windows_-amd64-gui.exe ebookdownloader_windows_-amd64-http-server.exe
       ;;
   esac
 
@@ -151,11 +154,11 @@ deploy:
   provider: releases
   token: ${GITHUB_TOKEN}
   file:
-    - "$TRAVIS_BUILD_DIR/ebookdownloader-linux-amd64.zip"
-    - "$TRAVIS_BUILD_DIR/ebookdownloader-linux-arm64.zip"
-    - "$TRAVIS_BUILD_DIR/ebookdownloader-linux-armv7.zip"
-    - "$TRAVIS_BUILD_DIR/ebookdownloader-darwin-amd64.zip"
-    - "$TRAVIS_BUILD_DIR/ebookdownloader-windows-amd64.zip"
+    - "$TRAVIS_BUILD_DIR/ebookdownloader-${TRAVIS_TAG}-linux-amd64.zip"
+    - "$TRAVIS_BUILD_DIR/ebookdownloader-${TRAVIS_TAG}-linux-arm64.zip"
+    - "$TRAVIS_BUILD_DIR/ebookdownloader-${TRAVIS_TAG}-linux-armv7.zip"
+    - "$TRAVIS_BUILD_DIR/ebookdownloader-${TRAVIS_TAG}-darwin-amd64.zip"
+    - "$TRAVIS_BUILD_DIR/ebookdownloader-${TRAVIS_TAG}-windows-amd64.zip"
   skip_cleanup: true
   on:
     tags: true
