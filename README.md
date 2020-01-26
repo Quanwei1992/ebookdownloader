@@ -30,6 +30,8 @@
     3. kindlegenMac 支持 Mac平台
     4. cli/gui 两个项目，都需要在当前项目的根目录运行
     5. gui程序，需要依赖 https://github.com/akavel/rsrc ，项目来生成图标
+    6. qemu-i386-static-armhf 支持在linux arm平台上运行 kindlegenLinux
+    7. qemu-i386-static-arm64 支持在linux arm64平台上运行 kindlegenLinux
 
   ## 懒人模式，直接下载编译好的程序
   
@@ -39,6 +41,7 @@
 
       2020.01.26 go版本
                 1. 添加 http-server版本，初始化
+                2. 添加qemu-i386-static 支持arm,arm64平台上生成mobi,azw3格式电子书
 
       2020.01.24 go版本
                 1. 版本更新到 v1.6.3
