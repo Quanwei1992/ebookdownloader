@@ -71,6 +71,33 @@ $ curl -X POST -v --form istxt=true --form ismobi=false "http://localhost:8080/p
 $ curl -X GET -v http://localhost:8080/list
 ```
 
+### Del
+删除在服务器上面下载好的小说
+```bash
+ /del
+ 接受参数
+ bookname
+ 返回值
+ 成功后的返回值
+ {
+    "Status": "bookname has been del"
+ }
+失败的返回值
+ {
+    "error": "bookname is not exists"
+ }
+```
+ 测试例子
+```bash
+$ curl -X GET -v "http://localhost:8080/del/who-am-i.txt"
+```
+返回结果
+```json
+{
+   "Status": "who-am-i.txt has been delete"
+}
+```
+
 ### 显示服务器版本信息
 此功能主要用于显示服务器的版本信息
 ```bash

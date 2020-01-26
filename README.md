@@ -33,6 +33,11 @@
     6. qemu-i386-static-armhf 支持在linux arm平台上运行 kindlegenLinux
     7. qemu-i386-static-arm64 支持在linux arm64平台上运行 kindlegenLinux
 
+  ## 后端服务器 API接口
+    主要目的是部署在vps上面，就可以方便随时下载小说了
+
+[ebookdowloader_http_api](http-server/ebookdowloader_http_api.md)
+
   ## 懒人模式，直接下载编译好的程序
   
   到[这里](https://github.com/sndnvaps/ebookdownloader/releases)下载你需要的版本
@@ -42,7 +47,7 @@
       2020.01.26 go版本
                 1. 添加 http-server版本，初始化
                 2. 添加qemu-i386-static 支持arm,arm64平台上生成mobi,azw3格式电子书
-                3. 更新版本到 v1.6.9
+                3. 更新版本到 v1.7.0
 
       2020.01.24 go版本
                 1. 版本更新到 v1.6.3

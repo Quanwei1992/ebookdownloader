@@ -159,6 +159,11 @@ func main() {
 	//列举./public目录所有的文件
 	router.GET("/list", List)
 
+	//删除 服务器上面已经下载的小说
+	// $ curl -X GET "http://localhost:8080/del/我是谁.mobi"
+	// $ curl -X GET "http://localhost:8080/del/我真不是作者菌.txt"
+	router.GET("/del/:bookname",Del)
+
 	//简单文件服务器
 	// http://localhost:8080/file
 	//public存放着要显示的文件
