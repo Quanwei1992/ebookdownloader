@@ -1,10 +1,17 @@
+# .travis.yml
+# test in https://config.travis-ci.com/explore
 language: go
+
+dist: bionic
 
 os:
    - windows
    - linux
    - osx
-  
+
+go:
+   - 1.13.x
+
 env:
    - GO111MODULE=on
 
@@ -42,6 +49,9 @@ script: |-
       cd $TRAVIS_BUILD_DIR/gui
       GOOS=linux  GOARCH=amd64 go build -ldflags "-X main.Version=${TRAVIS_TAG} -X main.Commit=${TRAVIS_COMMIT} -X main.BuildTime=$(date +'%Y-%m-%d_%T')" -o ebookdownloader_linux_-amd64-gui
       cp ebookdownloader_linux_-amd64-gui ../
+      cd $TRAVIS_BUILD_DIR/http-server
+      GOOS=linux  GOARCH=amd64 go build -ldflags "-X main.Version=${TRAVIS_TAG} -X main.Commit=${TRAVIS_COMMIT} -X main.BuildTime=$(date +'%Y-%m-%d_%T')" -o ebookdownloader_linux_-amd64-http-server
+      cp ebookdownloader_linux_-amd64-http-server ../ 
       ;;
     osx)
       cd $TRAVIS_BUILD_DIR/cli
@@ -50,6 +60,9 @@ script: |-
       cd $TRAVIS_BUILD_DIR/gui
       GOOS=darwin  GOARCH=amd64 go build -ldflags "-X main.Version=${TRAVIS_TAG} -X main.Commit=${TRAVIS_COMMIT} -X main.BuildTime=$(date +'%Y-%m-%d_%T')" -o ebookdownloader_darwin_-amd64-gui
       cp ebookdownloader_darwin_-amd64-gui ../
+      cd $TRAVIS_BUILD_DIR/http-server
+      GOOS=darwin  GOARCH=amd64 go build -ldflags "-X main.Version=${TRAVIS_TAG} -X main.Commit=${TRAVIS_COMMIT} -X main.BuildTime=$(date +'%Y-%m-%d_%T')" -o ebookdownloader_darwin_-amd64-http-server
+      cp ebookdownloader_darwin_-amd64-http-server ../
       ;;
    windows)
       cd $TRAVIS_BUILD_DIR/cli
@@ -60,32 +73,38 @@ script: |-
       GOOS=windows  GOARCH=amd64 go build -ldflags "-H windowsgui -w -s -X main.Version=${TRAVIS_TAG} -X main.Commit=${TRAVIS_COMMIT} -X main.BuildTime=$(date +'%Y-%m-%d_%T') -linkmode external -extldflags '-static'" -o ebookdownloader_windows_-amd64-gui.exe
       powershell copy-item ebookdownloader_windows_-amd64-gui.exe ../
       powershell remove-item rsrc_x64.syso
+      cd $TRAVIS_BUILD_DIR/http-server
+      GOOS=windows  GOARCH=amd64 go build -ldflags "-X main.Version=${TRAVIS_TAG} -X main.Commit=${TRAVIS_COMMIT} -X main.BuildTime=$(date +'%Y-%m-%d_%T')" -o ebookdownloader_windows_-amd64-http-server.exe
+      powershell copy-item ebookdownloader_windows_-amd64-http-server.exe ../
       ;;
      esac
 
+# 编译完成后，打包
 after_success: |-
  case $TRAVIS_OS_NAME in
     linux)
       cd $TRAVIS_BUILD_DIR/
       $TRAVIS_BUILD_DIR/ebookdownloader_linux_-amd64-cli
-      7z a -tzip ebookdownloader-linux-amd64.zip tools/kindlegenLinux tpls/* fonts/* LICENSE README.md ebookdownloader_linux_-amd64-cli ebookdownloader_linux_-amd64-gui
+      7z a -tzip ebookdownloader-linux-amd64.zip tools/kindlegenLinux tpls/* fonts/* conf/* LICENSE README.md ebookdownloader_linux_-amd64-cli ebookdownloader_linux_-amd64-gui ebookdownloader_linux_-amd64-http-server
       ;;
     osx)
      cd $TRAVIS_BUILD_DIR/
      $TRAVIS_BUILD_DIR/ebookdownloader_darwin_-amd64-cli
-     7z a -tzip ebookdownloader-darwin-amd64.zip tools/kindlegenMac tpls/* fonts/* LICENSE README.md ebookdownloader_darwin_-amd64-cli ebookdownloader_darwin_-amd64-gui
+     7z a -tzip ebookdownloader-darwin-amd64.zip tools/kindlegenMac tpls/* fonts/* conf/* LICENSE README.md ebookdownloader_darwin_-amd64-cli ebookdownloader_darwin_-amd64-gui ebookdownloader_darwin_-amd64-http-server
       ;;
    windows)
      cd $TRAVIS_BUILD_DIR/
      $TRAVIS_BUILD_DIR/ebookdownloader_windows_-amd64-cli.exe
-     7z a -tzip ebookdownloader-windows-amd64.zip tools/kindlegen.exe tpls/* fonts/* LICENSE README.md ebookdownloader_windows_-amd64-cli.exe ebookdownloader_windows_-amd64-gui.exe
+     7z a -tzip ebookdownloader-windows-amd64.zip tools/kindlegen.exe tpls/* fonts/* conf/* LICENSE README.md ebookdownloader_windows_-amd64-cli.exe ebookdownloader_windows_-amd64-gui.exe ebookdownloader_windows_-amd64-http-server.exe
       ;;
   esac
 
+# 发布Release前，配置 git
 before_deploy: |-
      git config --global user.name sndnvaps
      git config --global user.email sndnvaps@gmail.com
-     
+ 
+# 发布Release到 github.com 
 deploy:
   provider: releases
   token: ${GITHUB_TOKEN}

@@ -9,6 +9,7 @@
   ```bash
   go get github.com/sndnvaps/ebookdownloader/cli
   go get github.com/sndnvaps/ebookdownloader/gui
+  go get github.com/sndnvaps/ebookdownloader/http-server
   ```
   ## 使用方法
   ```bash
@@ -35,6 +36,9 @@
   到[这里](https://github.com/sndnvaps/ebookdownloader/releases)下载你需要的版本
 
   ## 更新日志
+
+      2020.01.26 go版本
+                1. 添加 http-server版本，初始化
 
       2020.01.24 go版本
                 1. 版本更新到 v1.6.3
@@ -103,3 +107,4 @@
      [√]  2. 添加不同平台的接口实现
      [√]  3. 添加生成二级目录的方法(已经添加相应的实例)
      [√]  4. 添加界面版本gui
+     [√]  5. 添加http-server,做为后端
