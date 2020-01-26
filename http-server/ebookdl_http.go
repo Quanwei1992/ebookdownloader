@@ -14,7 +14,7 @@ import (
 )
 
 var (
-	Version   string = "1.6.5"
+	Version   string = "1.6.9"
 	Commit    string = "b40f73c79"
 	BuildTime string = "2020-01-25 16:19"
 )
