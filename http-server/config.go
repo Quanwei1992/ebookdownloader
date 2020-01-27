@@ -15,7 +15,8 @@ var (
 )
 
 type Config struct {
-	Host     string `json:"host"`
+	Host     string `json:"host"`       //对外地址
+	InerHost string `json:"iner_host"` //内部地址
 	Port     string `json:"port"`
 	URL_BASE string `json:"url_base"`
 }
@@ -33,6 +34,7 @@ func init() {
 	}
 
 	conf.Host = Cfg.Section("server").Key("host").MustString("localhost")
+	conf.InerHost = Cfg.Section("server").Key("iner_host").MustString("localhost")
 	conf.Port = Cfg.Section("server").Key("port").MustString("8080")
 
 	conf.URL_BASE = "http://" + conf.Host + ":" + conf.Port

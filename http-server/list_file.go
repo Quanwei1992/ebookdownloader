@@ -36,6 +36,15 @@ func List(c *gin.Context) {
 
 			tmp.Metainfo, err = GetMetaData(metapath)
 			if err == nil {
+				if tmp.Metainfo.CoverUrl != "" {
+				tmp.Metainfo.CoverUrl = conf.URL_BASE + "/" + tmp.Metainfo.CoverUrl
+				}
+				if tmp.Metainfo.TxtUrlPath != "" {
+				tmp.Metainfo.TxtUrlPath = conf.URL_BASE + "/" + tmp.Metainfo.TxtUrlPath
+				}
+				if tmp.Metainfo.MobiUrlPath != "" {
+				tmp.Metainfo.MobiUrlPath = conf.URL_BASE + "/" + tmp.Metainfo.MobiUrlPath
+				}
 				filelist = append(filelist, tmp)
 			}
 		}

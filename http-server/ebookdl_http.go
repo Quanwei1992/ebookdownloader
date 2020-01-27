@@ -86,15 +86,15 @@ func ParseEbhostAndBookIdPost(c *gin.Context) {
 
 	if isTxt {
 		bookinfo.GenerateTxt()
-		txtfilepath = conf.URL_BASE + "/public/" + bookinfo.Name + "-" + bookinfo.Author + "/" + bookinfo.Name + "-" + bookinfo.Author + ".txt"
+		txtfilepath = "public/" + bookinfo.Name + "-" + bookinfo.Author + "/" + bookinfo.Name + "-" + bookinfo.Author + ".txt"
 	}
 	if isMobi {
 		bookinfo.SetKindleEbookType(true, false)
 		lock.Lock()
 		bookinfo.GenerateMobi()
 		lock.Unlock()
-		mobifilepath = conf.URL_BASE + "/public/" + bookinfo.Name + "-" + bookinfo.Author + "/" + bookinfo.Name + "-" + bookinfo.Author + ".mobi"
-		cover_url_path = conf.URL_BASE + "/public/" + bookinfo.Name + "-" + bookinfo.Author + "/" + "cover.jpg"
+		mobifilepath = "public/" + bookinfo.Name + "-" + bookinfo.Author + "/" + bookinfo.Name + "-" + bookinfo.Author + ".mobi"
+		cover_url_path = "public/" + bookinfo.Name + "-" + bookinfo.Author + "/" + "cover.jpg"
 
 	}
 
@@ -171,5 +171,5 @@ func main() {
 	// http://localhost:8080/stat
 	router.GET("/stat", HttpStat)
 
-	router.Run(conf.Host + ":" + conf.Port) // 监听并在 0.0.0.0:8080 上启动服务
+	router.Run(conf.InerHost + ":" + conf.Port) // 监听并在 0.0.0.0:8080 上启动服务
 }

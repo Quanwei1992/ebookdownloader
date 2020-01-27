@@ -35,8 +35,10 @@
 
   ## 后端服务器 API接口
     主要目的是部署在vps上面，就可以方便随时下载小说了
-
+   API接口文档
 [ebookdowloader_http_api](http-server/ebookdowloader_http_api.md)
+
+配置文件[ebdl_conf.ini](conf/ebdl_conf.ini)
 
   ## 懒人模式，直接下载编译好的程序
   
@@ -48,6 +50,7 @@
                 1. http-server添加中文件，处理跨域访问问题
                 2. 修改小说下载后，保存目录为 ./outputs/小说名-作者/
                 3. http-server 添加生成meta.json,用于保存小说作者，小说简介，小说下载网站，小说bookid等信息
+                4. http-server 配置文件修改，原来的host定义为外部地址，iner_host定义为内部地址
                 
       2020.01.26 go版本
                 1. 添加 http-server版本，初始化
