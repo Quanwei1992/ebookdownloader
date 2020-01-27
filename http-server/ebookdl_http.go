@@ -160,7 +160,10 @@ func main() {
 	//删除 服务器上面已经下载的小说
 	// $ curl -X GET "http://localhost:8080/del/我是谁-sndnvaps/我是谁-sndnvaps.mobi"
 	// $ curl -X GET "http://localhost:8080/del/我真不是作者菌-sndnvaps/我真不是作者菌-sndnvaps.txt"
-	router.GET("/del/:ebpath/:bookname", Del)
+	del := router.Group("/del")
+	{
+		del.GET("/:ebpath/:bookname",Del)
+	}
 
 	//简单文件服务器
 	// http://localhost:8080/file

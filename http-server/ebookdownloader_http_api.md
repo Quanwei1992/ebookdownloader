@@ -84,7 +84,8 @@ $ curl -X GET -v http://localhost:8080/get_list
 ```bash
  /del
  接受参数
- bookname
+ ebpath //定义小说的路径；类型 string; 格式： 小说名-作者
+ bookname //定义小说名，支持格式有.txt,.mobi,azw3,.jpg,.json；类型string; 可接受特定命令del，用于删除小说对应的目录
  返回值
  成功后的返回值
  {
@@ -97,12 +98,16 @@ $ curl -X GET -v http://localhost:8080/get_list
 ```
  测试例子
 ```bash
-$ curl -X GET -v "http://localhost:8080/del/who-am-i.txt"
+$ curl -X GET -v "http://localhost:8080/del/我是谁-sndnvaps/我是谁-sndnvaps.txt"
+$ curl -X GET -v "http://localhost:8080/del/我是谁-sndnvaps/del"
 ```
 返回结果
 ```json
 {
-   "Status": "who-am-i.txt has been delete"
+   "Status": "我是谁-sndnvaps.txt has been delete"
+}
+{
+      "Status": "我是谁-sndnvaps has been remove"
 }
 ```
 
