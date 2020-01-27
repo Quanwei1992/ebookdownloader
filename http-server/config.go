@@ -12,8 +12,16 @@ var (
 var (
 	//Cfg for global use
 	Cfg  *ini.File
-	Host string
-	Port string
+)
+
+type Config struct {
+	Host string `json:"host"`
+	Port string `json:"port"`
+	URL_BASE string `json:"url_base"`
+}
+
+var (
+   conf Config
 )
 
 func init() {
@@ -24,7 +32,9 @@ func init() {
 		panic(fmt.Errorf("fail to load config file '%s': %v", CFG_PATH, err))
 	}
 
-	Host = Cfg.Section("server").Key("host").MustString("localhost")
-	Port = Cfg.Section("server").Key("port").MustString("8080")
+	conf.Host = Cfg.Section("server").Key("host").MustString("localhost")
+	conf.Port = Cfg.Section("server").Key("port").MustString("8080")
+
+	conf.URL_BASE = "http://" + conf.Host + ":" + conf.Port
 
 }

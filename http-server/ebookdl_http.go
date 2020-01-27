@@ -14,7 +14,7 @@ import (
 )
 
 var (
-	Version   string = "1.6.9"
+	Version   string = "1.7.0"
 	Commit    string = "b40f73c79"
 	BuildTime string = "2020-01-25 16:19"
 )
@@ -30,31 +30,24 @@ var (
 
 //系统信息
 func HttpStat(c *gin.Context) {
+	// gin设置响应头，设置跨域
+	c.Header("Access-Control-Allow-Origin", "*")
 	c.JSON(200, gin.H{
 		"ebookdownloader_Version": Version,
 		"HashCommit":              Commit,
 		"SystemBuildTime":         BuildTime,
+		"hostinfo": conf,
 	})
 	c.String(http.StatusOK, "ok")
 }
 
-//The request responds to a url matching:  ?ebhost=xsbiquge.com&bookid=0_062
-func ParseEbhostAndBookIdGet(c *gin.Context) {
-	ebhost := c.DefaultQuery("ebhost", "xsbiquge.com") //设置默认值为 xsbiquge.com
-	bookid := c.Query("bookid")
-	c.JSON(200, gin.H{
-		"status": "geted",
-		"ebhost": ebhost,
-		"bookid": bookid,
-	})
-}
-
 func ParseEbhostAndBookIdPost(c *gin.Context) {
+
 	bookid := c.Query("bookid")
 	ebhost := c.DefaultQuery("ebhost", "xsbiquge.com") //设置默认值为 xsbiquge.com
 
-	isTxtStr := c.PostForm("istxt")   //需要传入bool值 , 0,1,true,false
-	isMobiStr := c.PostForm("ismobi") //需要传入bool值, 0,1,true,false
+	isTxtStr := c.DefaultQuery("istxt","false")   //需要传入bool值 , 0,1,true,false
+	isMobiStr := c.DefaultQuery("ismobi","false") //需要传入bool值, 0,1,true,false
 
 	txtfilepath := ""  //定义 txt下载后，获取得到的 地址
 	mobifilepath := "" //定义 txt下载后，获取得到的 地址
@@ -94,19 +87,19 @@ func ParseEbhostAndBookIdPost(c *gin.Context) {
 
 	if isTxt {
 		bookinfo.GenerateTxt()
-		txtfilepath = "public/" + bookinfo.Name + "-" + bookinfo.Author + ".txt"
+		txtfilepath =  conf.URL_BASE + "/public/" + bookinfo.Name + "-" + bookinfo.Author + ".txt"
 	}
 	if isMobi {
 		bookinfo.SetKindleEbookType(true, false)
 		lock.Lock()
 		bookinfo.GenerateMobi()
 		lock.Unlock()
-		mobifilepath = "public/" + bookinfo.Name + "-" + bookinfo.Author + ".mobi"
+		mobifilepath = conf.URL_BASE + "/public/" + bookinfo.Name + "-" + bookinfo.Author + ".mobi"
 
 	}
 
 	c.JSON(http.StatusOK, gin.H{
-		"status":       "post",
+		"status":       "ok",
 		"ebhost":       ebhost,
 		"bookid":       bookid,
 		"isTxt":        isTxtStr,
@@ -121,6 +114,7 @@ func ParseEbhostAndBookIdPost(c *gin.Context) {
 
 //用于上传文件，并保存到服务器的 public目录里面
 func Upload(c *gin.Context) {
+
 	file, header, err := c.Request.FormFile("file")
 	if err != nil {
 		c.String(http.StatusBadRequest, fmt.Sprintf("file err : %s", err.Error()))
@@ -136,28 +130,26 @@ func Upload(c *gin.Context) {
 	if err != nil {
 		log.Fatal(err)
 	}
-	filepath := "http://localhost:8080/public" + filename
+	filepath := conf.URL_BASE + "/public/" + filename
 	c.JSON(http.StatusOK, gin.H{"filepath": filepath})
 }
 
 func main() {
-	//gin.SetMode(gin.ReleaseMode)
+	// Creates a router with Default
 	router := gin.Default()
-	//The request responds to a url matching:  /get?ebhost=xsbiquge.com&bookid=0_062
-	// //get?ebhost=23us.la&bookid=0_062
-	// /get?bookid=0_062
-	// $ curl -X GET -v http://localhost:8080/get?ebhost=999xs.com&bookid=0_062"
 
-	//router.GET("/get", ParseEbhostAndBookIdGet)
+	//使用中间件，处理跨域问题
+	router.Use(AccessCROSMiddleware())
 
-	// $ curl -X POST -v --form istxt=true --form ismobi=false "http://localhost:8080/post?ebhost=23us.la&bookid=0_062"
-	router.POST("/post", ParseEbhostAndBookIdPost)
+
+	// $ curl -X GET -v --form istxt=true --form ismobi=false "http://localhost:8080/post?ebhost=23us.la&bookid=0_062&istxt=true&ismobi=true"
+	router.GET("/post", ParseEbhostAndBookIdPost)
 
 	// $ curl -X POST --form "file=@./hello.txt" http://localhost:8080/upload
 	router.POST("/upload", Upload)
 
 	//列举./public目录所有的文件
-	router.GET("/list", List)
+	router.GET("/get_list", List)
 
 	//删除 服务器上面已经下载的小说
 	// $ curl -X GET "http://localhost:8080/del/我是谁.mobi"
@@ -173,5 +165,5 @@ func main() {
 	// http://localhost:8080/stat
 	router.GET("/stat", HttpStat)
 
-	router.Run(Host + ":" + Port) // 监听并在 0.0.0.0:8080 上启动服务
+	router.Run(conf.Host + ":" + conf.Port) // 监听并在 0.0.0.0:8080 上启动服务
 }

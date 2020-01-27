@@ -26,11 +26,11 @@ $ curl -X POST --form "file=@./hello.txt" http://localhost:8080/upload
 ```bash
 /post
 query用到的参数
-   ebhost 定义小说下载网站，类型string
+   ebhost 定义小说下载网站，类型string; 默认值为 xsbiquge.com; 可用参数为 23us.la, 999xs.com
    bookid 定义对应小说在网站中的id,类型string
-form用到的参数
-   istxt 定义是否生成txt文件，类型为bool,可接受的值 0,1,true,false
-   ismobi 定义是否生成mobi文件，类型为bool,可接受的值 0,1,true,false
+   istxt 定义是否生成txt文件，类型为bool,可接受的值 0,1,true,false; 默认值为false
+   ismobi 定义是否生成mobi文件，类型为bool,可接受的值 0,1,true,false; 默认值为false
+  http_method: GET
 返回值
  {
   "status": "post",
@@ -47,28 +47,32 @@ form用到的参数
 
 测试例子
 ```bash
-$ curl -X POST -v --form istxt=true --form ismobi=false "http://localhost:8080/post?ebhost=23us.la&bookid=0_062"
+$ curl -X GET -v  "http://localhost:8080/post?ebhost=23us.la&bookid=0_062&istxt=true&ismobi=false"
 ```
 
 ### List
 列举下载目录里面的所有文件
 ```bash
-  /list
+  /get_list
   不接受任何参数
   返回值
   {
      "files": [
-        "public/text.txt",
-        "public/text2.txt",
-        "public/who-am-i.txt",
-        "public/who-am-i.mobi",
+        {
+           "filename":"测试文件.txt",
+           "url": "http://localhost:8080/public/测试文件.txt"
+        },
+         {
+           "filename":"测试文件.mobi",
+           "url": "http://localhost:8080/public/测试文件.mobi"
+        },
      ]
   }
 ```
 
 测试例子
 ```bash
-$ curl -X GET -v http://localhost:8080/list
+$ curl -X GET -v http://localhost:8080/get_list
 ```
 
 ### Del
@@ -108,6 +112,12 @@ $ curl -X GET -v "http://localhost:8080/del/who-am-i.txt"
   "ebookdownloader_Version": Version,
   "HashCommit": Commit,
   "SystemBuildTime": BuildTime,
+  "hostinfo": {
+               "host": "localhost",
+               "port": "8080",
+               "url_base": "http://localhost:8080"
+             }
+
  }
 ```
 

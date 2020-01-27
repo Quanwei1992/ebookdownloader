@@ -44,6 +44,9 @@
 
   ## 更新日志
 
+      2020.01.27 go版本
+                1. http-server添加中文件，处理跨域访问问题
+                
       2020.01.26 go版本
                 1. 添加 http-server版本，初始化
                 2. 添加qemu-i386-static 支持arm,arm64平台上生成mobi,azw3格式电子书

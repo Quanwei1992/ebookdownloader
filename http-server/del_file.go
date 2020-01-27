@@ -11,6 +11,9 @@ import (
 
 //用于删除 服务器中outputs/目录指定的文件 :bookname
 func Del(c *gin.Context) {
+	// gin设置响应头，设置跨域
+	c.Header("Access-Control-Allow-Origin", "*")
+
 	bookname := c.Param("bookname")
 	ext := filepath.Ext(bookname)
 	if ext == ".txt" || ext == ".mobi" || ext == ".azw3" {
