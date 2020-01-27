@@ -11,17 +11,17 @@ var (
 
 var (
 	//Cfg for global use
-	Cfg  *ini.File
+	Cfg *ini.File
 )
 
 type Config struct {
-	Host string `json:"host"`
-	Port string `json:"port"`
+	Host     string `json:"host"`
+	Port     string `json:"port"`
 	URL_BASE string `json:"url_base"`
 }
 
 var (
-   conf Config
+	conf Config
 )
 
 func init() {

@@ -46,6 +46,8 @@
 
       2020.01.27 go版本
                 1. http-server添加中文件，处理跨域访问问题
+                2. 修改小说下载后，保存目录为 ./outputs/小说名-作者/
+                3. http-server 添加生成meta.json,用于保存小说作者，小说简介，小说下载网站，小说bookid等信息
                 
       2020.01.26 go版本
                 1. 添加 http-server版本，初始化
@@ -121,3 +123,7 @@
      [√]  4. 添加界面版本gui
      [√]  5. 添加http-server,做为后端
      [√]  6. 添加linux arm,arm64平台支持
+     [ ]  7. 需要限制并发数量，因为vps性能有限
+           参考文章 
+               [1](https://blog.csdn.net/HaoDaWang/article/details/80868919)
+               [2](https://www.cnblogs.com/Zereker/p/9590788.html)

@@ -99,7 +99,7 @@ func (this BookInfo) GenerateTxt() {
 	chapters := this.Chapters //小说的章节信息
 	volumes := this.Volumes   //小说的分卷信息
 	content := ""             //用于存放（分卷、）章节内容
-	outfpath := "./outputs/"
+	outfpath := "./outputs/" + this.Name + "-" + this.Author + "/"
 	outfname := outfpath + this.Name + "-" + this.Author + ".txt"
 
 	for index := 0; index < len(chapters); index++ {
@@ -142,6 +142,12 @@ func (this BookInfo) GenerateMobi() {
 		os.RemoveAll(savepath)
 	}
 	os.MkdirAll(path.Dir(savepath), os.ModePerm)
+
+	//设置生成mobi的输出目录
+	outputpath := "./outputs/" + this.Name + "-" + this.Author + "/"
+	if !com.IsExist(outputpath) {
+		os.MkdirAll(path.Dir(outputpath), os.ModePerm)
+	}
 
 	// 生成封面
 	GenerateCover(this)
@@ -268,12 +274,13 @@ func (this BookInfo) GenerateMobi() {
 	//把修改内容写入到content.opf文件中
 	WriteFile(savepath+"/content.opf", []byte(opf_content))
 
-	if !com.IsExist("./outputs/") {
-		os.MkdirAll(path.Dir("./outputs/"), os.ModePerm)
-	}
-
 	//把封面复制到 tmp 目录当中
 	err := com.Copy("cover.jpg", savepath+"/cover.jpg")
+	if err != nil {
+		fmt.Println(err.Error())
+	}
+	//把封面复制到 outputs/小说名-作者/cover.jpg
+	err = com.Copy("cover.jpg", outputpath+"cover.jpg")
 	if err != nil {
 		fmt.Println(err.Error())
 	}
@@ -294,7 +301,7 @@ func (this BookInfo) GenerateMobi() {
 	cmd.Run()
 
 	// 把生成的mobi文件复制到 outputs/目录下面
-	com.Copy(savepath+"/"+outfname, "./outputs/"+outfname)
+	com.Copy(savepath+"/"+outfname, outputpath+outfname)
 }
 
 //AsycChapter

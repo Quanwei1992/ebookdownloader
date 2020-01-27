@@ -36,7 +36,7 @@ func HttpStat(c *gin.Context) {
 		"ebookdownloader_Version": Version,
 		"HashCommit":              Commit,
 		"SystemBuildTime":         BuildTime,
-		"hostinfo": conf,
+		"hostinfo":                conf,
 	})
 	c.String(http.StatusOK, "ok")
 }
@@ -46,11 +46,13 @@ func ParseEbhostAndBookIdPost(c *gin.Context) {
 	bookid := c.Query("bookid")
 	ebhost := c.DefaultQuery("ebhost", "xsbiquge.com") //设置默认值为 xsbiquge.com
 
-	isTxtStr := c.DefaultQuery("istxt","false")   //需要传入bool值 , 0,1,true,false
-	isMobiStr := c.DefaultQuery("ismobi","false") //需要传入bool值, 0,1,true,false
+	isTxtStr := c.DefaultQuery("istxt", "false")   //需要传入bool值 , 0,1,true,false
+	isMobiStr := c.DefaultQuery("ismobi", "false") //需要传入bool值, 0,1,true,false
 
 	txtfilepath := ""  //定义 txt下载后，获取得到的 地址
-	mobifilepath := "" //定义 txt下载后，获取得到的 地址
+	mobifilepath := "" //定义 mobi下载后，获取得到的 地址
+	cover_url_path := "" //定义下载小说后，封面的url地址
+	var metainfo Meta  //用于保存小说的meta信息
 
 	isTxt, errTxt := strconv.ParseBool(isTxtStr)
 	if errTxt != nil {
@@ -80,34 +82,39 @@ func ParseEbhostAndBookIdPost(c *gin.Context) {
 
 	bookinfo = EBDLInterface.GetBookInfo(bookid, "")
 
-	author := bookinfo.Author
-	description := bookinfo.Description
-
 	bookinfo = EBDLInterface.DownloadChapters(bookinfo, "")
 
 	if isTxt {
 		bookinfo.GenerateTxt()
-		txtfilepath =  conf.URL_BASE + "/public/" + bookinfo.Name + "-" + bookinfo.Author + ".txt"
+		txtfilepath = conf.URL_BASE + "/public/" + bookinfo.Name + "-" + bookinfo.Author + "/" + bookinfo.Name + "-" + bookinfo.Author + ".txt"
 	}
 	if isMobi {
 		bookinfo.SetKindleEbookType(true, false)
 		lock.Lock()
 		bookinfo.GenerateMobi()
 		lock.Unlock()
-		mobifilepath = conf.URL_BASE + "/public/" + bookinfo.Name + "-" + bookinfo.Author + ".mobi"
+		mobifilepath = conf.URL_BASE + "/public/" + bookinfo.Name + "-" + bookinfo.Author + "/" + bookinfo.Name + "-" + bookinfo.Author + ".mobi"
+		cover_url_path = conf.URL_BASE + "/public/" + bookinfo.Name + "-" + bookinfo.Author + "/" + "cover.jpg"
 
 	}
 
+	metainfo = Meta{
+		Ebhost:      ebhost,
+		Bookid:      bookid,
+		BookName:    bookinfo.Name,
+		Author:      bookinfo.Author,
+		CoverUrl: cover_url_path,
+		Description: bookinfo.Description,
+		TxtUrlPath:  txtfilepath,
+		MobiUrlPath: mobifilepath,
+	}
+
+	metainfo.WriteFile("./outputs/" + bookinfo.Name + "-" + bookinfo.Author + "/meta.json")
+
 	c.JSON(http.StatusOK, gin.H{
-		"status":       "ok",
-		"ebhost":       ebhost,
-		"bookid":       bookid,
-		"isTxt":        isTxtStr,
-		"isMobi":       isMobiStr,
-		"author":       author,
-		"description":  description,
-		"txtfilepath":  txtfilepath,
-		"mobifilepath": mobifilepath,
+		"isTxt":    isTxtStr,
+		"isMobi":   isMobiStr,
+		"metainfo": metainfo,
 	})
 
 }
@@ -141,20 +148,19 @@ func main() {
 	//使用中间件，处理跨域问题
 	router.Use(AccessCROSMiddleware())
 
-
 	// $ curl -X GET -v --form istxt=true --form ismobi=false "http://localhost:8080/post?ebhost=23us.la&bookid=0_062&istxt=true&ismobi=true"
 	router.GET("/post", ParseEbhostAndBookIdPost)
 
 	// $ curl -X POST --form "file=@./hello.txt" http://localhost:8080/upload
-	router.POST("/upload", Upload)
+	//router.POST("/upload", Upload)
 
 	//列举./public目录所有的文件
 	router.GET("/get_list", List)
 
 	//删除 服务器上面已经下载的小说
-	// $ curl -X GET "http://localhost:8080/del/我是谁.mobi"
-	// $ curl -X GET "http://localhost:8080/del/我真不是作者菌.txt"
-	router.GET("/del/:bookname",Del)
+	// $ curl -X GET "http://localhost:8080/del/我是谁-sndnvaps/我是谁-sndnvaps.mobi"
+	// $ curl -X GET "http://localhost:8080/del/我真不是作者菌-sndnvaps/我真不是作者菌-sndnvaps.txt"
+	router.GET("/del/:ebpath/:bookname", Del)
 
 	//简单文件服务器
 	// http://localhost:8080/file

@@ -4,22 +4,6 @@
 
 ## API文档内容
 
-### Upload
-此功能是上传文件到服务器上面
-```bash
-  /upload
-  form 传入参数 file
-  http_method: POST
-  返回值 
-    {
-        "filepath": "http://localhost:port/file/filename"
-    }
-```
-测试使用
-```bash
-$ curl -X POST --form "file=@./hello.txt" http://localhost:8080/upload
-```
-
 
 ### POST
 此功能，主要用于下载小说
@@ -33,15 +17,19 @@ query用到的参数
   http_method: GET
 返回值
  {
-  "status": "post",
-  "ebhost": ebhost, //类型 string
-  "bookid": bookid, //类型 string
   "isTxt": isTxtStr, //类型 string
   "isMobi": isMobiStr, //类型 string
-  "author": author, //类型 string
-  "description": description, //类型 string
-  "txtfilepath",txtfilepath, //类型 string
-  "mobifilepath",mobifilepath, //类型 string
+  "metainfo": {
+        "ebhost": "xsbiquge.com",
+        "bookid": "91_918743",
+        "bookname": "我是谁",
+        "author": "sndnvaps",
+        "cover_url": "http://192.168.13.118:8090/public/我是谁-sndnvaps/cover.jpg",
+        "description": "我是小说的简介信息",
+        "txt_url_path": "http://192.168.13.118:8090/public/我是谁-sndnvaps/我是谁-sndnvaps.txt",
+        "mobi_url_path": "http://192.168.13.118:8090/public/我是谁-sndnvaps/我是谁-sndnvaps.mobi"
+            }
+
  }
 ```
 
@@ -58,14 +46,30 @@ $ curl -X GET -v  "http://localhost:8080/post?ebhost=23us.la&bookid=0_062&istxt=
   返回值
   {
      "files": [
-        {
-           "filename":"测试文件.txt",
-           "url": "http://localhost:8080/public/测试文件.txt"
-        },
          {
-           "filename":"测试文件.mobi",
-           "url": "http://localhost:8080/public/测试文件.mobi"
-        },
+         "metainfo":{
+            "ebhost": "xsbiquge.com",
+            "bookid": "91_918743",
+            "bookname": "我是谁",
+            "author": "sndnvaps",
+            "cover_url": "http://192.168.13.118:8090/public/我是谁-sndnvaps/cover.jpg",
+            "description": "我是小说的简介信息",
+            "txt_url_path": "http://192.168.13.118:8090/public/我是谁-sndnvaps/我是谁-sndnvaps.txt",
+            "mobi_url_path": "http://192.168.13.118:8090/public/我是谁-sndnvaps/我是谁-sndnvaps.mobi"
+            }
+         },
+         {
+         "metainfo":{
+            "ebhost": "xsbiquge.com",
+            "bookid": "91_918748",
+            "bookname": "我是谁1",
+            "author": "sndnvaps",
+            "cover_url": "http://192.168.13.118:8090/public/我是谁1-sndnvaps/cover.jpg",
+            "description": "我是小说的简介信息",
+            "txt_url_path": "http://192.168.13.118:8090/public/我是谁1-sndnvaps/我是谁1-sndnvaps.txt",
+            "mobi_url_path": "http://192.168.13.118:8090/public/我是谁1-sndnvaps/我是谁1-sndnvaps.mobi"
+            }
+         }
      ]
   }
 ```
@@ -124,4 +128,20 @@ $ curl -X GET -v "http://localhost:8080/del/who-am-i.txt"
 测试例子
 ```bash
 $ curl -X GET -v http://localhost:8080/stat
+```
+
+### Upload, 此功能已经作废
+此功能是上传文件到服务器上面
+```bash
+  /upload
+  form 传入参数 file
+  http_method: POST
+  返回值 
+    {
+        "filepath": "http://localhost:port/file/filename"
+    }
+```
+测试使用
+```bash
+$ curl -X POST --form "file=@./hello.txt" http://localhost:8080/upload
 ```

@@ -1,4 +1,4 @@
-// +build linux 
+// +build linux
 // +build 386 amd64
 // +build !arm !arm64
 
