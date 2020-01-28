@@ -209,6 +209,7 @@ func (this Ebook23US) GetBookInfo(bookid string, proxy string) BookInfo {
 	return bi
 }
 
+
 //根据每个章节的 url连接，下载每章对应的内容Content当中
 func (this Ebook23US) DownloadChapters(Bi BookInfo, proxy string) BookInfo {
 	chapters := Bi.Chapters
@@ -275,10 +276,12 @@ func (this Ebook23US) DownloaderChapter(ResultChan chan chan Chapter, pc ProxyCh
 		if proxy != "" {
 			doc, _ := htmlquery.LoadURLWithProxy(pollURL, proxy)
 			contentNode, _ := htmlquery.FindOne(doc, "//div[@id='content']")
-			contentText := htmlquery.InnerText(contentNode)
+			contentText := htmlquery.OutputHTML(contentNode, false)
 
-			//替换字符串中的特殊字符 \xE3\x80\x80\xE3\x80\x80 为换行符 \n
-			tmp := strings.Replace(contentText, "\xE3\x80\x80\xE3\x80\x80", "\r\n", -1)
+			//替换两个 html换行
+			tmp := strings.Replace(contentText, "<br/><br/>", "\r\n", -1)
+			//替换一个 html换行
+			tmp = strings.Replace(tmp, "<br/>", "\r\n", -1)
 
 			//把 readx(); 替换成 ""
 			tmp = strings.Replace(tmp, "</p>", "", -1)
@@ -294,10 +297,12 @@ func (this Ebook23US) DownloaderChapter(ResultChan chan chan Chapter, pc ProxyCh
 		} else {
 			doc, _ := htmlquery.LoadURL(pollURL)
 			contentNode, _ := htmlquery.FindOne(doc, "//div[@id='content']")
-			contentText := htmlquery.InnerText(contentNode)
+			contentText := htmlquery.OutputHTML(contentNode, false)
 
-			//替换字符串中的特殊字符 \xE3\x80\x80\xE3\x80\x80 为换行符 \n
-			tmp := strings.Replace(contentText, "\xE3\x80\x80\xE3\x80\x80", "\r\n", -1)
+			//替换两个 html换行
+			tmp := strings.Replace(contentText, "<br/><br/>", "\r\n", -1)
+			//替换一个 html换行
+			tmp = strings.Replace(tmp, "<br/>", "\r\n", -1)
 
 			//把 readx(); 替换成 ""
 			tmp = strings.Replace(tmp, "</p>", "", -1)

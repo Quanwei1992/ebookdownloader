@@ -45,6 +45,9 @@
   到[这里](https://github.com/sndnvaps/ebookdownloader/releases)下载你需要的版本
 
   ## 更新日志
+     
+     2020.01.28 go版本
+                1. ebookdownloader 修改获取章节的规则:替换 <br/> 为 \r\n
 
       2020.01.27 go版本
                 1. http-server添加中文件，处理跨域访问问题

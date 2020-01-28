@@ -143,58 +143,6 @@ func (this Ebook999XS) GetBookInfo(bookid string, proxy string) BookInfo {
 	return bi
 }
 
-func (this Ebook999XS) GetChapterContent(pc ProxyChapter) Chapter {
-	pollURL := pc.C.Link
-	proxy := pc.Proxy
-	var result Chapter
-
-	if proxy != "" {
-		doc, _ := htmlquery.LoadURLWithProxy(pollURL, proxy)
-		contentNode, _ := htmlquery.FindOne(doc, "//div[@id='content']")
-		contentText := htmlquery.InnerText(contentNode)
-
-		//替换字符串中的特殊字符 \xE3\x80\x80\xE3\x80\x80 为换行符 \n
-		tmp := strings.Replace(contentText, "\xE3\x80\x80\xE3\x80\x80", "\r\n", -1)
-
-		//把 readx(); 替换成 ""
-		tmp = strings.Replace(tmp, "999小说更新最快 电脑端:https://www.999xs.com/", "", -1)
-		tmp = strings.Replace(tmp, "ωωω.九九九xs.com", "", -1)
-		tmp = strings.Replace(tmp, "999小说首发 https://www.999xs.com https://m.999xs.com", "", -1)
-		tmp = strings.Replace(tmp, "手机\\端 一秒記住『www.999xs.com』為您提\\供精彩小說\\閱讀", "", -1)
-
-		//tmp = tmp + "\r\n"
-		//返回数据，填写Content内容
-		result = Chapter{
-			Title:   pc.C.Title,
-			Link:    pc.C.Link,
-			Content: tmp,
-		}
-	} else {
-		doc, _ := htmlquery.LoadURL(pollURL)
-		contentNode, _ := htmlquery.FindOne(doc, "//div[@id='content']")
-		contentText := htmlquery.InnerText(contentNode)
-
-		//替换字符串中的特殊字符 \xE3\x80\x80\xE3\x80\x80 为换行符 \n
-		tmp := strings.Replace(contentText, "\xE3\x80\x80\xE3\x80\x80", "\r\n", -1)
-
-		//把 readx(); 替换成 ""
-		tmp = strings.Replace(tmp, "999小说更新最快 电脑端:https://www.999xs.com/", "", -1)
-		tmp = strings.Replace(tmp, "ωωω.九九九xs.com", "", -1)
-		tmp = strings.Replace(tmp, "999小说首发 https://www.999xs.com https://m.999xs.com", "", -1)
-		tmp = strings.Replace(tmp, "手机\\端 一秒記住『www.999xs.com』為您提\\供精彩小說\\閱讀", "", -1)
-
-		//tmp = tmp + "\r\n"
-		//返回数据，填写Content内容
-		result = Chapter{
-			Title:   pc.C.Title,
-			Link:    pc.C.Link,
-			Content: tmp,
-		}
-	}
-
-	return result
-}
-
 //根据每个章节的 url连接，下载每章对应的内容Content当中
 func (this Ebook999XS) DownloadChapters(Bi BookInfo, proxy string) BookInfo {
 	chapters := Bi.Chapters
@@ -261,10 +209,12 @@ func (this Ebook999XS) DownloaderChapter(ResultChan chan chan Chapter, pc ProxyC
 		if proxy != "" {
 			doc, _ := htmlquery.LoadURLWithProxy(pollURL, proxy)
 			contentNode, _ := htmlquery.FindOne(doc, "//div[@id='content']")
-			contentText := htmlquery.InnerText(contentNode)
+			contentText := htmlquery.OutputHTML(contentNode, false)
 
-			//替换字符串中的特殊字符 \xE3\x80\x80\xE3\x80\x80 为换行符 \n
-			tmp := strings.Replace(contentText, "\xE3\x80\x80\xE3\x80\x80", "\r\n", -1)
+			//替换两个 html换行
+			tmp := strings.Replace(contentText, "<br/><br/>", "\r\n", -1)
+			//替换一个 html换行
+			tmp = strings.Replace(tmp, "<br/>", "\r\n", -1)
 
 			//把 readx(); 替换成 ""
 			tmp = strings.Replace(tmp, "999小说更新最快 电脑端:https://www.999xs.com/", "", -1)
@@ -282,10 +232,12 @@ func (this Ebook999XS) DownloaderChapter(ResultChan chan chan Chapter, pc ProxyC
 		} else {
 			doc, _ := htmlquery.LoadURL(pollURL)
 			contentNode, _ := htmlquery.FindOne(doc, "//div[@id='content']")
-			contentText := htmlquery.InnerText(contentNode)
+			contentText := htmlquery.OutputHTML(contentNode, false)
 
-			//替换字符串中的特殊字符 \xE3\x80\x80\xE3\x80\x80 为换行符 \n
-			tmp := strings.Replace(contentText, "\xE3\x80\x80\xE3\x80\x80", "\r\n", -1)
+			//替换两个 html换行
+			tmp := strings.Replace(contentText, "<br/><br/>", "\r\n", -1)
+			//替换一个 html换行
+			tmp = strings.Replace(tmp, "<br/>", "\r\n", -1)
 
 			//把 readx(); 替换成 ""
 			tmp = strings.Replace(tmp, "999小说更新最快 电脑端:https://www.999xs.com/", "", -1)

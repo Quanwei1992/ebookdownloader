@@ -15,7 +15,7 @@ var (
 )
 
 type Config struct {
-	Host     string `json:"host"`       //对外地址
+	Host     string `json:"host"`      //对外地址
 	InerHost string `json:"iner_host"` //内部地址
 	Port     string `json:"port"`
 	URL_BASE string `json:"url_base"`

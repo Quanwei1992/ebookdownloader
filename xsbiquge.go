@@ -108,50 +108,6 @@ func (this EbookXSBiquge) GetBookInfo(bookid string, proxy string) BookInfo {
 	return bi
 }
 
-func (this EbookXSBiquge) GetChapterContent(pc ProxyChapter) Chapter {
-	pollURL := pc.C.Link
-	proxy := pc.Proxy
-	var result Chapter
-
-	if proxy != "" {
-		doc, _ := htmlquery.LoadURLWithProxy(pollURL, proxy)
-		contentNode, _ := htmlquery.FindOne(doc, "//div[@id='content']")
-		contentText := htmlquery.InnerText(contentNode)
-
-		//替换字符串中的特殊字符 \xC2\xA0 为换行符 \n
-		tmp := strings.Replace(contentText, "\xC2\xA0", "\r\n", -1)
-
-		//把 readx(); 替换成 ""
-		tmp = strings.Replace(tmp, "readx();", "", -1)
-		//tmp = tmp + "\r\n"
-		//返回数据，填写Content内容
-		result = Chapter{
-			Title:   pc.C.Title,
-			Link:    pc.C.Link,
-			Content: tmp,
-		}
-	} else {
-		doc, _ := htmlquery.LoadURL(pollURL)
-		contentNode, _ := htmlquery.FindOne(doc, "//div[@id='content']")
-		contentText := htmlquery.InnerText(contentNode)
-
-		//替换字符串中的特殊字符 \xC2\xA0 为换行符 \n
-		tmp := strings.Replace(contentText, "\xC2\xA0", "\r\n", -1)
-
-		//把 readx(); 替换成 ""
-		tmp = strings.Replace(tmp, "readx();", "", -1)
-		//tmp = tmp + "\r\n"
-		//返回数据，填写Content内容
-		result = Chapter{
-			Title:   pc.C.Title,
-			Link:    pc.C.Link,
-			Content: tmp,
-		}
-	}
-
-	return result
-}
-
 //根据每个章节的 url连接，下载每章对应的内容Content当中
 func (this EbookXSBiquge) DownloadChapters(Bi BookInfo, proxy string) BookInfo {
 	chapters := Bi.Chapters
@@ -218,10 +174,12 @@ func (this EbookXSBiquge) DownloaderChapter(ResultChan chan chan Chapter, pc Pro
 		if proxy != "" {
 			doc, _ := htmlquery.LoadURLWithProxy(pollURL, proxy)
 			contentNode, _ := htmlquery.FindOne(doc, "//div[@id='content']")
-			contentText := htmlquery.InnerText(contentNode)
+			contentText := htmlquery.OutputHTML(contentNode, false)
 
-			//替换字符串中的特殊字符 \xC2\xA0 为换行符 \n
-			tmp := strings.Replace(contentText, "\xC2\xA0", "\r\n", -1)
+			//替换两个 html换行
+			tmp := strings.Replace(contentText, "<br/><br/>", "\r\n", -1)
+			//替换一个 html换行
+			tmp = strings.Replace(tmp, "<br/>", "\r\n", -1)
 
 			//把 readx(); 替换成 ""
 			tmp = strings.Replace(tmp, "readx();", "", -1)
@@ -235,10 +193,12 @@ func (this EbookXSBiquge) DownloaderChapter(ResultChan chan chan Chapter, pc Pro
 		} else {
 			doc, _ := htmlquery.LoadURL(pollURL)
 			contentNode, _ := htmlquery.FindOne(doc, "//div[@id='content']")
-			contentText := htmlquery.InnerText(contentNode)
+			contentText := htmlquery.OutputHTML(contentNode, false)
 
-			//替换字符串中的特殊字符 \xC2\xA0 为换行符 \n
-			tmp := strings.Replace(contentText, "\xC2\xA0", "\r\n", -1)
+			//替换两个 html换行
+			tmp := strings.Replace(contentText, "<br/><br/>", "\r\n", -1)
+			//替换一个 html换行
+			tmp = strings.Replace(tmp, "<br/>", "\r\n", -1)
 
 			//把 readx(); 替换成 ""
 			tmp = strings.Replace(tmp, "readx();", "", -1)

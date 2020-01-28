@@ -13,10 +13,10 @@ import (
 func Del(c *gin.Context) {
 
 	bookname := c.Param("bookname") //定义为小说名，或者是或者杂项；如果出现的为del,就执行删除目录操作
-	ebpath := c.Param("ebpath") //小说对应目录
+	ebpath := c.Param("ebpath")     //小说对应目录
 	ext := filepath.Ext(bookname)
 	//删除目录操作
-    if bookname == "del" {
+	if bookname == "del" {
 		fullpath := "outputs/" + ebpath + "/"
 		if !com.IsExist(fullpath) {
 			c.JSON(http.StatusOK, gin.H{"Status": fullpath + " is not exist in the serve"})
@@ -32,9 +32,9 @@ func Del(c *gin.Context) {
 	}
 
 	//删除文件操作
-	if (ext == ".txt" || ext == ".mobi" ||
-	 ext == ".azw3" || ext == ".json" || 
-	 ext == ".jpg") {
+	if ext == ".txt" || ext == ".mobi" ||
+		ext == ".azw3" || ext == ".json" ||
+		ext == ".jpg" {
 		fullpath := "outputs/" + ebpath + "/" + bookname
 		if !com.IsExist(fullpath) {
 			c.JSON(http.StatusOK, gin.H{"Status": fullpath + " is not exist in the serve"})
@@ -59,8 +59,8 @@ func DelFolder(c *gin.Context) {
 
 	ebpath := c.Param("ebpath") //小说对应目录
 	action := c.Param("action") //要执行的操作，目前只有指定 del
-	if (action == "del") {
-	
+	if action == "del" {
+
 		fullpath := "outputs/" + ebpath
 		if !com.IsExist(fullpath) {
 			c.JSON(http.StatusOK, gin.H{"Status": fullpath + " is not exist in the serve"})

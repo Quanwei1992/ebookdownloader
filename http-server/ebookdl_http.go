@@ -49,10 +49,10 @@ func ParseEbhostAndBookIdPost(c *gin.Context) {
 	isTxtStr := c.DefaultQuery("istxt", "false")   //需要传入bool值 , 0,1,true,false
 	isMobiStr := c.DefaultQuery("ismobi", "false") //需要传入bool值, 0,1,true,false
 
-	txtfilepath := ""  //定义 txt下载后，获取得到的 地址
-	mobifilepath := "" //定义 mobi下载后，获取得到的 地址
+	txtfilepath := ""    //定义 txt下载后，获取得到的 地址
+	mobifilepath := ""   //定义 mobi下载后，获取得到的 地址
 	cover_url_path := "" //定义下载小说后，封面的url地址
-	var metainfo Meta  //用于保存小说的meta信息
+	var metainfo Meta    //用于保存小说的meta信息
 
 	isTxt, errTxt := strconv.ParseBool(isTxtStr)
 	if errTxt != nil {
@@ -103,7 +103,7 @@ func ParseEbhostAndBookIdPost(c *gin.Context) {
 		Bookid:      bookid,
 		BookName:    bookinfo.Name,
 		Author:      bookinfo.Author,
-		CoverUrl: cover_url_path,
+		CoverUrl:    cover_url_path,
 		Description: bookinfo.Description,
 		TxtUrlPath:  txtfilepath,
 		MobiUrlPath: mobifilepath,
@@ -162,7 +162,7 @@ func main() {
 	// $ curl -X GET "http://localhost:8080/del/我真不是作者菌-sndnvaps/我真不是作者菌-sndnvaps.txt"
 	del := router.Group("/del")
 	{
-		del.GET("/:ebpath/:bookname",Del)
+		del.GET("/:ebpath/:bookname", Del)
 	}
 
 	//简单文件服务器
