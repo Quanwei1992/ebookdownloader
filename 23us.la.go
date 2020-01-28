@@ -209,7 +209,6 @@ func (this Ebook23US) GetBookInfo(bookid string, proxy string) BookInfo {
 	return bi
 }
 
-
 //根据每个章节的 url连接，下载每章对应的内容Content当中
 func (this Ebook23US) DownloadChapters(Bi BookInfo, proxy string) BookInfo {
 	chapters := Bi.Chapters

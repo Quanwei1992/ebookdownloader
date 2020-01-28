@@ -2,19 +2,71 @@
 
 为了方便下载网上的小说，特意写了此项目
 
+
+### api v2 添加权限管理
+需要验证 username,password
+也可以使用token
+
 ## API文档内容
 
+### Login 登陆，生成 token
+此功能主要用于进行登陆验证，生成token
+```bash
+/login
+username 类型 string; 默认用户为admin; 传入方式 --form
+password 类型 string;默认密码 admin; 传入方式 --form
+http_method: POST
+返回值{
+   "code": 200,
+   "expire": "2020-01-28T19:23:09+08:00",
+   "token":"eyJhbGciOiJIUzI1NiIsIn
+R5cCI6IkpXVCJ9.eyJleHAiOjE1ODAyMTA1ODksImlkIjoiYWRtaW4iLCJvcmlnX2lhdCI6MTU4MDIwN
+jk4OX0.XNPrk0LKcMJlJqf0Opx9JYh_kaKL_STT5p7J9_mkc0Y"
+}
+```
+
+测试例子
+```bash
+$curl -X POST -form username=admin --form password=admin http://localhost:8080/login
+```
+
+### 更新 token
+此功能，用于更新已经失效的 TOKEN
+```bash
+/refresh_token
+没有参数
+但需要定义传入的http header
+传入header:
+  Authorization:Bearer TOKEN
+  Content-Type: application/json
+cookie: 需要传入 token
+返回值 
+{
+   "code": 200,
+   "expire": "2020-01-28T19:23:09+08:00",
+   "token":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE1ODAyMTA1ODksImlkIjoiYWRtaW4iLCJvcmlnX2lhdCI6MTU4MDIwNjk4OX0.XNPrk0LKcMJlJqf0Opx9JYh_kaKL_STT5p7J9_mkc0Y"
+}
+```
+
+测试例子
+```bash
+$curl  -H "Authorization:Bearer xxxxxxxxx" -H "Content-Type: application/json" -X GET localhost:8000/auth/refresh_token 
+```
 
 ### POST
 此功能，主要用于下载小说
 ```bash
-/post
+/auth/post
 query用到的参数
    ebhost 定义小说下载网站，类型string; 默认值为 xsbiquge.com; 可用参数为 23us.la, 999xs.com
    bookid 定义对应小说在网站中的id,类型string
    istxt 定义是否生成txt文件，类型为bool,可接受的值 0,1,true,false; 默认值为false
    ismobi 定义是否生成mobi文件，类型为bool,可接受的值 0,1,true,false; 默认值为false
   http_method: GET
+传入header:
+  Authorization:Bearer TOKEN
+  Content-Type: application/json
+或者 cookie: 需要传入 token
 返回值
  {
   "isTxt": isTxtStr, //类型 string
@@ -35,7 +87,8 @@ query用到的参数
 
 测试例子
 ```bash
-$ curl -X GET -v  "http://localhost:8080/post?ebhost=23us.la&bookid=0_062&istxt=true&ismobi=false"
+$ curl -H "Authorization:Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE1ODAyMTI3MzIsImlkIjoiYWRtaW4iLCJvcmlnX2lhdCI6MTU4MDIwOTEzMn0.Whcz9m1boDKPh_F9jpgOZ4EUoIXIS3b8LrK1aqIYFRE" -H "Content-Type: application/js
+on" -X GET -v  "http://localhost:8080/auth/post?ebhost=23us.la&bookid=0_062&istxt=true&ismobi=false"
 ```
 
 ### List
@@ -43,6 +96,11 @@ $ curl -X GET -v  "http://localhost:8080/post?ebhost=23us.la&bookid=0_062&istxt=
 ```bash
   /get_list
   不接受任何参数
+   http_method: GET
+   传入header:
+  Authorization:Bearer TOKEN
+  Content-Type: application/json
+ 或者 cookie: 需要传入 token
   返回值
   {
      "files": [
@@ -76,7 +134,7 @@ $ curl -X GET -v  "http://localhost:8080/post?ebhost=23us.la&bookid=0_062&istxt=
 
 测试例子
 ```bash
-$ curl -X GET -v http://localhost:8080/get_list
+$ curl  -H "Authorization:Bearer xxxxxxxxx" -H "Content-Type: application/json" -X GET -v http://localhost:8080/auth/get_list
 ```
 
 ### Del
@@ -86,6 +144,10 @@ $ curl -X GET -v http://localhost:8080/get_list
  接受参数
  ebpath //定义小说的路径；类型 string; 格式： 小说名-作者
  bookname //定义小说名，支持格式有.txt,.mobi,azw3,.jpg,.json；类型string; 可接受特定命令del，用于删除小说对应的目录
+ 传入header:
+  Authorization:Bearer TOKEN
+  Content-Type: application/json
+ 或者 cookie: 需要传入 token
  返回值
  成功后的返回值
  {
@@ -98,8 +160,8 @@ $ curl -X GET -v http://localhost:8080/get_list
 ```
  测试例子
 ```bash
-$ curl -X GET -v "http://localhost:8080/del/我是谁-sndnvaps/我是谁-sndnvaps.txt"
-$ curl -X GET -v "http://localhost:8080/del/我是谁-sndnvaps/del"
+$ curl  -H "Authorization:Bearer xxxxxxxxx" -H "Content-Type: application/json" -X GET -v "http://localhost:8080/auth/del/我是谁-sndnvaps/我是谁-sndnvaps.txt"
+$ curl  -H "Authorization:Bearer xxxxxxxxx" -H "Content-Type: application/json" -X GET -v "http://localhost:8080/auth/del/我是谁-sndnvaps/del"
 ```
 返回结果
 ```json
@@ -132,7 +194,7 @@ $ curl -X GET -v "http://localhost:8080/del/我是谁-sndnvaps/del"
 
 测试例子
 ```bash
-$ curl -X GET -v http://localhost:8080/stat
+$ curl  -H "Authorization:Bearer xxxxxxxxx" -H "Content-Type: application/json" -X GET -v http://localhost:8080/stat
 ```
 
 ### Upload, 此功能已经作废
@@ -150,3 +212,5 @@ $ curl -X GET -v http://localhost:8080/stat
 ```bash
 $ curl -X POST --form "file=@./hello.txt" http://localhost:8080/upload
 ```
+
+curl -H "Authorization:Bearer eyJhbGciOiJIUzI1N6IkpXVCJ9.eyJleHAiOjE1ODAyMTI3MzIsImlkIjoiYWRtaW4iLCJvcmlnX2lhdCI6MTU40.Whcz9m1boDKPh_F9jpgOZ4EUoIXIS3b8LrK1aqIYFRE" -H "Content-Type: application/json" -X GET "http://192.168.13.103:8090/auth/del/帝婿归来-十年一梦/del"

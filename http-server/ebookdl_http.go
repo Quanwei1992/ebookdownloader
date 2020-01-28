@@ -8,9 +8,12 @@ import (
 	"os"
 	"strconv"
 	"sync"
+	"time"
 
+	jwt "github.com/appleboy/gin-jwt/v2"
 	"github.com/gin-gonic/gin"
 	edl "github.com/sndnvaps/ebookdownloader"
+	"github.com/sndnvaps/ebookdownloader/http-server/middleware"
 )
 
 var (
@@ -28,10 +31,32 @@ var (
 	lock sync.Mutex
 )
 
+type login struct {
+	Username string `form:"username" json:"username" binding:"required"`
+	Password string `form:"password" json:"password" binding:"required"`
+}
+
+// User demo
+type User struct {
+	UserName  string
+	FirstName string
+	LastName  string
+}
+
+var identityKey = "id"
+
+func helloHandler(c *gin.Context) {
+	claims := jwt.ExtractClaims(c)
+	user, _ := c.Get(identityKey)
+	c.JSON(200, gin.H{
+		"userID":   claims[identityKey],
+		"userName": user.(*User).UserName,
+		"text":     "Hello World.",
+	})
+}
+
 //系统信息
 func HttpStat(c *gin.Context) {
-	// gin设置响应头，设置跨域
-	c.Header("Access-Control-Allow-Origin", "*")
 	c.JSON(200, gin.H{
 		"ebookdownloader_Version": Version,
 		"HashCommit":              Commit,
@@ -146,33 +171,114 @@ func main() {
 	router := gin.Default()
 
 	//使用中间件，处理跨域问题
-	router.Use(AccessCROSMiddleware())
+	router.Use(middleware.Cors())
 
-	// $ curl -X GET -v --form istxt=true --form ismobi=false "http://localhost:8080/post?ebhost=23us.la&bookid=0_062&istxt=true&ismobi=true"
-	router.GET("/post", ParseEbhostAndBookIdPost)
+	// the jwt middleware
+	authMiddleware, err := jwt.New(&jwt.GinJWTMiddleware{
+		Realm:       "test zone",
+		Key:         []byte("secret key"),
+		Timeout:     time.Hour,
+		MaxRefresh:  time.Hour,
+		IdentityKey: identityKey,
+		PayloadFunc: func(data interface{}) jwt.MapClaims {
+			if v, ok := data.(*User); ok {
+				return jwt.MapClaims{
+					identityKey: v.UserName,
+				}
+			}
+			return jwt.MapClaims{}
+		},
+		IdentityHandler: func(c *gin.Context) interface{} {
+			claims := jwt.ExtractClaims(c)
+			return &User{
+				UserName: claims[identityKey].(string),
+			}
+		},
+		Authenticator: func(c *gin.Context) (interface{}, error) {
+			var loginVals login
+			if err := c.ShouldBind(&loginVals); err != nil {
+				return "", jwt.ErrMissingLoginValues
+			}
+			userID := loginVals.Username
+			password := loginVals.Password
 
-	// $ curl -X POST --form "file=@./hello.txt" http://localhost:8080/upload
-	//router.POST("/upload", Upload)
+			if (userID == "admin" && password == "admin") || (userID == "test" && password == "test") {
+				return &User{
+					UserName:  userID,
+					LastName:  "Bo-Yi",
+					FirstName: "Wu",
+				}, nil
+			}
 
-	//列举./public目录所有的文件
-	router.GET("/get_list", List)
+			return nil, jwt.ErrFailedAuthentication
+		},
+		Authorizator: func(data interface{}, c *gin.Context) bool {
+			if v, ok := data.(*User); ok && v.UserName == "admin" {
+				return true
+			}
 
-	//删除 服务器上面已经下载的小说
-	// $ curl -X GET "http://localhost:8080/del/我是谁-sndnvaps/我是谁-sndnvaps.mobi"
-	// $ curl -X GET "http://localhost:8080/del/我真不是作者菌-sndnvaps/我真不是作者菌-sndnvaps.txt"
-	del := router.Group("/del")
+			return false
+		},
+		Unauthorized: func(c *gin.Context, code int, message string) {
+			c.JSON(code, gin.H{
+				"code":    code,
+				"message": message,
+			})
+		},
+		// TokenLookup is a string in the form of "<source>:<name>" that is used
+		// to extract token from the request.
+		// Optional. Default value "header:Authorization".
+		// Possible values:
+		// - "header:<name>"
+		// - "query:<name>"
+		// - "cookie:<name>"
+		// - "param:<name>"
+		TokenLookup: "header: Authorization, query: token, cookie: jwt",
+		// TokenLookup: "query:token",
+		// TokenLookup: "cookie:token",
+
+		// TokenHeadName is a string in the header. Default value is "Bearer"
+		TokenHeadName: "Bearer",
+
+		// TimeFunc provides the current time. You can override it to use another time value. This is useful for testing or if your server uses a different time zone than your tokens.
+		TimeFunc: time.Now,
+	})
+
+	if err != nil {
+		log.Fatal("JWT Error:" + err.Error())
+	}
+
+	router.POST("/login", authMiddleware.LoginHandler)
+
+	router.NoRoute(authMiddleware.MiddlewareFunc(), func(c *gin.Context) {
+		claims := jwt.ExtractClaims(c)
+		log.Printf("NoRoute claims: %#v\n", claims)
+		c.JSON(404, gin.H{"code": "PAGE_NOT_FOUND", "message": "Page not found"})
+	})
+
+	auth := router.Group("/auth")
+	// Refresh time can be longer than token timeout
+	auth.GET("/refresh_token", authMiddleware.RefreshHandler)
+	auth.Use(authMiddleware.MiddlewareFunc())
 	{
-		del.GET("/:ebpath/:bookname", Del)
+		// $ curl -X GET -v --form istxt=true --form ismobi=false "http://localhost:8080/post?ebhost=23us.la&bookid=0_062&istxt=true&ismobi=true"
+		auth.GET("/post", ParseEbhostAndBookIdPost)
+		//列举./public目录所有的文件
+		auth.GET("/get_list", List)
+		//删除 服务器上面已经下载的小说
+		// $ curl -X GET "http://localhost:8080/del/我是谁-sndnvaps/我是谁-sndnvaps.mobi"
+		// $ curl -X GET "http://localhost:8080/del/我真不是作者菌-sndnvaps/我真不是作者菌-sndnvaps.txt"
+		auth.GET("/del/:ebpath/:bookname", Del)
+		//系统状态信息
+		// http://localhost:8080/stat
+		auth.GET("/stat", HttpStat)
+
 	}
 
 	//简单文件服务器
 	// http://localhost:8080/file
 	//public存放着要显示的文件
 	router.StaticFS("/public", http.Dir("outputs"))
-
-	//系统状态信息
-	// http://localhost:8080/stat
-	router.GET("/stat", HttpStat)
 
 	router.Run(conf.InerHost + ":" + conf.Port) // 监听并在 0.0.0.0:8080 上启动服务
 }
