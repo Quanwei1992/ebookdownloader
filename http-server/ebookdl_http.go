@@ -248,7 +248,10 @@ func main() {
 		log.Fatal("JWT Error:" + err.Error())
 	}
 
+	//登陆，并生成 token
 	router.POST("/login", authMiddleware.LoginHandler)
+	//退出，并删除cookie中的 token
+	router.GET("/logout",authMiddleware.LogoutHandler)
 
 	router.NoRoute(authMiddleware.MiddlewareFunc(), func(c *gin.Context) {
 		claims := jwt.ExtractClaims(c)

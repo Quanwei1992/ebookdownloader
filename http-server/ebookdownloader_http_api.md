@@ -16,7 +16,8 @@
 username 类型 string; 默认用户为admin; 传入方式 --form
 password 类型 string;默认密码 admin; 传入方式 --form
 http_method: POST
-返回值{
+返回值
+{
    "code": 200,
    "expire": "2020-01-28T19:23:09+08:00",
    "token":"eyJhbGciOiJIUzI1NiIsIn
@@ -30,17 +31,36 @@ jk4OX0.XNPrk0LKcMJlJqf0Opx9JYh_kaKL_STT5p7J9_mkc0Y"
 $curl -X POST -form username=admin --form password=admin http://localhost:8080/login
 ```
 
+### Logout 退出登陆，并删除 token
+此功能用于退出当前用户的登陆，并删除相应的token
+```bash
+/logout
+没有参数
+http_method: GET
+返回值
+{
+ "code": 200
+}
+```
+
+测试例子
+```bash
+$curl -X GET http://localhost:8080/logout
+```
+
 ### 更新 token
 此功能，用于更新已经失效的 TOKEN
+
 ```bash
 /refresh_token
 没有参数
+http_method: GET
 但需要定义传入的http header
 传入header:
   Authorization:Bearer TOKEN
   Content-Type: application/json
 cookie: 需要传入 token
-返回值 
+返回值
 {
    "code": 200,
    "expire": "2020-01-28T19:23:09+08:00",
@@ -49,8 +69,9 @@ cookie: 需要传入 token
 ```
 
 测试例子
+
 ```bash
-$curl  -H "Authorization:Bearer xxxxxxxxx" -H "Content-Type: application/json" -X GET localhost:8000/auth/refresh_token 
+$curl  -H "Authorization:Bearer token_string" -H "Content-Type: application/json" -X GET localhost:8000/auth/refresh_token 
 ```
 
 ### POST
@@ -87,20 +108,22 @@ query用到的参数
 
 测试例子
 ```bash
-$ curl -H "Authorization:Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE1ODAyMTI3MzIsImlkIjoiYWRtaW4iLCJvcmlnX2lhdCI6MTU4MDIwOTEzMn0.Whcz9m1boDKPh_F9jpgOZ4EUoIXIS3b8LrK1aqIYFRE" -H "Content-Type: application/js
-on" -X GET -v  "http://localhost:8080/auth/post?ebhost=23us.la&bookid=0_062&istxt=true&ismobi=false"
+$ curl -H "Authorization:Bearer token_string" -H "Content-Type: application/json" -X GET -v  "http://localhost:8080/auth/post?ebhost=23us.la&bookid=0_062&istxt=true&ismobi=false"
 ```
 
 ### List
 列举下载目录里面的所有文件
 ```bash
-  /get_list
+  /auth/get_list
   不接受任何参数
    http_method: GET
    传入header:
   Authorization:Bearer TOKEN
   Content-Type: application/json
  或者 cookie: 需要传入 token
+ ```
+
+ ```json
   返回值
   {
      "files": [
@@ -133,14 +156,16 @@ on" -X GET -v  "http://localhost:8080/auth/post?ebhost=23us.la&bookid=0_062&istx
 ```
 
 测试例子
+
 ```bash
-$ curl  -H "Authorization:Bearer xxxxxxxxx" -H "Content-Type: application/json" -X GET -v http://localhost:8080/auth/get_list
+$ curl  -H "Authorization:Bearer token_string" -H "Content-Type: application/json" -X GET -v http://localhost:8080/auth/get_list
 ```
 
 ### Del
 删除在服务器上面下载好的小说
+
 ```bash
- /del
+ /auth/del
  接受参数
  ebpath //定义小说的路径；类型 string; 格式： 小说名-作者
  bookname //定义小说名，支持格式有.txt,.mobi,azw3,.jpg,.json；类型string; 可接受特定命令del，用于删除小说对应的目录
@@ -158,11 +183,13 @@ $ curl  -H "Authorization:Bearer xxxxxxxxx" -H "Content-Type: application/json" 
     "error": "bookname is not exists"
  }
 ```
+
  测试例子
 ```bash
 $ curl  -H "Authorization:Bearer xxxxxxxxx" -H "Content-Type: application/json" -X GET -v "http://localhost:8080/auth/del/我是谁-sndnvaps/我是谁-sndnvaps.txt"
 $ curl  -H "Authorization:Bearer xxxxxxxxx" -H "Content-Type: application/json" -X GET -v "http://localhost:8080/auth/del/我是谁-sndnvaps/del"
 ```
+
 返回结果
 ```json
 {
@@ -175,8 +202,9 @@ $ curl  -H "Authorization:Bearer xxxxxxxxx" -H "Content-Type: application/json" 
 
 ### 显示服务器版本信息
 此功能主要用于显示服务器的版本信息
+
 ```bash
- /stat
+ /auth/stat
  不接受任何参数
  返回值
  {
@@ -194,11 +222,12 @@ $ curl  -H "Authorization:Bearer xxxxxxxxx" -H "Content-Type: application/json" 
 
 测试例子
 ```bash
-$ curl  -H "Authorization:Bearer xxxxxxxxx" -H "Content-Type: application/json" -X GET -v http://localhost:8080/stat
+$ curl  -H "Authorization:Bearer xxxxxxxxx" -H "Content-Type: application/json" -X GET -v http://localhost:8080/auth/stat
 ```
 
 ### Upload, 此功能已经作废
 此功能是上传文件到服务器上面
+
 ```bash
   /upload
   form 传入参数 file
@@ -208,9 +237,9 @@ $ curl  -H "Authorization:Bearer xxxxxxxxx" -H "Content-Type: application/json" 
         "filepath": "http://localhost:port/file/filename"
     }
 ```
+
 测试使用
+
 ```bash
 $ curl -X POST --form "file=@./hello.txt" http://localhost:8080/upload
 ```
-
-curl -H "Authorization:Bearer eyJhbGciOiJIUzI1N6IkpXVCJ9.eyJleHAiOjE1ODAyMTI3MzIsImlkIjoiYWRtaW4iLCJvcmlnX2lhdCI6MTU40.Whcz9m1boDKPh_F9jpgOZ4EUoIXIS3b8LrK1aqIYFRE" -H "Content-Type: application/json" -X GET "http://192.168.13.103:8090/auth/del/帝婿归来-十年一梦/del"
