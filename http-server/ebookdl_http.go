@@ -14,6 +14,7 @@ import (
 	"github.com/gin-gonic/gin"
 	edl "github.com/sndnvaps/ebookdownloader"
 	"github.com/sndnvaps/ebookdownloader/http-server/middleware"
+	"gopkg.in/urfave/cli.v1"
 )
 
 var (
@@ -165,8 +166,11 @@ func Upload(c *gin.Context) {
 	filepath := conf.URL_BASE + "/public/" + filename
 	c.JSON(http.StatusOK, gin.H{"filepath": filepath})
 }
+func ebook_http_server(c *cli.Context) error {
 
-func main() {
+	CFG_PATH = c.String("conf")
+	ConfInit()
+
 	// Creates a router with Default
 	router := gin.Default()
 
@@ -251,7 +255,7 @@ func main() {
 	//登陆，并生成 token
 	router.POST("/login", authMiddleware.LoginHandler)
 	//退出，并删除cookie中的 token
-	router.GET("/logout",authMiddleware.LogoutHandler)
+	router.GET("/logout", authMiddleware.LogoutHandler)
 
 	router.NoRoute(authMiddleware.MiddlewareFunc(), func(c *gin.Context) {
 		claims := jwt.ExtractClaims(c)
@@ -284,4 +288,34 @@ func main() {
 	router.StaticFS("/public", http.Dir("outputs"))
 
 	router.Run(conf.InerHost + ":" + conf.Port) // 监听并在 0.0.0.0:8080 上启动服务
+
+	return nil
+
+}
+func main() {
+
+	app := cli.NewApp()
+	app.Name = "golang EBookDownloader http-server"
+	app.Version = Version + "-" + Commit + "-" + BuildTime
+	app.Authors = []cli.Author{
+		cli.Author{
+			Name:  "Jimes Yang",
+			Email: "sndnvaps@gmail.com",
+		},
+	}
+	app.Copyright = "(c) 2019 - 2020 Jimes Yang<sndnvaps@gmail.com>"
+	app.Usage = "用于下载 笔趣阁(https://www.xsbiquge.com),999小说网(https://www.999xs.com/) ,顶点小说网(https://www.23us.la) 上面的电子书，并保存为txt格式或者(mobi格式,awz3格式)的电子书"
+	app.Action = ebook_http_server
+	app.Flags = []cli.Flag{
+		cli.StringFlag{
+			Name:  "conf,c",
+			Value: "./conf/ebdl_conf.ini",
+			Usage: "定义http-server的配置文件路径",
+		},
+	}
+
+	err := app.Run(os.Args)
+	if err != nil {
+		log.Fatal(err)
+	}
 }

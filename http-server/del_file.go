@@ -17,7 +17,8 @@ func Del(c *gin.Context) {
 	ext := filepath.Ext(bookname)
 	//删除目录操作
 	if bookname == "del" {
-		fullpath := "outputs/" + ebpath + "/"
+		fullpath := "./outputs/" + ebpath + "/"
+		fullpath, _ = filepath.Abs(fullpath)
 		if !com.IsExist(fullpath) {
 			c.JSON(http.StatusOK, gin.H{"Status": fullpath + " is not exist in the serve"})
 			return
@@ -35,7 +36,8 @@ func Del(c *gin.Context) {
 	if ext == ".txt" || ext == ".mobi" ||
 		ext == ".azw3" || ext == ".json" ||
 		ext == ".jpg" {
-		fullpath := "outputs/" + ebpath + "/" + bookname
+		fullpath := "./outputs/" + ebpath + "/" + bookname
+		fullpath, _ = filepath.Abs(fullpath)
 		if !com.IsExist(fullpath) {
 			c.JSON(http.StatusOK, gin.H{"Status": fullpath + " is not exist in the serve"})
 			return
@@ -61,7 +63,8 @@ func DelFolder(c *gin.Context) {
 	action := c.Param("action") //要执行的操作，目前只有指定 del
 	if action == "del" {
 
-		fullpath := "outputs/" + ebpath
+		fullpath := "./outputs/" + ebpath
+		fullpath, _ = filepath.Abs(fullpath)
 		if !com.IsExist(fullpath) {
 			c.JSON(http.StatusOK, gin.H{"Status": fullpath + " is not exist in the serve"})
 			return

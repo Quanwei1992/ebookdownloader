@@ -5,6 +5,7 @@ import (
 	"io/ioutil"
 	"os"
 	"path"
+	"path/filepath"
 	"strings"
 	"sync"
 	"time"
@@ -51,13 +52,15 @@ type EBookDLInterface interface {
 
 //读取文件内容，并存入string,最终返回
 func ReadAllString(filename string) string {
-	tmp, _ := ioutil.ReadFile(filename)
+	filepathAbs, _ := filepath.Abs(filename)
+	tmp, _ := ioutil.ReadFile(filepathAbs)
 	return string(tmp)
 }
 
 func WriteFile(filename string, data []byte) error {
+	filepathAbs, _ := filepath.Abs(filename)
 	os.MkdirAll(path.Dir(filename), os.ModePerm)
-	return ioutil.WriteFile(filename, data, 0655)
+	return ioutil.WriteFile(filepathAbs, data, 0655)
 }
 
 //设置生成mobi格式，或者生成awz3格式
@@ -138,6 +141,7 @@ func (this BookInfo) GenerateMobi() {
 	//将文件名转换成拼音
 	strPinyin, _ := pinyin.New(this.Name).Split("-").Mode(pinyin.WithoutTone).Convert()
 	savepath := "./tmp/" + strPinyin
+	savepath, _ = filepath.Abs(savepath) //使用绝对路径
 	if com.IsExist(savepath) {
 		os.RemoveAll(savepath)
 	}
@@ -145,6 +149,8 @@ func (this BookInfo) GenerateMobi() {
 
 	//设置生成mobi的输出目录
 	outputpath := "./outputs/" + this.Name + "-" + this.Author + "/"
+	outputpath, _ = filepath.Abs(outputpath) //使用绝对路径
+	fmt.Println(outputpath)
 	if !com.IsExist(outputpath) {
 		os.MkdirAll(path.Dir(outputpath), os.ModePerm)
 	}
@@ -275,17 +281,18 @@ func (this BookInfo) GenerateMobi() {
 	WriteFile(savepath+"/content.opf", []byte(opf_content))
 
 	//把封面复制到 tmp 目录当中
-	err := com.Copy("cover.jpg", savepath+"/cover.jpg")
+	coverPath, _ := filepath.Abs("./cover.jpg")
+	err := com.Copy(coverPath, savepath+"/cover.jpg")
 	if err != nil {
 		fmt.Println(err.Error())
 	}
 	//把封面复制到 outputs/小说名-作者/cover.jpg
-	err = com.Copy("cover.jpg", outputpath+"cover.jpg")
+	err = com.Copy(coverPath, outputpath+"/cover.jpg")
 	if err != nil {
 		fmt.Println(err.Error())
 	}
 	//删除当前目前的cover.jpg文件
-	os.RemoveAll("cover.jpg")
+	os.RemoveAll(coverPath)
 
 	// 生成
 	outfname := this.Name + "-" + this.Author
@@ -301,7 +308,7 @@ func (this BookInfo) GenerateMobi() {
 	cmd.Run()
 
 	// 把生成的mobi文件复制到 outputs/目录下面
-	com.Copy(savepath+"/"+outfname, outputpath+outfname)
+	com.Copy(savepath+"/"+outfname, outputpath+"/"+outfname)
 }
 
 //AsycChapter

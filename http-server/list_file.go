@@ -3,6 +3,7 @@ package main
 import (
 	"net/http"
 	"os"
+	"path/filepath"
 
 	"github.com/gin-gonic/gin"
 )
@@ -19,6 +20,8 @@ func List(c *gin.Context) {
 	var err error
 
 	path := "./outputs/"
+	path, _ = filepath.Abs(path)
+
 	//以只读的方式打开目录
 	f, err := os.OpenFile(path, os.O_RDONLY, os.ModeDir)
 	if err != nil {

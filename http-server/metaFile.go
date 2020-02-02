@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/json"
 	"os"
+	"path/filepath"
 )
 
 type Meta struct {
@@ -19,7 +20,8 @@ type Meta struct {
 //把json数据写入 filename定义的文件中
 func (this Meta) WriteFile(filename string) error {
 	// 创建文件
-	filePtr, err := os.Create(filename)
+	fileAbs, _ := filepath.Abs(filename) //使用相对路径
+	filePtr, err := os.Create(fileAbs)
 	if err != nil {
 		return err
 	}
@@ -39,7 +41,8 @@ func (this Meta) WriteFile(filename string) error {
 
 //从文件中读取meta信息，并返回
 func GetMetaData(filename string) (Meta, error) {
-	filePtr, _ := os.Open(filename)
+	fileAbs, _ := filepath.Abs(filename)
+	filePtr, _ := os.Open(fileAbs)
 
 	defer filePtr.Close()
 

@@ -52,14 +52,13 @@ $curl -X GET http://localhost:8080/logout
 此功能，用于更新已经失效的 TOKEN
 
 ```bash
-/refresh_token
+/auth/refresh_token
 没有参数
 http_method: GET
 但需要定义传入的http header
 传入header:
   Authorization:Bearer TOKEN
   Content-Type: application/json
-cookie: 需要传入 token
 返回值
 {
    "code": 200,

@@ -3,10 +3,11 @@ package main
 import (
 	"fmt"
 	"gopkg.in/ini.v1"
+	"path/filepath"
 )
 
 var (
-	CFG_PATH string = "conf/ebdl_conf.ini"
+	CFG_PATH string
 )
 
 var (
@@ -21,14 +22,22 @@ type Config struct {
 	URL_BASE string `json:"url_base"`
 }
 
+type KalaConfig struct {
+	Host     string `json:"host"`     //kala job Schemule host
+	Port     string `json:"port"`     //kala port
+	URL_BASE string `json:"url_base"` //url_base
+}
+
 var (
-	conf Config
+	conf  Config
+	kconf KalaConfig
 )
 
-func init() {
+func ConfInit() {
 
 	var err error
-	Cfg, err = ini.Load(CFG_PATH)
+	cfg_abs_path, _ := filepath.Abs(CFG_PATH)
+	Cfg, err = ini.Load(cfg_abs_path)
 	if err != nil {
 		panic(fmt.Errorf("fail to load config file '%s': %v", CFG_PATH, err))
 	}
@@ -38,5 +47,9 @@ func init() {
 	conf.Port = Cfg.Section("server").Key("port").MustString("8080")
 
 	conf.URL_BASE = "http://" + conf.Host + ":" + conf.Port
+
+	kconf.Host = Cfg.Section("kala").Key("host").MustString("localhost")
+	kconf.Port = Cfg.Section("kala").Key("port").MustString("8081")
+	kconf.URL_BASE = "http://" + kconf.Host + ":" + kconf.Port
 
 }

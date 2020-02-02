@@ -32,11 +32,13 @@
     5. gui程序，需要依赖 https://github.com/akavel/rsrc ，项目来生成图标
     6. qemu-i386-static-armhf 支持在linux arm平台上运行 kindlegenLinux
     7. qemu-i386-static-arm64 支持在linux arm64平台上运行 kindlegenLinux
+    8. http-server 项目依赖：
+          github.com/ajvb/kala 项目，用于任务控制和管理
 
   ## 后端服务器 API接口
     主要目的是部署在vps上面，就可以方便随时下载小说了
    API接口文档
-[ebookdowloader_http_api](http-server/ebookdowloader_http_api.md)
+[ebookdownloader_http_api](http-server/ebookdownloader_http_api.md)
 
 配置文件[ebdl_conf.ini](conf/ebdl_conf.ini)
 
@@ -46,6 +48,9 @@
 
   ## 更新日志
      
+     2020.02.02 go版本
+                1. 初步添加kala接口，做为 Job Scheduler
+
      2020.01.28 go版本
                 1. ebookdownloader 修改获取章节的规则:替换 <br/> 为 \r\n
                 2. http-server 添加鉴权功能，通过/login来获取 token
@@ -134,3 +139,5 @@
            参考文章 
                [1](https://blog.csdn.net/HaoDaWang/article/details/80868919)
                [2](https://www.cnblogs.com/Zereker/p/9590788.html)
+
+              [注册/认证/鉴权/授权] https://gitee.com/sblig/go-ums/tree/master

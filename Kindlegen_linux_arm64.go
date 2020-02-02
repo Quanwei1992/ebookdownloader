@@ -6,12 +6,15 @@ package ebookdownloader
 
 import (
 	"os/exec"
+	"path/filepath"
 )
 
 func KindlegenCmd(args ...string) *exec.Cmd {
 	var cmds []string
-	cmds = append(cmds, "./tools/kindlegenLinux")
+	path, _ := filepath.Abs("./tools/kindlegenLinux")
+	qemu_path, _ := filepath.Abs("./tools/qemu-i386-static-arm64")
+	cmds = append(cmds, path)
 	cmds = append(cmds, args...)
-	cmd := exec.Command("./tools/qemu-i386-static-arm64", cmds...)
+	cmd := exec.Command(qemu_path, cmds...)
 	return cmd
 }
