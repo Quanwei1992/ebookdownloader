@@ -21,7 +21,7 @@ func GenerateCover(this BookInfo) {
 
 	//需要添加内容的图片
 	coverAbs, _ := filepath.Abs("./tpls/cover.jpg")
-	fmt.Println(coverAbs)
+	//fmt.Println(coverAbs)
 	imgfile, err := os.Open(coverAbs)
 	if err != nil {
 		fmt.Println(err.Error())

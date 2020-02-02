@@ -4,9 +4,9 @@ import (
 	"fmt"
 	"github.com/ajvb/kala/job"
 	//"github.com/ajvb/kala/client"
-	"time"
-	//"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/assert"
 	"testing"
+	"time"
 )
 
 func test1(t *testing.T) {
@@ -21,6 +21,7 @@ func test1(t *testing.T) {
 	}
 	id, err := c.CreateJob(body)
 	fmt.Println("Job Created: ", id)
+	assert.Equal(t, nil, err)
 	if err != nil {
 		fmt.Println(err.Error())
 	}

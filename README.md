@@ -20,6 +20,7 @@
   .\ebookdownloader.exe --proxy="http://proxyip:proxyport" --bookid=0_642 --mobi #生成mobi电子书，在下载章节的过程中使用 Proxy
   .\ebookdownloader.exe --ebhost=xsbiquge.com --bookid=0_642 --txt --mobi #使用xsbiquge.com做为下载源，生成txt 和 mobi
   .\ebookdownloader.exe --ebhost=999xs.com --bookid=0_642 --txt --mobi #使用999xs.com做为下载源，生成txt 和 mobi
+   .\ebookdownloader.exe --ebhost=999xs.com --bookid=0_642 --txt --mobi --meta #使用999xs.com做为下载源，生成txt,mobi电子书，并生成meta.json文件于小说目录当中
   .\ebookdownloader.exe --ebhost=23us.la --bookid=127064 --pv #新功能，用于打印小说的分卷信息，此时不下载小说任何内容
   .\ebookdownloader.exe --help #显示帮助信息
   ```
@@ -50,6 +51,7 @@
      
      2020.02.02 go版本
                 1. 初步添加kala接口，做为 Job Scheduler
+                2. cli版本添加生成meta.json文件功能
 
      2020.01.28 go版本
                 1. ebookdownloader 修改获取章节的规则:替换 <br/> 为 \r\n

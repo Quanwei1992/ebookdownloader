@@ -1,4 +1,4 @@
-package main
+package ebookdownloader
 
 import (
 	"encoding/json"

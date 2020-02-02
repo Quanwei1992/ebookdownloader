@@ -6,10 +6,11 @@ import (
 	"path/filepath"
 
 	"github.com/gin-gonic/gin"
+	edl "github.com/sndnvaps/ebookdownloader"
 )
 
 type FileList struct {
-	Metainfo Meta `json:"metainfo"`
+	Metainfo edl.Meta `json:"metainfo"`
 }
 
 //用于显示 public目录所有的文件
@@ -37,7 +38,7 @@ func List(c *gin.Context) {
 		if info.IsDir() {
 			metapath := path + info.Name() + "/meta.json"
 
-			tmp.Metainfo, err = GetMetaData(metapath)
+			tmp.Metainfo, err = edl.GetMetaData(metapath)
 			if err == nil {
 				if tmp.Metainfo.CoverUrl != "" {
 					tmp.Metainfo.CoverUrl = conf.URL_BASE + "/" + tmp.Metainfo.CoverUrl

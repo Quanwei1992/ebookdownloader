@@ -149,10 +149,11 @@ func (this BookInfo) GenerateMobi() {
 
 	//设置生成mobi的输出目录
 	outputpath := "./outputs/" + this.Name + "-" + this.Author + "/"
-	outputpath, _ = filepath.Abs(outputpath) //使用绝对路径
-	fmt.Println(outputpath)
+	outputpath, _ = filepath.Abs(outputpath)
+	outputpath = outputpath + string(os.PathSeparator) //使用绝对路径
+	//fmt.Println(outputpath)
 	if !com.IsExist(outputpath) {
-		os.MkdirAll(path.Dir(outputpath), os.ModePerm)
+		os.MkdirAll(outputpath, os.ModePerm)
 	}
 
 	// 生成封面
@@ -287,7 +288,7 @@ func (this BookInfo) GenerateMobi() {
 		fmt.Println(err.Error())
 	}
 	//把封面复制到 outputs/小说名-作者/cover.jpg
-	err = com.Copy(coverPath, outputpath+"/cover.jpg")
+	err = com.Copy(coverPath, outputpath+"cover.jpg")
 	if err != nil {
 		fmt.Println(err.Error())
 	}
@@ -308,7 +309,7 @@ func (this BookInfo) GenerateMobi() {
 	cmd.Run()
 
 	// 把生成的mobi文件复制到 outputs/目录下面
-	com.Copy(savepath+"/"+outfname, outputpath+"/"+outfname)
+	com.Copy(savepath+string(os.PathSeparator)+outfname, outputpath+string(os.PathSeparator)+outfname)
 }
 
 //AsycChapter

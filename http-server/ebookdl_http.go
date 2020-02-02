@@ -75,10 +75,10 @@ func ParseEbhostAndBookIdPost(c *gin.Context) {
 	isTxtStr := c.DefaultQuery("istxt", "false")   //需要传入bool值 , 0,1,true,false
 	isMobiStr := c.DefaultQuery("ismobi", "false") //需要传入bool值, 0,1,true,false
 
-	txtfilepath := ""    //定义 txt下载后，获取得到的 地址
-	mobifilepath := ""   //定义 mobi下载后，获取得到的 地址
-	cover_url_path := "" //定义下载小说后，封面的url地址
-	var metainfo Meta    //用于保存小说的meta信息
+	txtfilepath := ""     //定义 txt下载后，获取得到的 地址
+	mobifilepath := ""    //定义 mobi下载后，获取得到的 地址
+	cover_url_path := ""  //定义下载小说后，封面的url地址
+	var metainfo edl.Meta //用于保存小说的meta信息
 
 	isTxt, errTxt := strconv.ParseBool(isTxtStr)
 	if errTxt != nil {
@@ -124,7 +124,7 @@ func ParseEbhostAndBookIdPost(c *gin.Context) {
 
 	}
 
-	metainfo = Meta{
+	metainfo = edl.Meta{
 		Ebhost:      ebhost,
 		Bookid:      bookid,
 		BookName:    bookinfo.Name,
