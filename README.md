@@ -9,6 +9,7 @@
   ```bash
   go get github.com/sndnvaps/ebookdownloader/cli
   go get github.com/sndnvaps/ebookdownloader/gui
+  go get github.com/sndnvaps/ebookdownloader/http-server
   ```
   ## 使用方法
   ```bash
@@ -19,6 +20,7 @@
   .\ebookdownloader.exe --proxy="http://proxyip:proxyport" --bookid=0_642 --mobi #生成mobi电子书，在下载章节的过程中使用 Proxy
   .\ebookdownloader.exe --ebhost=xsbiquge.com --bookid=0_642 --txt --mobi #使用xsbiquge.com做为下载源，生成txt 和 mobi
   .\ebookdownloader.exe --ebhost=999xs.com --bookid=0_642 --txt --mobi #使用999xs.com做为下载源，生成txt 和 mobi
+   .\ebookdownloader.exe --ebhost=999xs.com --bookid=0_642 --txt --mobi --meta #使用999xs.com做为下载源，生成txt,mobi电子书，并生成meta.json文件于小说目录当中
   .\ebookdownloader.exe --ebhost=23us.la --bookid=127064 --pv #新功能，用于打印小说的分卷信息，此时不下载小说任何内容
   .\ebookdownloader.exe --help #显示帮助信息
   ```
@@ -29,13 +31,53 @@
     3. kindlegenMac 支持 Mac平台
     4. cli/gui 两个项目，都需要在当前项目的根目录运行
     5. gui程序，需要依赖 https://github.com/akavel/rsrc ，项目来生成图标
+    6. qemu-i386-static-armhf 支持在linux arm平台上运行 kindlegenLinux
+    7. qemu-i386-static-arm64 支持在linux arm64平台上运行 kindlegenLinux
+    8. http-server 项目依赖：
+          github.com/ajvb/kala 项目，用于任务控制和管理
+
+  ## 后端服务器 API接口
+    主要目的是部署在vps上面，就可以方便随时下载小说了
+   API接口文档
+[ebookdownloader_http_api](http-server/ebookdownloader_http_api.md)
+
+配置文件[ebdl_conf.ini](conf/ebdl_conf.ini)
 
   ## 懒人模式，直接下载编译好的程序
   
   到[这里](https://github.com/sndnvaps/ebookdownloader/releases)下载你需要的版本
 
   ## 更新日志
+     
+      2020.02.10 go版本
+                1. 添加小说章节分割下载功能(以300章为一个下载单元)
+                2. 限制并发数量，目前最大并发数量为 (300+49)*2 = 698
+                3. arm版本问题：目前只能生成txt文件，因为生成mobi花费时间过于长(测试平台:Raspberry Pi 3b, cpu过于垃圾和内存太小)
+                4. 更新版本到 v1.7.1
+                5. 更换字体为: 文泉驿微米黑 Regular
 
+     2020.02.02 go版本
+                1. 初步添加kala接口，做为 Job Scheduler
+                2. cli版本添加生成meta.json文件功能
+
+     2020.01.28 go版本
+                1. ebookdownloader 修改获取章节的规则:替换 <br/> 为 \r\n
+                2. http-server 添加鉴权功能，通过/login来获取 token
+
+      2020.01.27 go版本
+                1. http-server添加中文件，处理跨域访问问题
+                2. 修改小说下载后，保存目录为 ./outputs/小说名-作者/
+                3. http-server 添加生成meta.json,用于保存小说作者，小说简介，小说下载网站，小说bookid等信息
+                4. http-server 配置文件修改，原来的host定义为外部地址，iner_host定义为内部地址
+                
+      2020.01.26 go版本
+                1. 添加 http-server版本，初始化
+                2. 添加qemu-i386-static 支持arm,arm64平台上生成mobi,azw3格式电子书
+                3. 更新版本到 v1.7.0
+
+      2020.01.24 go版本
+                1. 版本更新到 v1.6.3
+                2. 更新到 v1.6.4 用于测试 Travis-ci
       2020.01.23 go版本 更新
                  1. 使用 github.com/AllenDang/giu 库，重新构建 gui界面
                  2. 编译命令 cd gui;build.[cmd|sh]。文件生成后，会复制到根目录
@@ -99,4 +141,7 @@
      [√]  1.添加生成封面功能
      [√]  2. 添加不同平台的接口实现
      [√]  3. 添加生成二级目录的方法(已经添加相应的实例)
-     [ ]  4. 添加界面版本gui
+     [√]  4. 添加界面版本gui
+     [√]  5. 添加http-server,做为后端
+     [√]  6. 添加linux arm,arm64平台支持
+     [√]  7. 需要限制并发数量，因为vps性能有限 -> 目前限制的并发数量为(300+49)*2 = 698

@@ -102,7 +102,7 @@ func TestBookInfo(t *testing.T) {
 func TestGenerateTxt(t *testing.T) {
 	testbi.ChangeVolumeState(true /* hasVolume */)
 	testbi.GenerateTxt()
-	savename := "./outputs/" + testbi.Name + "-" + testbi.Author + ".txt"
+	savename := "./outputs/" + testbi.Name + "-" + testbi.Author + "/" + testbi.Name + "-" + testbi.Author + ".txt"
 
 	assert.True(t, true, isExist(savename))
 	//os.RemoveAll(savename)
@@ -113,7 +113,7 @@ func TestGenerateMobi(t *testing.T) {
 	testbi.ChangeVolumeState(true /* hasVolume */)
 	testbi.SetKindleEbookType(true /* isMobi */, false /* isAwz3 */)
 	testbi.GenerateMobi()
-	savename := "./outputs/" + testbi.Name + "-" + testbi.Author + ".mobi"
+	savename := "./outputs/" + testbi.Name + "-" + testbi.Author + "/" + testbi.Name + "-" + testbi.Author + ".mobi"
 
 	assert.True(t, true, isExist(savename))
 	//os.RemoveAll(savename)
@@ -123,7 +123,7 @@ func TestGenerateAwz3(t *testing.T) {
 	testbi.ChangeVolumeState(true /* hasVolume */)
 	testbi.SetKindleEbookType(false /* isMobi */, true /* isAwz3 */)
 	testbi.GenerateMobi()
-	savename := "./outputs/" + testbi.Name + "-" + testbi.Author + ".awz3"
+	savename := "./outputs/" + testbi.Name + "-" + testbi.Author + "/" + testbi.Name + "-" + testbi.Author + ".awz3"
 
 	assert.True(t, true, isExist(savename))
 	//os.RemoveAll(savename)

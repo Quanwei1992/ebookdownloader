@@ -3,8 +3,10 @@ package ebookdownloader
 import (
 	"fmt"
 	"io/ioutil"
+	"math"
 	"os"
 	"path"
+	"path/filepath"
 	"strings"
 	"sync"
 	"time"
@@ -51,13 +53,15 @@ type EBookDLInterface interface {
 
 //读取文件内容，并存入string,最终返回
 func ReadAllString(filename string) string {
-	tmp, _ := ioutil.ReadFile(filename)
+	filepathAbs, _ := filepath.Abs(filename)
+	tmp, _ := ioutil.ReadFile(filepathAbs)
 	return string(tmp)
 }
 
 func WriteFile(filename string, data []byte) error {
+	filepathAbs, _ := filepath.Abs(filename)
 	os.MkdirAll(path.Dir(filename), os.ModePerm)
-	return ioutil.WriteFile(filename, data, 0655)
+	return ioutil.WriteFile(filepathAbs, data, 0655)
 }
 
 //设置生成mobi格式，或者生成awz3格式
@@ -76,6 +80,73 @@ func (this *BookInfo) ChangeVolumeState(hasVolume bool) {
 //返回 HasVolume的状态，true,false
 func (this BookInfo) VolumeState() bool {
 	return this.HasVolume
+}
+
+//Split BookInfo里面的Chapter,以300章为一组进行分割
+//当少于300章的里面，全部分为一卷；当有1000卷的时候，分为4卷；
+//当分割有n个卷的时候，剩下的章节大于50章，重开一个分卷，当少于50的时候，分割到最后一个分卷里面
+func (this BookInfo) Split() []BookInfo {
+	chapters := this.Chapters       //小说的章节信息
+	volumes := this.Volumes         //小说的分卷信息
+	Bookname := this.Name           //小说的名称
+	Author := this.Author           //小说的作者
+	Description := this.Description //小说的描述信息
+	IsAzw3 := this.IsAzw3           //是否生成azw3
+	IsMobi := this.IsMobi           //是否生成mobi
+	HasVolume := this.HasVolume     //是否包含分卷信息
+
+	var bis []BookInfo //slice of BookInfo
+
+	//当剩下章节大于200章时候
+	var tmp1 BookInfo
+	var BiggerThan50 bool = false //大于50章的时候设置为 true
+
+	chapterCount := len(chapters)             //有多少章节
+	count := (float64)(chapterCount / 300.00) //把章节分成几个部分
+	if count < 1 {
+		count = math.Ceil(count) //向上取整， 0.8 -> 1
+		tmp := BookInfo{
+			Name:        Bookname,
+			Author:      Author,
+			Description: Description,
+			IsMobi:      IsMobi,
+			IsAzw3:      IsAzw3,
+			HasVolume:   HasVolume,
+			Volumes:     volumes,
+			Chapters:    chapters, //因为少于500章，所以全部分在一起
+		}
+		bis = append(bis, tmp)
+	} else {
+		count = math.Floor(count) //向下取下 3.1 -> 3; 2.5 -> 2
+		for index := 0; index < (int)(count); index++ {
+			tmp := BookInfo{
+				Name:        Bookname,
+				Author:      Author,
+				Description: Description,
+				IsMobi:      IsMobi,
+				IsAzw3:      IsAzw3,
+				HasVolume:   HasVolume,
+				Volumes:     volumes,
+				Chapters:    chapters[index*300 : (index+1)*300], //chapters[startindex:endindex]
+				// [0*500:(0+1)*500] , [1*500:(1+1)*500], [2*500:(2+1)*500]
+			}
+			if index == (int)(count-1) && ((chapterCount - (index+1)*300) < 50) { //因为count 是向下取整的，所以需要进行一下处理
+				tmp.Chapters = chapters[index*300 : chapterCount] // 1680 - 1000 == 680
+			} else if index == (int)(count-1) && ((chapterCount - (index+1)*300) > 50) { //当剩下的章节多于200章，重新分割一个新的分卷
+				tmp1 = tmp
+				tmp1.Chapters = chapters[(index+1)*300 : chapterCount]
+				BiggerThan50 = true
+			}
+
+			bis = append(bis, tmp)
+		}
+	}
+
+	if BiggerThan50 { //当最后剩下的章节大于200时，再加多一个分割卷
+		bis = append(bis, tmp1)
+	}
+	fmt.Printf("共分%d个下载单元", len(bis))
+	return bis
 }
 
 func (this BookInfo) PrintVolumeInfo() {
@@ -99,7 +170,7 @@ func (this BookInfo) GenerateTxt() {
 	chapters := this.Chapters //小说的章节信息
 	volumes := this.Volumes   //小说的分卷信息
 	content := ""             //用于存放（分卷、）章节内容
-	outfpath := "./outputs/"
+	outfpath := "./outputs/" + this.Name + "-" + this.Author + "/"
 	outfname := outfpath + this.Name + "-" + this.Author + ".txt"
 
 	for index := 0; index < len(chapters); index++ {
@@ -138,10 +209,20 @@ func (this BookInfo) GenerateMobi() {
 	//将文件名转换成拼音
 	strPinyin, _ := pinyin.New(this.Name).Split("-").Mode(pinyin.WithoutTone).Convert()
 	savepath := "./tmp/" + strPinyin
+	savepath, _ = filepath.Abs(savepath) //使用绝对路径
 	if com.IsExist(savepath) {
 		os.RemoveAll(savepath)
 	}
 	os.MkdirAll(path.Dir(savepath), os.ModePerm)
+
+	//设置生成mobi的输出目录
+	outputpath := "./outputs/" + this.Name + "-" + this.Author + "/"
+	outputpath, _ = filepath.Abs(outputpath)
+	outputpath = outputpath + string(os.PathSeparator) //使用绝对路径
+	//fmt.Println(outputpath)
+	if !com.IsExist(outputpath) {
+		os.MkdirAll(outputpath, os.ModePerm)
+	}
 
 	// 生成封面
 	GenerateCover(this)
@@ -268,17 +349,19 @@ func (this BookInfo) GenerateMobi() {
 	//把修改内容写入到content.opf文件中
 	WriteFile(savepath+"/content.opf", []byte(opf_content))
 
-	if !com.IsExist("./outputs/") {
-		os.MkdirAll(path.Dir("./outputs/"), os.ModePerm)
-	}
-
 	//把封面复制到 tmp 目录当中
-	err := com.Copy("cover.jpg", savepath+"/cover.jpg")
+	coverPath, _ := filepath.Abs("./cover.jpg")
+	err := com.Copy(coverPath, savepath+"/cover.jpg")
+	if err != nil {
+		fmt.Println(err.Error())
+	}
+	//把封面复制到 outputs/小说名-作者/cover.jpg
+	err = com.Copy(coverPath, outputpath+"cover.jpg")
 	if err != nil {
 		fmt.Println(err.Error())
 	}
 	//删除当前目前的cover.jpg文件
-	os.RemoveAll("cover.jpg")
+	os.RemoveAll(coverPath)
 
 	// 生成
 	outfname := this.Name + "-" + this.Author
@@ -294,7 +377,7 @@ func (this BookInfo) GenerateMobi() {
 	cmd.Run()
 
 	// 把生成的mobi文件复制到 outputs/目录下面
-	com.Copy(savepath+"/"+outfname, "./outputs/"+outfname)
+	com.Copy(savepath+string(os.PathSeparator)+outfname, outputpath+string(os.PathSeparator)+outfname)
 }
 
 //AsycChapter

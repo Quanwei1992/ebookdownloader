@@ -7,19 +7,22 @@ import (
 	"io/ioutil"
 	"log"
 	"os"
+	"path/filepath"
 
 	"github.com/goki/freetype"
 )
 
 const (
-	fontSize = 45 //字体尺寸
+	fontSize = 40 //字体尺寸
 )
 
 //生成封面 cover.jpg
 func GenerateCover(this BookInfo) {
 
 	//需要添加内容的图片
-	imgfile, err := os.Open("./tpls/cover.jpg")
+	coverAbs, _ := filepath.Abs("./tpls/cover.jpg")
+	//fmt.Println(coverAbs)
+	imgfile, err := os.Open(coverAbs)
 	if err != nil {
 		fmt.Println(err.Error())
 	}
@@ -35,7 +38,8 @@ func GenerateCover(this BookInfo) {
 	}
 
 	//需要一个ttf字体文件
-	fontBytes, err := ioutil.ReadFile("./fonts/FZYTK.TTF")
+	fontAbs, _ := filepath.Abs("./fonts/WenQuanYiMicroHei.ttf")
+	fontBytes, err := ioutil.ReadFile(fontAbs)
 	if err != nil {
 		log.Println(err.Error())
 	}
@@ -58,15 +62,16 @@ func GenerateCover(this BookInfo) {
 	NameRune := []rune(this.Name)
 	f.DrawString(string(NameRune[0]), pt) // 第一个中文字符
 	for index := 1; index < len(NameRune); index++ {
-		pt.Y += f.PointToFixed(60)
+		pt.Y += f.PointToFixed(50)
 		f.DrawString(string(NameRune[index]), pt) //写入 小说名
 	}
 
 	f.SetFontSize(35)                                                     //重新设置 字体大小为35
 	ptAuthor := freetype.Pt(img.Bounds().Dx()-320, img.Bounds().Dy()-500) //字体出现的位置
-	f.DrawString(this.Author+" (c)著", ptAuthor)                           //写入小说作者名
+	f.DrawString(this.Author+" ©著", ptAuthor)                             //写入小说作者名
 
-	newfile, err := os.Create("cover.jpg")
+	newCoverpath, _ := filepath.Abs("./cover.jpg")
+	newfile, err := os.Create(newCoverpath)
 	if err != nil {
 		fmt.Println(err.Error())
 	}

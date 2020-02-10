@@ -4,9 +4,11 @@ package ebookdownloader
 
 import (
 	"os/exec"
+	"path/filepath"
 )
 
 func KindlegenCmd(args ...string) *exec.Cmd {
-	cmd := exec.Command("./tools/kindlegenMac", args...)
+	path, _ := filepath.Abs("./tools/kindlegenMac")
+	cmd := exec.Command(path, args...)
 	return cmd
 }
