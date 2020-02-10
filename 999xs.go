@@ -32,12 +32,14 @@ https://www.999xs.com/files/article/html/75/75842/ -> bookid = 75842
 
 //999小说网 999xs.com
 type Ebook999XS struct {
-	Url string
+	Url  string
+	Lock *sync.Mutex
 }
 
 func New999XS() Ebook999XS {
 	return Ebook999XS{
-		Url: "https://www.999xs.com",
+		Url:  "https://www.999xs.com",
+		Lock: new(sync.Mutex),
 	}
 }
 
@@ -142,9 +144,27 @@ func (this Ebook999XS) GetBookInfo(bookid string, proxy string) BookInfo {
 	}
 	return bi
 }
+func (this Ebook999XS) DownloadChapters(Bi BookInfo, proxy string) BookInfo {
+	result := Bi //先进行赋值，把数据
+	var chapters []Chapter
+	result.Chapters = chapters //把原来的数据清空
+	bis := Bi.Split()
+
+	for index := 0; index < len(bis); index++ {
+		this.Lock.Lock()
+		bookinfo := bis[index]
+		rec := this.downloadChapters(bookinfo, "")
+		chapters = append(chapters, rec.Chapters...)
+		//fmt.Printf("Get into this.Lock.Unlock() time: %d\n", index+1)
+		this.Lock.Unlock()
+	}
+	result.Chapters = chapters
+
+	return result
+}
 
 //根据每个章节的 url连接，下载每章对应的内容Content当中
-func (this Ebook999XS) DownloadChapters(Bi BookInfo, proxy string) BookInfo {
+func (this Ebook999XS) downloadChapters(Bi BookInfo, proxy string) BookInfo {
 	chapters := Bi.Chapters
 
 	NumChapter := len(chapters)
@@ -168,14 +188,14 @@ func (this Ebook999XS) DownloadChapters(Bi BookInfo, proxy string) BookInfo {
 	bar = progressbar.New(NumChapter)
 	bar.RenderBlank()
 
-	for index := 0; index < NumChapter; {
+	for index := 0; index <= NumChapter; {
 		select {
 		case tmp := <-tmpChapter:
 			//fmt.Printf("tmp.Title = %s\n", tmp.Title)
 			//fmt.Printf("tmp.Content= %s\n", tmp.Content)
 			c = append(c, tmp)
 			index++
-			if index == (NumChapter - 1) {
+			if index == NumChapter {
 				goto ForEnd
 			}
 		}

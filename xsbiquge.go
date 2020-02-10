@@ -10,14 +10,15 @@ import (
 	"github.com/schollz/progressbar/v2"
 )
 
-//新笔趣阁 xsbiquge.com
 type EbookXSBiquge struct {
-	Url string
+	Url  string
+	Lock *sync.Mutex
 }
 
 func NewXSBiquge() EbookXSBiquge {
 	return EbookXSBiquge{
-		Url: "https://www.xsbiquge.com",
+		Url:  "https://www.xsbiquge.com",
+		Lock: new(sync.Mutex),
 	}
 }
 
@@ -108,8 +109,27 @@ func (this EbookXSBiquge) GetBookInfo(bookid string, proxy string) BookInfo {
 	return bi
 }
 
-//根据每个章节的 url连接，下载每章对应的内容Content当中
 func (this EbookXSBiquge) DownloadChapters(Bi BookInfo, proxy string) BookInfo {
+	result := Bi //先进行赋值，把数据
+	var chapters []Chapter
+	result.Chapters = chapters //把原来的数据清空
+	bis := Bi.Split()
+
+	for index := 0; index < len(bis); index++ {
+		this.Lock.Lock()
+		bookinfo := bis[index]
+		rec := this.downloadChapters(bookinfo, "")
+		chapters = append(chapters, rec.Chapters...)
+		//fmt.Printf("Get into this.Lock.Unlock() time: %d\n", index+1)
+		this.Lock.Unlock()
+	}
+	result.Chapters = chapters
+
+	return result
+}
+
+//根据每个章节的 url连接，下载每章对应的内容Content当中
+func (this EbookXSBiquge) downloadChapters(Bi BookInfo, proxy string) BookInfo {
 	chapters := Bi.Chapters
 
 	NumChapter := len(chapters)
@@ -133,14 +153,14 @@ func (this EbookXSBiquge) DownloadChapters(Bi BookInfo, proxy string) BookInfo {
 	bar = progressbar.New(NumChapter)
 	bar.RenderBlank()
 
-	for index := 0; index < NumChapter; {
+	for index := 0; index <= NumChapter; {
 		select {
 		case tmp := <-tmpChapter:
 			//fmt.Printf("tmp.Title = %s\n", tmp.Title)
 			//fmt.Printf("tmp.Content= %s\n", tmp.Content)
 			c = append(c, tmp)
 			index++
-			if index == (NumChapter - 1) {
+			if index == NumChapter {
 				goto ForEnd
 			}
 		}
@@ -163,9 +183,11 @@ ForEnd:
 
 //func DownloaderChapter(ResultChan chan chan Chapter)
 func (this EbookXSBiquge) DownloaderChapter(ResultChan chan chan Chapter, pc ProxyChapter, wg *sync.WaitGroup) {
+	wg.Add(1)
+	defer wg.Done()
 	c := make(chan Chapter)
 	ResultChan <- c
-	wg.Add(1)
+
 	go func(pc ProxyChapter) {
 		pollURL := pc.C.Link
 		proxy := pc.Proxy
@@ -211,6 +233,5 @@ func (this EbookXSBiquge) DownloaderChapter(ResultChan chan chan Chapter, pc Pro
 			}
 		}
 		c <- result
-		wg.Done()
 	}(pc)
 }

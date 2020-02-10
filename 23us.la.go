@@ -18,12 +18,14 @@ import (
 
 //顶点小说网 23us.la
 type Ebook23US struct {
-	Url string
+	Url  string
+	Lock *sync.Mutex
 }
 
 func New23US() Ebook23US {
 	return Ebook23US{
-		Url: "https://www.23us.la",
+		Url:  "https://www.23us.la",
+		Lock: new(sync.Mutex),
 	}
 }
 
@@ -209,8 +211,27 @@ func (this Ebook23US) GetBookInfo(bookid string, proxy string) BookInfo {
 	return bi
 }
 
-//根据每个章节的 url连接，下载每章对应的内容Content当中
 func (this Ebook23US) DownloadChapters(Bi BookInfo, proxy string) BookInfo {
+	result := Bi //先进行赋值，把数据
+	var chapters []Chapter
+	result.Chapters = chapters //把原来的数据清空
+	bis := Bi.Split()
+
+	for index := 0; index < len(bis); index++ {
+		this.Lock.Lock()
+		bookinfo := bis[index]
+		rec := this.downloadChapters(bookinfo, "")
+		chapters = append(chapters, rec.Chapters...)
+		//fmt.Printf("Get into this.Lock.Unlock() time: %d\n", index+1)
+		this.Lock.Unlock()
+	}
+	result.Chapters = chapters
+
+	return result
+}
+
+//根据每个章节的 url连接，下载每章对应的内容Content当中
+func (this Ebook23US) downloadChapters(Bi BookInfo, proxy string) BookInfo {
 	chapters := Bi.Chapters
 
 	NumChapter := len(chapters)
@@ -234,14 +255,14 @@ func (this Ebook23US) DownloadChapters(Bi BookInfo, proxy string) BookInfo {
 	bar = progressbar.New(NumChapter)
 	bar.RenderBlank()
 
-	for index := 0; index < NumChapter; {
+	for index := 0; index <= NumChapter; {
 		select {
 		case tmp := <-tmpChapter:
 			//fmt.Printf("tmp.Title = %s\n", tmp.Title)
 			//fmt.Printf("tmp.Content= %s\n", tmp.Content)
 			c = append(c, tmp)
 			index++
-			if index == (NumChapter - 1) {
+			if index == NumChapter {
 				goto ForEnd
 			}
 		}

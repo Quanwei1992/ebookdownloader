@@ -67,6 +67,8 @@ func EbookDownloader(c *cli.Context) error {
 		//打印分卷信息，只用于调试
 		if isPV {
 			bookinfo.PrintVolumeInfo()
+			bis := bookinfo.Split()
+			fmt.Println(bis)
 			return nil
 		} else {
 			//下载章节内容

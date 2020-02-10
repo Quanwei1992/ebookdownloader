@@ -49,6 +49,11 @@
 
   ## 更新日志
      
+      2020.02.10 go版本
+                1. 添加小说章节分割下载功能(以300章为一个下载单元)
+                2. 限制并发数量，目前最大并发数量为 (300+49)*2 = 698
+                3. arm版本问题：目前只能生成txt文件，因为生成mobi花费时间过于长(测试平台:Raspberry Pi 3b, cpu过于垃圾和内存太小)
+
      2020.02.02 go版本
                 1. 初步添加kala接口，做为 Job Scheduler
                 2. cli版本添加生成meta.json文件功能
@@ -137,9 +142,4 @@
      [√]  4. 添加界面版本gui
      [√]  5. 添加http-server,做为后端
      [√]  6. 添加linux arm,arm64平台支持
-     [ ]  7. 需要限制并发数量，因为vps性能有限
-           参考文章 
-               [1](https://blog.csdn.net/HaoDaWang/article/details/80868919)
-               [2](https://www.cnblogs.com/Zereker/p/9590788.html)
-
-              [注册/认证/鉴权/授权] https://gitee.com/sblig/go-ums/tree/master
+     [√]  7. 需要限制并发数量，因为vps性能有限 -> 目前限制的并发数量为(300+49)*2 = 698

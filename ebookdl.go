@@ -3,6 +3,7 @@ package ebookdownloader
 import (
 	"fmt"
 	"io/ioutil"
+	"math"
 	"os"
 	"path"
 	"path/filepath"
@@ -79,6 +80,73 @@ func (this *BookInfo) ChangeVolumeState(hasVolume bool) {
 //返回 HasVolume的状态，true,false
 func (this BookInfo) VolumeState() bool {
 	return this.HasVolume
+}
+
+//Split BookInfo里面的Chapter,以300章为一组进行分割
+//当少于300章的里面，全部分为一卷；当有1000卷的时候，分为4卷；
+//当分割有n个卷的时候，剩下的章节大于50章，重开一个分卷，当少于50的时候，分割到最后一个分卷里面
+func (this BookInfo) Split() []BookInfo {
+	chapters := this.Chapters       //小说的章节信息
+	volumes := this.Volumes         //小说的分卷信息
+	Bookname := this.Name           //小说的名称
+	Author := this.Author           //小说的作者
+	Description := this.Description //小说的描述信息
+	IsAzw3 := this.IsAzw3           //是否生成azw3
+	IsMobi := this.IsMobi           //是否生成mobi
+	HasVolume := this.HasVolume     //是否包含分卷信息
+
+	var bis []BookInfo //slice of BookInfo
+
+	//当剩下章节大于200章时候
+	var tmp1 BookInfo
+	var BiggerThan50 bool = false //大于50章的时候设置为 true
+
+	chapterCount := len(chapters)             //有多少章节
+	count := (float64)(chapterCount / 300.00) //把章节分成几个部分
+	if count < 1 {
+		count = math.Ceil(count) //向上取整， 0.8 -> 1
+		tmp := BookInfo{
+			Name:        Bookname,
+			Author:      Author,
+			Description: Description,
+			IsMobi:      IsMobi,
+			IsAzw3:      IsAzw3,
+			HasVolume:   HasVolume,
+			Volumes:     volumes,
+			Chapters:    chapters, //因为少于500章，所以全部分在一起
+		}
+		bis = append(bis, tmp)
+	} else {
+		count = math.Floor(count) //向下取下 3.1 -> 3; 2.5 -> 2
+		for index := 0; index < (int)(count); index++ {
+			tmp := BookInfo{
+				Name:        Bookname,
+				Author:      Author,
+				Description: Description,
+				IsMobi:      IsMobi,
+				IsAzw3:      IsAzw3,
+				HasVolume:   HasVolume,
+				Volumes:     volumes,
+				Chapters:    chapters[index*300 : (index+1)*300], //chapters[startindex:endindex]
+				// [0*500:(0+1)*500] , [1*500:(1+1)*500], [2*500:(2+1)*500]
+			}
+			if index == (int)(count-1) && ((chapterCount - (index+1)*300) < 50) { //因为count 是向下取整的，所以需要进行一下处理
+				tmp.Chapters = chapters[index*300 : chapterCount] // 1680 - 1000 == 680
+			} else if index == (int)(count-1) && ((chapterCount - (index+1)*300) > 50) { //当剩下的章节多于200章，重新分割一个新的分卷
+				tmp1 = tmp
+				tmp1.Chapters = chapters[(index+1)*300 : chapterCount]
+				BiggerThan50 = true
+			}
+
+			bis = append(bis, tmp)
+		}
+	}
+
+	if BiggerThan50 { //当最后剩下的章节大于200时，再加多一个分割卷
+		bis = append(bis, tmp1)
+	}
+	fmt.Printf("共分%d个下载单元", len(bis))
+	return bis
 }
 
 func (this BookInfo) PrintVolumeInfo() {
