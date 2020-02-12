@@ -41,7 +41,8 @@ before_install: |-
               sudo apt-get install -y libgl1-mesa-dev xorg-dev p7zip-full
             ;;
           arm64)
-              sudo apt-get install -y libgl1-mesa-dev xorg-dev p7zip-full libgl1-mesa-dev:armhf xorg-dev:armhf
+              sudo apt-get install -y libgl1-mesa-dev xorg-dev p7zip-full
+              sudo apt-get install -y libgl1-mesa-dev:armhf xserver-xor-dev:armhf libxcursor-dev:armhf
               sudo apt-get install -y gcc-arm-linux-gnueabihf  g++-arm-linux-gnueabihf autoconf
             ;;
           esac
