@@ -112,6 +112,8 @@ func (this Ebook23US) GetBookInfo(bookid string, proxy string) BookInfo {
 		HasVolume := bi.VolumeState() //先赋值给 HasVolume,再把值导入到结构体中，用于数据返回
 		//导入信息
 		bi = BookInfo{
+			EBHost:      this.Url,
+			EBookId:     bookid,
 			Name:        bookName,
 			Author:      author,
 			Description: description,
@@ -200,6 +202,8 @@ func (this Ebook23US) GetBookInfo(bookid string, proxy string) BookInfo {
 		HasVolume := bi.VolumeState() //先赋值给 HasVolume,再把值导入到结构体中，用于数据返回
 		//导入信息
 		bi = BookInfo{
+			EBHost:      this.Url,
+			EBookId:     bookid,
 			Name:        bookName,
 			Author:      author,
 			Description: description,
@@ -272,6 +276,8 @@ func (this Ebook23US) downloadChapters(Bi BookInfo, proxy string) BookInfo {
 ForEnd:
 
 	result := BookInfo{
+		EBHost:      Bi.EBHost,
+		EBookId:     Bi.EBookId,
 		Name:        Bi.Name,
 		Author:      Bi.Author,
 		Description: Bi.Description,

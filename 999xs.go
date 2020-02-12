@@ -98,6 +98,8 @@ func (this Ebook999XS) GetBookInfo(bookid string, proxy string) BookInfo {
 
 		//导入信息
 		bi = BookInfo{
+			EBHost:      this.Url,
+			EBookId:     bookid,
 			Name:        bookName,
 			Author:      author,
 			Description: description,
@@ -136,6 +138,8 @@ func (this Ebook999XS) GetBookInfo(bookid string, proxy string) BookInfo {
 
 		//导入信息
 		bi = BookInfo{
+			EBHost:      this.Url,
+			EBookId:     bookid,
 			Name:        bookName,
 			Author:      author,
 			Description: description,
@@ -205,6 +209,8 @@ func (this Ebook999XS) downloadChapters(Bi BookInfo, proxy string) BookInfo {
 ForEnd:
 
 	result := BookInfo{
+		EBHost:      Bi.EBHost,
+		EBookId:     Bi.EBookId,
 		Name:        Bi.Name,
 		Author:      Bi.Author,
 		Description: Bi.Description,

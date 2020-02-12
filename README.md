@@ -28,6 +28,8 @@
   .\ebookdownloader.exe --ebhost=999xs.com --bookid=0_642 --txt --mobi #使用999xs.com做为下载源，生成txt 和 mobi
    .\ebookdownloader.exe --ebhost=999xs.com --bookid=0_642 --txt --mobi --meta #使用999xs.com做为下载源，生成txt,mobi电子书，并生成meta.json文件于小说目录当中
   .\ebookdownloader.exe --ebhost=23us.la --bookid=127064 --pv #新功能，用于打印小说的分卷信息，此时不下载小说任何内容
+  .\ebookdownloader.exe --bookid=0_0642 --json #生成json格式的小说数据
+  .\ebookdownloader.exe conv --json=".\outputs\我是谁-sndnvaps\我是谁-sndnvaps.json" --txt --mobi #新功能，转换json格式到txt,mobi格式
   .\ebookdownloader.exe --help #显示帮助信息
   ```
 
@@ -64,6 +66,8 @@
       2020.02.12 README更新
                 1. 添加gitee项目地址，加快国内的下载速度
                 2. 生成txt：修改方法为按一章一章地往磁盘中写入文件，以降低cpu占用率
+                3. cli: 添加生成json格式内容，用于把小说保存成json格式，方便线下再进行转换，方便进行二次处理
+                4. 添加二级命令conv,用于转换json文件到txt,mobi,azw3格式小说
 
       2020.02.10 go版本
                 1. 添加小说章节分割下载功能(以300章为一个下载单元)
