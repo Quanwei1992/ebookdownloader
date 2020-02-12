@@ -172,8 +172,17 @@ func (this BookInfo) GenerateTxt() {
 	content := ""             //用于存放（分卷、）章节内容
 	outfpath := "./outputs/" + this.Name + "-" + this.Author + "/"
 	outfname := outfpath + this.Name + "-" + this.Author + ".txt"
+	txtAbsPath, _ := filepath.Abs(outfname)
+	//当txt文件存在的时候删除它
+	if com.IsExist(txtAbsPath) {
+		os.RemoveAll(txtAbsPath)
+	}
+	//创建文件
+	fptr, _ := os.Create(txtAbsPath)
+	defer fptr.Close()
 
 	for index := 0; index < len(chapters); index++ {
+		content = "" //每次循环，都初始化一次
 		if len(volumes) > 0 && this.VolumeState() {
 			for vindex := 0; vindex < len(volumes); vindex++ {
 
@@ -189,10 +198,12 @@ func (this BookInfo) GenerateTxt() {
 		//fmt.Printf("Content = %s\n", chapters[index].Content)            //用于测试
 		content += "\n" + "### " + chapters[index].Title + " ###" + "\n" //每一章的标题，使用 ‘### 第n章 标题 ###’ 为格式
 		content += chapters[index].Content + "\n\n"                      //每一章内容的结尾，使用两个换行符
-
+		fptr.Write(([]byte)(content))                                    //一章一章地往txt文件中写入
+		fptr.Sync()                                                      //同步修改的文件
 	}
 
-	WriteFile(outfname, []byte(content))
+	fptr.Close() //关闭文件
+	//WriteFile(outfname, []byte(content))
 }
 
 //生成mobi格式电子书
