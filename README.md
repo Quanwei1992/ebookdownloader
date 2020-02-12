@@ -51,10 +51,19 @@
 
   ## 懒人模式，直接下载编译好的程序
   
-  到[这里](https://github.com/sndnvaps/ebookdownloader/releases)下载你需要的版本
+  墙里面使用gitee
+
+  [gitee ebookdownloader release page](https://gitee.com/sndnvaps/ebookdownloader/releases "https://gitee.com/sndnvaps/ebookdownloader/releases")
+
+墙外面使用github
+
+  [github ebookdownloader release page](https://github.com/sndnvaps/ebookdownloader/releases "https://github.com/sndnvaps/ebookdownloader/releases")
+
 
   ## 更新日志
-     
+      2020.02.12 README更新
+                1. 添加gitee项目地址，加快国内的下载速度
+
       2020.02.10 go版本
                 1. 添加小说章节分割下载功能(以300章为一个下载单元)
                 2. 限制并发数量，目前最大并发数量为 (300+49)*2 = 698
