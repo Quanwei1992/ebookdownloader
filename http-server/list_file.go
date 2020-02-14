@@ -24,6 +24,7 @@ func List(c *gin.Context) {
 	path := "./outputs/"
 	path, _ = filepath.Abs(path)
 
+	//fmt.Println(path)
 	//以只读的方式打开目录
 	f, err := os.OpenFile(path, os.O_RDONLY, os.ModeDir)
 	if err != nil {
@@ -37,7 +38,7 @@ func List(c *gin.Context) {
 	for _, info := range fileInfo {
 		//判断是否是目录,当前只有目录，不存在文件
 		if info.IsDir() {
-			metapath := path + info.Name() + "/meta.json"
+			metapath := path + string(os.PathSeparator) + info.Name() + "/meta.json"
 
 			tmp.Metainfo, err = edl.GetMetaData(metapath)
 			if err == nil {
