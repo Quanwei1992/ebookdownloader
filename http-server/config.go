@@ -8,7 +8,8 @@ import (
 )
 
 var (
-	CFG_PATH string
+	//CFGPATH 定义配置文件的路径
+	CFGPATH string
 )
 
 var (
@@ -46,10 +47,10 @@ var (
 func ConfInit() {
 
 	var err error
-	cfgAbsPath, _ := filepath.Abs(CFG_PATH)
+	cfgAbsPath, _ := filepath.Abs(CFGPATH)
 	Cfg, err = ini.Load(cfgAbsPath)
 	if err != nil {
-		panic(fmt.Errorf("fail to load config file '%s': %v", CFG_PATH, err))
+		panic(fmt.Errorf("fail to load config file '%s': %v", CFGPATH, err))
 	}
 
 	conf.Host = Cfg.Section("server").Key("host").MustString("localhost")

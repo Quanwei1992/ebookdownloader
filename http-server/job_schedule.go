@@ -138,11 +138,12 @@ func EbookDLGetJob(c *gin.Context) {
 			"jobinfo": jobInfo,
 		})
 		return
-	} else {
-		c.JSON(http.StatusOK, gin.H{
-			"jobid": jobID,
-			"msg":   "输入的jobid错误无法识别",
-		})
-		return
 	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"jobid": jobID,
+		"msg":   "输入的jobid无法识别",
+	})
+	return
+
 }

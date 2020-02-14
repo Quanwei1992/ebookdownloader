@@ -139,7 +139,9 @@ func ParseEbhostAndBookIDPost(c *gin.Context) {
 //ebook_http_server 启动ebookdownloader服务器后台程序
 func ebookHTTPServer(c *cli.Context) error {
 
-	CFG_PATH = c.String("conf")
+	//从参数中获取配置文件的路径
+	CFGPATH = c.String("conf")
+	//初始化配置文件
 	ConfInit()
 
 	// Creates a router with Default
