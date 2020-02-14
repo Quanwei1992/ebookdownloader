@@ -43,6 +43,7 @@
     7. qemu-i386-static-arm64 支持在linux arm64平台上运行 kindlegenLinux
     8. http-server 项目依赖：
           github.com/ajvb/kala 项目，用于任务控制和管理
+          kala需要与ebookdownloader_cli运行在同一个目录里面
 
   ## 后端服务器 API接口
     主要目的是部署在vps上面，就可以方便随时下载小说了
@@ -63,6 +64,11 @@
 
 
   ## 更新日志
+  
+      2020.02.14 go版本
+                1. http-server:添加创建任务功能和查询任务功能（使用kala Job Schedule)
+                2. 对代码进行添加注释
+
       2020.02.13 go版本
                 1. cli: 重新补充完成meta.json信息
 
@@ -161,7 +167,7 @@
 
   ## To Do List
 
-     [√]  1.添加生成封面功能
+     [√]  1. 添加生成封面功能
      [√]  2. 添加不同平台的接口实现
      [√]  3. 添加生成二级目录的方法(已经添加相应的实例)
      [√]  4. 添加界面版本gui

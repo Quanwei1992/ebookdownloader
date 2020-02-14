@@ -10,11 +10,15 @@ import (
 )
 
 var (
-	Version   string = "1.6.9"
-	Commit    string = ""
-	BuildTime string = ""
+	//Version 版本信息
+	Version string = "1.7.0"
+	//Commit git commit信息
+	Commit string = "b40f73c79"
+	//BuildTime 编译时间
+	BuildTime string = "2020-01-25 16:19"
 )
 
+// EbookDownloader 下载电子书的接口
 func EbookDownloader(c *cli.Context) error {
 	//bookid := "91_91345" //91_91345, 0_642
 	bookid := c.String("bookid")
@@ -30,7 +34,7 @@ func EbookDownloader(c *cli.Context) error {
 	isTxt := c.Bool("txt")
 	isMobi := c.Bool("mobi")
 	isAzw3 := c.Bool("azw3")
-	isJson := c.Bool("json")      //把下载到的小说信息保存到json数据当中
+	isJSON := c.Bool("json")      //把下载到的小说信息保存到json数据当中
 	isPV := c.Bool("printvolume") //打印分卷信息，只用做调试时使用
 	isMeta := c.Bool("meta")      //保存meta信息到 小说目录当中
 
@@ -40,7 +44,7 @@ func EbookDownloader(c *cli.Context) error {
 	var metainfo edl.Meta //用于保存小说的meta信息
 	txtfilepath := ""     //定义 txt下载后，获取得到的 地址
 	mobifilepath := ""    //定义 mobi下载后，获取得到的 地址
-	coverUrlPath := ""    //定义下载小说后，封面的url地址
+	coverURLPath := ""    //定义下载小说后，封面的url地址
 
 	//isTxt 或者 isMobi必须一个为真，或者两个都为真
 	if (isTxt || isMobi || isAzw3) || (isTxt && isMobi) || (isTxt && isAzw3) || isPV || isJson {
@@ -74,9 +78,9 @@ func EbookDownloader(c *cli.Context) error {
 			bookinfo = EBDLInterface.DownloadChapters(bookinfo, proxy)
 		}
 
-		if isJson {
+		if isJSON {
 			//生成 json格式后，直接退出程序
-			err := bookinfo.GenerateJson()
+			err := bookinfo.GenerateJSON()
 			if err != nil {
 				fmt.Println(err.Error())
 			}
@@ -96,7 +100,7 @@ func EbookDownloader(c *cli.Context) error {
 			bookinfo.GenerateMobi()
 			if isMeta { //配置meta信息
 				mobifilepath = "public/" + bookinfo.Name + "-" + bookinfo.Author + "/" + bookinfo.Name + "-" + bookinfo.Author + ".mobi"
-				coverUrlPath = "public/" + bookinfo.Name + "-" + bookinfo.Author + "/" + "cover.jpg"
+				coverURLPath = "public/" + bookinfo.Name + "-" + bookinfo.Author + "/" + "cover.jpg"
 			}
 
 		}
@@ -107,7 +111,7 @@ func EbookDownloader(c *cli.Context) error {
 			bookinfo.GenerateMobi()
 			if isMeta { //配置meta信息
 				mobifilepath = "public/" + bookinfo.Name + "-" + bookinfo.Author + "/" + bookinfo.Name + "-" + bookinfo.Author + ".azw3"
-				coverUrlPath = "public/" + bookinfo.Name + "-" + bookinfo.Author + "/" + "cover.jpg"
+				coverURLPath = "public/" + bookinfo.Name + "-" + bookinfo.Author + "/" + "cover.jpg"
 			}
 		}
 		if isMeta {
@@ -116,7 +120,7 @@ func EbookDownloader(c *cli.Context) error {
 				Bookid:      bookid,
 				BookName:    bookinfo.Name,
 				Author:      bookinfo.Author,
-				CoverUrl:    coverUrlPath,
+				CoverUrl:    coverURLPath,
 				Description: bookinfo.Description,
 				TxtUrlPath:  txtfilepath,
 				MobiUrlPath: mobifilepath,
@@ -134,8 +138,8 @@ func EbookDownloader(c *cli.Context) error {
 	return nil
 }
 
-//转换json文件到ebook格式
-func ConvJson2Ebook(c *cli.Context) error {
+//ConvJSON2Ebook 转换json文件到ebook格式
+func ConvJSON2Ebook(c *cli.Context) error {
 
 	jsonPath := c.String("json")
 	if jsonPath == "" {
@@ -151,7 +155,7 @@ func ConvJson2Ebook(c *cli.Context) error {
 	var metainfo edl.Meta //用于保存小说的meta信息
 	txtfilepath := ""     //定义 txt下载后，获取得到的 地址
 	mobifilepath := ""    //定义 mobi下载后，获取得到的 地址
-	coverUrlPath := ""    //定义下载小说后，封面的url地址
+	coverURLPath := ""    //定义下载小说后，封面的url地址
 
 	//isTxt 或者 isMobi必须一个为真，或者两个都为真
 	if (isTxt || isMobi || isAzw3) || (isTxt && isMobi) || (isTxt && isAzw3) {
@@ -161,7 +165,7 @@ func ConvJson2Ebook(c *cli.Context) error {
 			cli.ShowAppHelpAndExit(c, 0)
 			return nil
 		}
-		bookinfo, err := edl.LoadBookJsonData(jsonPath)
+		bookinfo, err := edl.LoadBookJSONData(jsonPath)
 		if err != nil {
 			return err
 		}
@@ -181,7 +185,7 @@ func ConvJson2Ebook(c *cli.Context) error {
 			bookinfo.GenerateMobi()
 			if isMeta { //配置meta信息
 				mobifilepath = "public/" + bookinfo.Name + "-" + bookinfo.Author + "/" + bookinfo.Name + "-" + bookinfo.Author + ".mobi"
-				coverUrlPath = "public/" + bookinfo.Name + "-" + bookinfo.Author + "/" + "cover.jpg"
+				coverURLPath = "public/" + bookinfo.Name + "-" + bookinfo.Author + "/" + "cover.jpg"
 			}
 
 		}
@@ -192,7 +196,7 @@ func ConvJson2Ebook(c *cli.Context) error {
 			bookinfo.GenerateMobi()
 			if isMeta { //配置meta信息
 				mobifilepath = "public/" + bookinfo.Name + "-" + bookinfo.Author + "/" + bookinfo.Name + "-" + bookinfo.Author + ".azw3"
-				coverUrlPath = "public/" + bookinfo.Name + "-" + bookinfo.Author + "/" + "cover.jpg"
+				coverURLPath = "public/" + bookinfo.Name + "-" + bookinfo.Author + "/" + "cover.jpg"
 			}
 		}
 		if isMeta {
@@ -201,7 +205,7 @@ func ConvJson2Ebook(c *cli.Context) error {
 				Bookid:      bookinfo.EBookId,
 				BookName:    bookinfo.Name,
 				Author:      bookinfo.Author,
-				CoverUrl:    coverUrlPath,
+				CoverUrl:    coverURLPath,
 				Description: bookinfo.Description,
 				TxtUrlPath:  txtfilepath,
 				MobiUrlPath: mobifilepath,
@@ -298,7 +302,7 @@ func main() {
 					Usage: "生成meta文件",
 				},
 			},
-			Action: ConvJson2Ebook,
+			Action: ConvJSON2Ebook,
 		},
 	}
 

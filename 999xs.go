@@ -222,7 +222,7 @@ ForEnd:
 	return result
 }
 
-//func DownloaderChapter(ResultChan chan chan Chapter)
+//DownloaderChapter 下载小说
 func (this Ebook999XS) DownloaderChapter(ResultChan chan chan Chapter, pc ProxyChapter, wg *sync.WaitGroup) {
 	c := make(chan Chapter)
 	ResultChan <- c

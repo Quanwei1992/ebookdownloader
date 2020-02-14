@@ -1,5 +1,6 @@
 // +build linux
-// +build !386 !amd64
+// +build !windows
+// +build !386 !amd64 !arm64
 // +build arm
 
 package ebookdownloader
@@ -9,6 +10,7 @@ import (
 	"path/filepath"
 )
 
+//KindlegenCmd 执行外部kindlegen命令
 func KindlegenCmd(args ...string) *exec.Cmd {
 	var cmds []string
 	path, _ := filepath.Abs("./tools/kindlegenLinux")

@@ -2,8 +2,9 @@ package main
 
 import (
 	"fmt"
-	"gopkg.in/ini.v1"
 	"path/filepath"
+
+	"gopkg.in/ini.v1"
 )
 
 var (
@@ -15,29 +16,38 @@ var (
 	Cfg *ini.File
 )
 
+//Config 定义http-server服务器的相关参数
 type Config struct {
 	Host     string `json:"host"`      //对外地址
 	InerHost string `json:"iner_host"` //内部地址
 	Port     string `json:"port"`
-	URL_BASE string `json:"url_base"`
+	URLBase  string `json:"url_base"`
 }
 
+// KalaConfig 定义 kala程序运行的相关参数
 type KalaConfig struct {
-	Host     string `json:"host"`     //kala job Schemule host
-	Port     string `json:"port"`     //kala port
-	URL_BASE string `json:"url_base"` //url_base
+	Host    string `json:"host"`     //kala job Schemule host
+	Port    string `json:"port"`     //kala port
+	URLBase string `json:"url_base"` //url_base
+}
+
+// EBDBinPathConfig ebookdownloader_cli 运行程序路径
+type EBDBinPathConfig struct {
+	Path string `json:"bin_path"` //ebookdownloader_cli exec path -> /usr/local/bin/ebookdownloader_cli
 }
 
 var (
-	conf  Config
-	kconf KalaConfig
+	conf           Config
+	kconf          KalaConfig
+	ebdBinPathConf EBDBinPathConfig
 )
 
+//ConfInit 初始化配置文件参数
 func ConfInit() {
 
 	var err error
-	cfg_abs_path, _ := filepath.Abs(CFG_PATH)
-	Cfg, err = ini.Load(cfg_abs_path)
+	cfgAbsPath, _ := filepath.Abs(CFG_PATH)
+	Cfg, err = ini.Load(cfgAbsPath)
 	if err != nil {
 		panic(fmt.Errorf("fail to load config file '%s': %v", CFG_PATH, err))
 	}
@@ -46,10 +56,12 @@ func ConfInit() {
 	conf.InerHost = Cfg.Section("server").Key("iner_host").MustString("localhost")
 	conf.Port = Cfg.Section("server").Key("port").MustString("8080")
 
-	conf.URL_BASE = "http://" + conf.Host + ":" + conf.Port
+	conf.URLBase = "http://" + conf.Host + ":" + conf.Port
 
 	kconf.Host = Cfg.Section("kala").Key("host").MustString("localhost")
 	kconf.Port = Cfg.Section("kala").Key("port").MustString("8081")
-	kconf.URL_BASE = "http://" + kconf.Host + ":" + kconf.Port
+	kconf.URLBase = "http://" + kconf.Host + ":" + kconf.Port
 
+	ebdBinPathConf.Path = Cfg.Section("ebookdownloader_cli").Key("path").MustString("./ebookdownloader_cli")
+	ebdBinPathConf.Path, _ = filepath.Abs(ebdBinPathConf.Path)
 }

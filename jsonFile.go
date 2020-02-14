@@ -6,8 +6,8 @@ import (
 	"path/filepath"
 )
 
-//从文件中读取BookInfo信息，并返回
-func LoadBookJsonData(filename string) (BookInfo, error) {
+//LoadBookJSONData 从文件中读取BookInfo信息，并返回
+func LoadBookJSONData(filename string) (BookInfo, error) {
 	fileAbs, _ := filepath.Abs(filename)
 	filePtr, _ := os.Open(fileAbs)
 

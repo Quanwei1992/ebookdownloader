@@ -10,11 +10,13 @@ import (
 	"github.com/schollz/progressbar/v2"
 )
 
+// EbookXSBiquge xsbiquge.com小说网
 type EbookXSBiquge struct {
 	Url  string
 	Lock *sync.Mutex
 }
 
+// NewXSBiquge 初始化
 func NewXSBiquge() EbookXSBiquge {
 	return EbookXSBiquge{
 		Url:  "https://www.xsbiquge.com",
@@ -22,6 +24,7 @@ func NewXSBiquge() EbookXSBiquge {
 	}
 }
 
+//GetBookInfo 获取小说的信息
 func (this EbookXSBiquge) GetBookInfo(bookid string, proxy string) BookInfo {
 
 	var bi BookInfo
@@ -113,6 +116,7 @@ func (this EbookXSBiquge) GetBookInfo(bookid string, proxy string) BookInfo {
 	return bi
 }
 
+//DownloadChapters 下载所有章节
 func (this EbookXSBiquge) DownloadChapters(Bi BookInfo, proxy string) BookInfo {
 	result := Bi //先进行赋值，把数据
 	var chapters []Chapter

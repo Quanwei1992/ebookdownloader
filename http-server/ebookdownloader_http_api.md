@@ -224,6 +224,173 @@ $ curl  -H "Authorization:Bearer xxxxxxxxx" -H "Content-Type: application/json" 
 $ curl  -H "Authorization:Bearer xxxxxxxxx" -H "Content-Type: application/json" -X GET -v http://localhost:8080/auth/stat
 ```
 
+## 任务调度功能
+
+## create job
+此功能用于创建定时下载任务（下载任务会在当前时间10分钟后执行)
+需要配置/conf/ebd_conf.ini文件来定义ebookdownloader_cli的位置，要于kala程序运行目录一致
+```bash
+  /api/v1/job
+  传入query参数可以是如下
+    ebhost string类型 定义下载源
+    bookid string类型 定义小说的bookid
+    istxt string类型 true,false
+    ismobi string类型 true,false
+    meta string类型 true,false；默认为true
+ 传入header:
+    Authorization:Bearer TOKEN
+    Content-Type: application/json
+  http_method: POST
+  返回值
+    成功创建的结果
+  {
+    	"code":        200,
+		"msg":         "创建下载任务完成",
+		"JobID":       jobID,
+		"JobName":     jobName,
+		"JobCMD":      cmd,
+		"JobSchedule": schedule,
+  }
+   失败返回结果
+     {
+        	"code":   201,
+			"msg":    "创建下载下载失败",
+			"errMsg": err.Error(),
+     }
+```
+
+测试例子
+```bash
+$curl  -H "Authorization:Bearer xxxxxxxxx" -H "Content-Type: application/json" -X POST http://192.168.13.107:8090/api/v1/job?bookid=90_90583&istxt=true&ismobi=true
+```
+
+### 查询任务信息
+查询任务信息
+
+```bash
+  /api/v1/job/*id
+  可传入参数 id
+ 传入header:
+    Authorization:Bearer TOKEN
+    Content-Type: application/json
+  http_method: GET
+  返回结果
+  执行 /api/vi/job/ 后的结果
+```
+
+```json
+{
+    "id": ""
+}
+{
+    "jobinfos": [
+        {
+            "id": "5cd1fd60-e6a8-42a3-63e9-c4b4474f26b4",
+            "job": {
+                "name": "Downloader ebook 垂钓之神-会狼叫的猪",
+                "id": "5cd1fd60-e6a8-42a3-63e9-c4b4474f26b4",
+                "command": "F:/work/ebookdownloader/ebookdownloader_cli.exe --ebhost=xsbiquge.com --bookid=90_90583 --txt --mobi --meta",
+                "owner": "",
+                "disabled": false,
+                "dependent_jobs": null,
+                "parent_jobs": null,
+                "on_failure_job": "",
+                "schedule": "R0/2020-02-14T19:01:43+08:00/",
+                "retries": 0,
+                "epsilon": "",
+                "next_run_at": "2020-02-14T19:01:43+08:00",
+                "resume_at_next_scheduled_time": false,
+                "metadata": {
+                    "success_count": 1,
+                    "last_success": "2020-02-14T19:02:45.4369279+08:00",
+                    "error_count": 0,
+                    "last_error": "0001-01-01T00:00:00Z",
+                    "last_attempted_run": "2020-02-14T19:01:43.0003567+08:00",
+                    "number_of_finished_runs": 1
+                },
+                "type": 0,
+                "remote_properties": {
+                    "url": "",
+                    "method": "",
+                    "body": "",
+                    "headers": null,
+                    "timeout": 0,
+                    "expected_response_codes": null
+                },
+                "stats": [
+                    {
+                        "job_id": "5cd1fd60-e6a8-42a3-63e9-c4b4474f26b4",
+                        "ran_at": "2020-02-14T19:01:43.0003567+08:00",
+                        "number_of_retries": 0,
+                        "success": true,
+                        "execution_duration": 62436571200
+                    }
+                ],
+                "is_done": true
+            }
+        }
+    ]
+}
+```
+
+执行 /api/v1/job/
+
+```json
+  {
+    "id": "5cd1fd60-e6a8-42a3-63e9-c4b4474f26b4"
+}
+{
+    "jobinfo": {
+        "name": "Downloader ebook 垂钓之神-会狼叫的猪",
+        "id": "5cd1fd60-e6a8-42a3-63e9-c4b4474f26b4",
+        "command": "F:/work/ebookdownloader/ebookdownloader_cli.exe --ebhost=xsbiquge.com --bookid=90_90583 --txt --mobi --meta",
+        "owner": "",
+        "disabled": false,
+        "dependent_jobs": null,
+        "parent_jobs": null,
+        "on_failure_job": "",
+        "schedule": "R0/2020-02-14T19:01:43+08:00/",
+        "retries": 0,
+        "epsilon": "",
+        "next_run_at": "2020-02-14T19:01:43+08:00",
+        "resume_at_next_scheduled_time": false,
+        "metadata": {
+            "success_count": 1,
+            "last_success": "2020-02-14T19:02:45.4369279+08:00",
+            "error_count": 0,
+            "last_error": "0001-01-01T00:00:00Z",
+            "last_attempted_run": "2020-02-14T19:01:43.0003567+08:00",
+            "number_of_finished_runs": 1
+        },
+        "type": 0,
+        "remote_properties": {
+            "url": "",
+            "method": "",
+            "body": "",
+            "headers": null,
+            "timeout": 0,
+            "expected_response_codes": null
+        },
+        "stats": [
+            {
+                "job_id": "5cd1fd60-e6a8-42a3-63e9-c4b4474f26b4",
+                "ran_at": "2020-02-14T19:01:43.0003567+08:00",
+                "number_of_retries": 0,
+                "success": true,
+                "execution_duration": 62436571200
+            }
+        ],
+        "is_done": true
+    }
+}
+```
+测试例子
+
+```bash
+$curl  -H "Authorization:Bearer xxxxxxxxx" -H "Content-Type: application/json" -X GET http://192.168.13.107:8090/api/v1/job/
+$curl  -H "Authorization:Bearer xxxxxxxxx" -H "Content-Type: application/json" -X GET http://192.168.13.107:8090/api/v1/job/5cd1fd60-e6a8-42a3-63e9-c4b4474f26b4
+```
+
 ### Upload, 此功能已经作废
 此功能是上传文件到服务器上面
 
