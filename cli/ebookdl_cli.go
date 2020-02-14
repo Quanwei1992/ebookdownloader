@@ -47,7 +47,7 @@ func EbookDownloader(c *cli.Context) error {
 	coverURLPath := ""    //定义下载小说后，封面的url地址
 
 	//isTxt 或者 isMobi必须一个为真，或者两个都为真
-	if (isTxt || isMobi || isAzw3) || (isTxt && isMobi) || (isTxt && isAzw3) || isPV || isJson {
+	if (isTxt || isMobi || isAzw3) || (isTxt && isMobi) || (isTxt && isAzw3) || isPV || isJSON {
 
 		if ebhost == "xsbiquge.com" {
 			xsbiquge := edl.NewXSBiquge()
