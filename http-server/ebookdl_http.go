@@ -103,7 +103,7 @@ func ParseEbhostAndBookIDPost(c *gin.Context) {
 	//add --bookid={{.bookid}}
 	cmdArgs = append(cmdArgs, fmt.Sprintf("--bookid=%s", bookid))
 
-	bookinfo = ebdlInterface.GetBookInfo(bookid, "")
+	bookinfo = ebdlInterface.GetBookBriefInfo(bookid, "")
 
 	if isTxt {
 		cmdArgs = append(cmdArgs, "--txt")

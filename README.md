@@ -68,6 +68,9 @@
       2020.02.14 go版本
                 1. http-server:添加创建任务功能和查询任务功能（使用kala Job Schedule)
                 2. 对代码进行添加注释
+                3. 添加新接口 GetBookBriefInfo只用于获取小说名字，作者，简介信息
+                4. gui: 更新代码，修改字体的路径
+                5. gui: 现在改用外部调用ebookdownloader_cli来执行下载操作，需要用到配置文件./conf/ebdl_conf.ini
 
       2020.02.13 go版本
                 1. cli: 重新补充完成meta.json信息

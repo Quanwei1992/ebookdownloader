@@ -30,6 +30,75 @@ func New23US() Ebook23US {
 	}
 }
 
+//GetBookBriefInfo 获取小说的信息
+func (this Ebook23US) GetBookBriefInfo(bookid string, proxy string) BookInfo {
+
+	var bi BookInfo
+	pollURL := this.URL + "/" + "html/" + handleBookid(bookid) + "/"
+
+	//当 proxy 不为空的时候，表示设置代理
+	if proxy != "" {
+		doc, err := htmlquery.LoadURLWithProxy(pollURL, proxy)
+		if err != nil {
+			fmt.Println(err.Error())
+		}
+
+		//获取书名字
+		bookNameMeta, _ := htmlquery.FindOne(doc, "//meta[@property='og:novel:book_name']")
+		bookName := htmlquery.SelectAttr(bookNameMeta, "content")
+		fmt.Println("书名 = ", bookName)
+
+		//获取书作者
+		AuthorMeta, _ := htmlquery.FindOne(doc, "//meta[@property='og:novel:author']")
+		author := htmlquery.SelectAttr(AuthorMeta, "content")
+		fmt.Println("作者 = ", author)
+
+		//获取书的描述信息
+		DescriptionMeta, _ := htmlquery.FindOne(doc, "//meta[@property='og:description']")
+		description := htmlquery.SelectAttr(DescriptionMeta, "content")
+		fmt.Println("简介 = ", description)
+
+		//导入信息
+		bi = BookInfo{
+			EBHost:      this.URL,
+			EBookId:     bookid,
+			Name:        bookName,
+			Author:      author,
+			Description: description,
+		}
+	} else { //没有设置代理
+		doc, err := htmlquery.LoadURL(pollURL)
+		if err != nil {
+			fmt.Println(err.Error())
+		}
+
+		//获取书名字
+		bookNameMeta, _ := htmlquery.FindOne(doc, "//meta[@property='og:novel:book_name']")
+		bookName := htmlquery.SelectAttr(bookNameMeta, "content")
+		fmt.Println("书名 = ", bookName)
+
+		//获取书作者
+		AuthorMeta, _ := htmlquery.FindOne(doc, "//meta[@property='og:novel:author']")
+		author := htmlquery.SelectAttr(AuthorMeta, "content")
+		fmt.Println("作者 = ", author)
+
+		//获取书的描述信息
+		DescriptionMeta, _ := htmlquery.FindOne(doc, "//meta[@property='og:description']")
+		description := htmlquery.SelectAttr(DescriptionMeta, "content")
+		fmt.Println("简介 = ", description)
+
+		//导入信息
+		bi = BookInfo{
+			EBHost:      this.URL,
+			EBookId:     bookid,
+			Name:        bookName,
+			Author:      author,
+			Description: description,
+		}
+	}
+	return bi
+}
+
 //GetBookInfo 下载小说信息
 func (this Ebook23US) GetBookInfo(bookid string, proxy string) BookInfo {
 
