@@ -68,6 +68,7 @@
       2020.02.16 go版本
                 1. ebookdownloader库：windows平台 kindlegen运行时添加隐藏窗口功能
                 2. gui:运行时，隐藏ebookdownloader_cli程序启动时的黑色窗口
+                3. 更新版本到1.7.2
 
       2020.02.14 go版本
                 1. http-server:添加创建任务功能和查询任务功能（使用kala Job Schedule)

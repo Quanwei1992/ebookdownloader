@@ -11,11 +11,11 @@ import (
 
 var (
 	//Version 版本信息
-	Version string = "1.7.0"
+	Version string = "1.7.2"
 	//Commit git commit信息
 	Commit string = "b40f73c79"
 	//BuildTime 编译时间
-	BuildTime string = "2020-01-25 16:19"
+	BuildTime string = "2020-02-16 16:34"
 )
 
 // EbookDownloader 下载电子书的接口
