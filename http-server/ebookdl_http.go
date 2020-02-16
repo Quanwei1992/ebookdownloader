@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"io"
 	"log"
 	"net/http"
 	"os"
@@ -18,14 +17,17 @@ import (
 )
 
 var (
-	Version   string = "1.7.0"
-	Commit    string = "b40f73c79"
-	BuildTime string = "2020-01-25 16:19"
+	//Version 版本信息
+	Version string = "1.7.2"
+	//Commit git commit信息
+	Commit string = "b40f73c79"
+	//BuildTime 编译时间
+	BuildTime string = "2020-02-16 16:34"
 )
 
 var (
 	bookinfo      edl.BookInfo         //初始化变量
-	EBDLInterface edl.EBookDLInterface //初始化接口
+	ebdlInterface edl.EBookDLInterface //初始化接口
 )
 
 var (
@@ -46,18 +48,8 @@ type User struct {
 
 var identityKey = "id"
 
-func helloHandler(c *gin.Context) {
-	claims := jwt.ExtractClaims(c)
-	user, _ := c.Get(identityKey)
-	c.JSON(200, gin.H{
-		"userID":   claims[identityKey],
-		"userName": user.(*User).UserName,
-		"text":     "Hello World.",
-	})
-}
-
-//系统信息
-func HttpStat(c *gin.Context) {
+//HTTPStat 系统信息
+func HTTPStat(c *gin.Context) {
 	c.JSON(200, gin.H{
 		"ebookdownloader_Version": Version,
 		"HashCommit":              Commit,
@@ -67,7 +59,8 @@ func HttpStat(c *gin.Context) {
 	c.String(http.StatusOK, "ok")
 }
 
-func ParseEbhostAndBookIdPost(c *gin.Context) {
+// ParseEbhostAndBookIDPost 处理下载小说的请求
+func ParseEbhostAndBookIDPost(c *gin.Context) {
 
 	bookid := c.Query("bookid")
 	ebhost := c.DefaultQuery("ebhost", "xsbiquge.com") //设置默认值为 xsbiquge.com
@@ -75,10 +68,8 @@ func ParseEbhostAndBookIdPost(c *gin.Context) {
 	isTxtStr := c.DefaultQuery("istxt", "false")   //需要传入bool值 , 0,1,true,false
 	isMobiStr := c.DefaultQuery("ismobi", "false") //需要传入bool值, 0,1,true,false
 
-	txtfilepath := ""     //定义 txt下载后，获取得到的 地址
-	mobifilepath := ""    //定义 mobi下载后，获取得到的 地址
-	cover_url_path := ""  //定义下载小说后，封面的url地址
 	var metainfo edl.Meta //用于保存小说的meta信息
+	var cmdArgs []string  //定义命令用到的参数
 
 	isTxt, errTxt := strconv.ParseBool(isTxtStr)
 	if errTxt != nil {
@@ -96,46 +87,46 @@ func ParseEbhostAndBookIdPost(c *gin.Context) {
 	}
 	switch ebhost {
 	case "xsbiquge.com":
+		cmdArgs = append(cmdArgs, "--ebhost=xsbiquge.com")
 		xsbiquge := edl.NewXSBiquge()
-		EBDLInterface = xsbiquge //实例化接口
+		ebdlInterface = xsbiquge //实例化接口
 	case "999xs.com":
+		cmdArgs = append(cmdArgs, "--ebhost=999xs.com")
 		xs999 := edl.New999XS()
-		EBDLInterface = xs999 //实例化接口
+		ebdlInterface = xs999 //实例化接口
 	case "23us.la":
+		cmdArgs = append(cmdArgs, "--ebhost=23us.la")
 		xs23 := edl.New23US()
-		EBDLInterface = xs23 //实例化接口
+		ebdlInterface = xs23 //实例化接口
 	}
 
-	bookinfo = EBDLInterface.GetBookInfo(bookid, "")
+	//add --bookid={{.bookid}}
+	cmdArgs = append(cmdArgs, fmt.Sprintf("--bookid=%s", bookid))
 
-	bookinfo = EBDLInterface.DownloadChapters(bookinfo, "")
+	bookinfo = ebdlInterface.GetBookBriefInfo(bookid, "")
 
 	if isTxt {
-		bookinfo.GenerateTxt()
-		txtfilepath = "public/" + bookinfo.Name + "-" + bookinfo.Author + "/" + bookinfo.Name + "-" + bookinfo.Author + ".txt"
+		cmdArgs = append(cmdArgs, "--txt")
 	}
 	if isMobi {
-		bookinfo.SetKindleEbookType(true, false)
-		lock.Lock()
-		bookinfo.GenerateMobi()
-		lock.Unlock()
-		mobifilepath = "public/" + bookinfo.Name + "-" + bookinfo.Author + "/" + bookinfo.Name + "-" + bookinfo.Author + ".mobi"
-		cover_url_path = "public/" + bookinfo.Name + "-" + bookinfo.Author + "/" + "cover.jpg"
-
+		cmdArgs = append(cmdArgs, "--mobi")
 	}
 
-	metainfo = edl.Meta{
-		Ebhost:      ebhost,
-		Bookid:      bookid,
-		BookName:    bookinfo.Name,
-		Author:      bookinfo.Author,
-		CoverUrl:    cover_url_path,
-		Description: bookinfo.Description,
-		TxtUrlPath:  txtfilepath,
-		MobiUrlPath: mobifilepath,
-	}
+	//添加生成meta.json参数
+	cmdArgs = append(cmdArgs, "--meta")
 
-	metainfo.WriteFile("./outputs/" + bookinfo.Name + "-" + bookinfo.Author + "/meta.json")
+	cmd := EbookdownloaderCliCmd(cmdArgs...)
+	lock.Lock()
+	err := cmd.Run()
+	lock.Unlock()
+
+	if err != nil {
+		c.JSON(http.StatusOK, gin.H{
+			"code": 201,
+			"msg":  "下载小说失败",
+		})
+	}
+	metainfo, _ = edl.GetMetaData("./outputs/" + bookinfo.Name + "-" + bookinfo.Author + "/meta.json")
 
 	c.JSON(http.StatusOK, gin.H{
 		"isTxt":    isTxtStr,
@@ -145,30 +136,12 @@ func ParseEbhostAndBookIdPost(c *gin.Context) {
 
 }
 
-//用于上传文件，并保存到服务器的 public目录里面
-func Upload(c *gin.Context) {
+//ebook_http_server 启动ebookdownloader服务器后台程序
+func ebookHTTPServer(c *cli.Context) error {
 
-	file, header, err := c.Request.FormFile("file")
-	if err != nil {
-		c.String(http.StatusBadRequest, fmt.Sprintf("file err : %s", err.Error()))
-		return
-	}
-	filename := header.Filename
-	out, err := os.Create("outputs/" + filename)
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer out.Close()
-	_, err = io.Copy(out, file)
-	if err != nil {
-		log.Fatal(err)
-	}
-	filepath := conf.URL_BASE + "/public/" + filename
-	c.JSON(http.StatusOK, gin.H{"filepath": filepath})
-}
-func ebook_http_server(c *cli.Context) error {
-
-	CFG_PATH = c.String("conf")
+	//从参数中获取配置文件的路径
+	CFGPATH = c.String("conf")
+	//初始化配置文件
 	ConfInit()
 
 	// Creates a router with Default
@@ -209,8 +182,8 @@ func ebook_http_server(c *cli.Context) error {
 			if (userID == "admin" && password == "admin") || (userID == "test" && password == "test") {
 				return &User{
 					UserName:  userID,
-					LastName:  "Bo-Yi",
-					FirstName: "Wu",
+					LastName:  "Jimes",
+					FirstName: "Yang",
 				}, nil
 			}
 
@@ -268,18 +241,25 @@ func ebook_http_server(c *cli.Context) error {
 	auth.GET("/refresh_token", authMiddleware.RefreshHandler)
 	auth.Use(authMiddleware.MiddlewareFunc())
 	{
-		// $ curl -X GET -v --form istxt=true --form ismobi=false "http://localhost:8080/post?ebhost=23us.la&bookid=0_062&istxt=true&ismobi=true"
-		auth.GET("/post", ParseEbhostAndBookIdPost)
+		// $ curl -X GET -v --form istxt=true --form ismobi=false "http://localhost:8080/auth/post?ebhost=23us.la&bookid=0_062&istxt=true&ismobi=true"
+		auth.GET("/post", ParseEbhostAndBookIDPost)
 		//列举./public目录所有的文件
 		auth.GET("/get_list", List)
 		//删除 服务器上面已经下载的小说
-		// $ curl -X GET "http://localhost:8080/del/我是谁-sndnvaps/我是谁-sndnvaps.mobi"
-		// $ curl -X GET "http://localhost:8080/del/我真不是作者菌-sndnvaps/我真不是作者菌-sndnvaps.txt"
-		auth.GET("/del/:ebpath/:bookname", Del)
+		// $ curl -X GET "http://localhost:8080/auth/del/我是谁-sndnvaps/我是谁-sndnvaps.mobi"
+		// $ curl -X GET "http://localhost:8080/auth/del/我真不是作者菌-sndnvaps/我真不是作者菌-sndnvaps.txt"
+		auth.DELETE("/del/:ebpath/:bookname", Del)
 		//系统状态信息
-		// http://localhost:8080/stat
-		auth.GET("/stat", HttpStat)
+		// http://localhost:8080/auth/stat
+		auth.GET("/stat", HTTPStat)
 
+	}
+
+	apiV1 := router.Group("/api/v1")
+	apiV1.Use(authMiddleware.MiddlewareFunc())
+	{
+		apiV1.POST("/job", EbookDLCreateJob)
+		apiV1.GET("/job/*id", EbookDLGetJob)
 	}
 
 	//简单文件服务器
@@ -292,6 +272,7 @@ func ebook_http_server(c *cli.Context) error {
 	return nil
 
 }
+
 func main() {
 
 	app := cli.NewApp()
@@ -303,9 +284,9 @@ func main() {
 			Email: "sndnvaps@gmail.com",
 		},
 	}
-	app.Copyright = "(c) 2019 - 2020 Jimes Yang<sndnvaps@gmail.com>"
+	app.Copyright = "© 2019 - 2020 Jimes Yang<sndnvaps@gmail.com>"
 	app.Usage = "用于下载 笔趣阁(https://www.xsbiquge.com),999小说网(https://www.999xs.com/) ,顶点小说网(https://www.23us.la) 上面的电子书，并保存为txt格式或者(mobi格式,awz3格式)的电子书"
-	app.Action = ebook_http_server
+	app.Action = ebookHTTPServer
 	app.Flags = []cli.Flag{
 		cli.StringFlag{
 			Name:  "conf,c",

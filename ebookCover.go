@@ -16,7 +16,7 @@ const (
 	fontSize = 40 //字体尺寸
 )
 
-//生成封面 cover.jpg
+//GenerateCover 生成封面 cover.jpg
 func GenerateCover(this BookInfo) {
 
 	//需要添加内容的图片

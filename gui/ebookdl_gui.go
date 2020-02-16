@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"sync"
 
 	g "github.com/AllenDang/giu"
 	"github.com/AllenDang/giu/imgui"
@@ -9,6 +10,7 @@ import (
 )
 
 var (
+	bookname     string   //对应小说名
 	bookid       string   //对应小说网的bookid
 	proxy        string   //代理，默认为空
 	items        []string //定义下载小说的默认网站
@@ -19,13 +21,20 @@ var (
 	author       string   //小说作者
 
 	bookinfo      edl.BookInfo         //初始化bookinfo变量
-	EBDLInterface edl.EBookDLInterface //初始化接口
+	ebdlInterface edl.EBookDLInterface //初始化接口
 )
 
 var (
-	Version   string = "v1.6.9"
-	Commit    string = ""
-	BuildTime string = ""
+	lock sync.Mutex
+)
+
+var (
+	//Version 版本信息
+	Version string = "1.7.2"
+	//Commit git commit信息
+	Commit string = "b40f73c79"
+	//BuildTime 编译时间
+	BuildTime string = "2020-02-16 16:34"
 )
 
 func btnClickMeClicked() {
@@ -36,14 +45,6 @@ func comboChanged() {
 	fmt.Println(items[itemSelected])
 }
 
-func contextMenu1Clicked() {
-	fmt.Println("Context menu 1 is clicked")
-}
-
-func contextMenu2Clicked() {
-	fmt.Println("Context menu 2 is clicked")
-}
-
 func btnPopupCLicked() {
 	imgui.OpenPopup("Confirm")
 }
@@ -51,6 +52,8 @@ func btnPopupCLicked() {
 func btnPopupCLicked1() {
 	imgui.OpenPopup("Confirm1")
 }
+
+//EbookDownloaderRun 下载小说功能
 func EbookDownloaderRun() {
 	multiline = items[itemSelected]
 	id := bookid
@@ -59,32 +62,45 @@ func EbookDownloaderRun() {
 	isMobi := checked2
 	p := proxy
 
+	var cmdArgs []string //定义命令用到的参数
+
 	switch ebhost {
 	case "xsbiquge.com":
+		cmdArgs = append(cmdArgs, "--ebhost=xsbiquge.com")
 		xsbiquge := edl.NewXSBiquge()
-		EBDLInterface = xsbiquge //实例化接口
+		ebdlInterface = xsbiquge //实例化接口
 	case "999xs.com":
+		cmdArgs = append(cmdArgs, "--ebhost=999xs.com")
 		xs999 := edl.New999XS()
-		EBDLInterface = xs999 //实例化接口
+		ebdlInterface = xs999 //实例化接口
 	case "23us.la":
+		cmdArgs = append(cmdArgs, "--ebhost=23us.la")
 		xs23 := edl.New23US()
-		EBDLInterface = xs23 //实例化接口
+		ebdlInterface = xs23 //实例化接口
 	}
 
-	bookinfo = EBDLInterface.GetBookInfo(id, p)
+	//add --bookid={{.bookid}}
+	cmdArgs = append(cmdArgs, fmt.Sprintf("--bookid=%s", id))
 
+	bookinfo = ebdlInterface.GetBookBriefInfo(id, p)
+
+	bookname = bookinfo.Name
 	author = bookinfo.Author
 	multiline = bookinfo.Description
 
-	bookinfo = EBDLInterface.DownloadChapters(bookinfo, proxy)
-
 	if isTxt {
-		bookinfo.GenerateTxt()
+		cmdArgs = append(cmdArgs, "--txt")
 	}
 	if isMobi {
-		bookinfo.SetKindleEbookType(true /* isMobi */, false /* isAzw3 */)
-		bookinfo.GenerateMobi()
+		cmdArgs = append(cmdArgs, "--mobi")
 	}
+	//添加生成meta.json参数
+	cmdArgs = append(cmdArgs, "--meta")
+
+	cmd := EbookdownloaderCliCmd(cmdArgs...)
+	lock.Lock()
+	cmd.Run()
+	lock.Unlock()
 
 }
 func loop() {
@@ -146,6 +162,10 @@ func loop() {
 
 		g.Combo("选择要用到的默认下载网站", items[itemSelected], items, &itemSelected, 0, comboChanged),
 		g.Line(
+			g.Label("小说名"),
+			g.InputText("##bookname", 0, &bookname),
+		),
+		g.Line(
 			g.Label("作者"),
 			g.InputText("##author", 0, &author),
 		),
@@ -174,10 +194,14 @@ func loadFont() {
 	builder.AddRanges(fonts.GlyphRangesChineseFull())
 	builder.BuildRanges(ranges)
 
-	fontPath := "./fonts/fzytk.ttf"
+	fontPath := "./fonts/WenQuanYiMicroHei.ttf"
 	fonts.AddFontFromFileTTFV(fontPath, 14, imgui.DefaultFontConfig, ranges.Data())
 }
 func main() {
+
+	//初始化配置文件
+	ConfInit()
+
 	items = make([]string, 3)
 	//定义items里面的变量
 	items[0] = "xsbiquge.com"

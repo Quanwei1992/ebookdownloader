@@ -28,6 +28,8 @@
   .\ebookdownloader.exe --ebhost=999xs.com --bookid=0_642 --txt --mobi #使用999xs.com做为下载源，生成txt 和 mobi
    .\ebookdownloader.exe --ebhost=999xs.com --bookid=0_642 --txt --mobi --meta #使用999xs.com做为下载源，生成txt,mobi电子书，并生成meta.json文件于小说目录当中
   .\ebookdownloader.exe --ebhost=23us.la --bookid=127064 --pv #新功能，用于打印小说的分卷信息，此时不下载小说任何内容
+  .\ebookdownloader.exe --bookid=0_0642 --json #生成json格式的小说数据
+  .\ebookdownloader.exe conv --json=".\outputs\我是谁-sndnvaps\我是谁-sndnvaps.json" --txt --mobi #新功能，转换json格式到txt,mobi格式
   .\ebookdownloader.exe --help #显示帮助信息
   ```
 
@@ -41,6 +43,7 @@
     7. qemu-i386-static-arm64 支持在linux arm64平台上运行 kindlegenLinux
     8. http-server 项目依赖：
           github.com/ajvb/kala 项目，用于任务控制和管理
+          kala需要与ebookdownloader_cli运行在同一个目录里面
 
   ## 后端服务器 API接口
     主要目的是部署在vps上面，就可以方便随时下载小说了
@@ -51,10 +54,40 @@
 
   ## 懒人模式，直接下载编译好的程序
   
-  到[这里](https://github.com/sndnvaps/ebookdownloader/releases)下载你需要的版本
+  墙里面使用gitee
+
+  [gitee ebookdownloader release page](https://gitee.com/sndnvaps/ebookdownloader/releases "https://gitee.com/sndnvaps/ebookdownloader/releases")
+
+墙外面使用github
+
+  [github ebookdownloader release page](https://github.com/sndnvaps/ebookdownloader/releases "https://github.com/sndnvaps/ebookdownloader/releases")
+
 
   ## 更新日志
-     
+  
+      2020.02.16 go版本
+                1. ebookdownloader库：windows平台 kindlegen运行时添加隐藏窗口功能
+                2. gui:运行时，隐藏ebookdownloader_cli程序启动时的黑色窗口
+                3. 更新版本到1.7.2
+                -----
+                4. travis-ci: 对生成的程序进行upx -9压缩（Mac平台因为upx有问题，没有包含进去)
+
+      2020.02.14 go版本
+                1. http-server:添加创建任务功能和查询任务功能（使用kala Job Schedule)
+                2. 对代码进行添加注释
+                3. 添加新接口 GetBookBriefInfo只用于获取小说名字，作者，简介信息
+                4. gui: 更新代码，修改字体的路径
+                5. gui: 现在改用外部调用ebookdownloader_cli来执行下载操作，需要用到配置文件./conf/ebdl_conf.ini
+
+      2020.02.13 go版本
+                1. cli: 重新补充完成meta.json信息
+
+      2020.02.12 go版本
+                1. 添加gitee项目地址，加快国内的下载速度
+                2. 生成txt：修改方法为按一章一章地往磁盘中写入文件，以降低cpu占用率
+                3. cli: 添加生成json格式内容，用于把小说保存成json格式，方便线下再进行转换，方便进行二次处理
+                4. 添加二级命令conv,用于转换json文件到txt,mobi,azw3格式小说
+
       2020.02.10 go版本
                 1. 添加小说章节分割下载功能(以300章为一个下载单元)
                 2. 限制并发数量，目前最大并发数量为 (300+49)*2 = 698
@@ -144,7 +177,7 @@
 
   ## To Do List
 
-     [√]  1.添加生成封面功能
+     [√]  1. 添加生成封面功能
      [√]  2. 添加不同平台的接口实现
      [√]  3. 添加生成二级目录的方法(已经添加相应的实例)
      [√]  4. 添加界面版本gui

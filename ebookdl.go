@@ -1,6 +1,7 @@
 package ebookdownloader
 
 import (
+	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"math"
@@ -15,28 +16,34 @@ import (
 	"github.com/unknwon/com"
 )
 
+//BookInfo 小说信息
 type BookInfo struct {
-	Name        string
-	Author      string
-	Description string
-	IsMobi      bool      //当为true的时候生成mobi
-	IsAzw3      bool      //当为true的时候生成azw3,
-	HasVolume   bool      //是否有小说分卷，默认为false；当设置为true的时候，Volumes里面需要包含分卷信息
-	Volumes     []Volume  //小说分卷信息，一般不设置
-	Chapters    []Chapter //小说章节信息
+	EBHost      string    `json:"ebook_host"` //下载小说的网站
+	EBookId     string    `json:"ebook_id"`   //对应小说网站的bookid
+	Name        string    `json:"bookname"`
+	Author      string    `json:"author"`
+	Description string    `json:"novel_description"`
+	IsMobi      bool      `json:"is_mobi"`    //当为true的时候生成mobi
+	IsAzw3      bool      `json:"is_azw3"`    //当为true的时候生成azw3,
+	HasVolume   bool      `json:"has_volume"` //是否有小说分卷，默认为false；当设置为true的时候，Volumes里面需要包含分卷信息
+	Volumes     []Volume  `json:"volumes"`    //小说分卷信息，一般不设置
+	Chapters    []Chapter `json:"chapters"`   //小说章节信息
 }
 
+//Volume 定义小说分卷信息
 type Volume struct {
-	PrevChapterId int
-	PrevChapter   Chapter
-	CurrentVolume string
-	NextChapterId int
-	NextChapter   Chapter
+	PrevChapterId int     `json:"prev_chapter_id"`
+	PrevChapter   Chapter `json:"prev_chapter"`
+	CurrentVolume string  `json:"current_volume_name"`
+	NextChapterId int     `json:"next_chapter_id"`
+	NextChapter   Chapter `json:"next_chapter"`
 }
+
+// Chapter 定义小说章节信息
 type Chapter struct {
-	Title   string
-	Content string
-	Link    string
+	Title   string `json:"title"`
+	Content string `json:"content"`
+	Link    string `json:"chapter_url_link"`
 }
 
 type ProxyChapter struct {
@@ -44,40 +51,40 @@ type ProxyChapter struct {
 	C     Chapter
 }
 
-//interface
+//EBookDLInterface 小说下载器接口interface
 type EBookDLInterface interface {
-	GetBookInfo(bookid string, proxy string) BookInfo //获取小说的所有信息，包含小说名，作者，简介等信息
+	GetBookInfo(bookid string, proxy string) BookInfo      //获取小说的所有信息，包含小说名，作者，简介等信息
+	GetBookBriefInfo(bookid string, proxy string) BookInfo //获取小说最基本的信息，不包含章节信息
 	DownloaderChapter(ResultChan chan chan Chapter, pc ProxyChapter, wg *sync.WaitGroup)
 	DownloadChapters(Bi BookInfo, proxy string) BookInfo
 }
 
-//读取文件内容，并存入string,最终返回
+//ReadAllString 读取文件内容，并存入string,最终返回
 func ReadAllString(filename string) string {
 	filepathAbs, _ := filepath.Abs(filename)
 	tmp, _ := ioutil.ReadFile(filepathAbs)
 	return string(tmp)
 }
 
+//WriteFile 写入文件操作
 func WriteFile(filename string, data []byte) error {
 	filepathAbs, _ := filepath.Abs(filename)
 	os.MkdirAll(path.Dir(filename), os.ModePerm)
 	return ioutil.WriteFile(filepathAbs, data, 0655)
 }
 
-//设置生成mobi格式，或者生成awz3格式
-//现在设置，mobi和awz3格式不能同时设置为true
+//SetKindleEbookType 现在设置，mobi和awz3格式不能同时设置为true
 func (this *BookInfo) SetKindleEbookType(isMobi bool, isAzw3 bool) {
 	this.IsMobi = isMobi
 	this.IsAzw3 = isAzw3
 }
 
-//设置 是否包含分卷信息
-// func ChangeVolumeState
+// ChangeVolumeState 设置 是否包含分卷信息
 func (this *BookInfo) ChangeVolumeState(hasVolume bool) {
 	this.HasVolume = hasVolume
 }
 
-//返回 HasVolume的状态，true,false
+//VolumeState 返回 HasVolume的状态，true,false
 func (this BookInfo) VolumeState() bool {
 	return this.HasVolume
 }
@@ -149,6 +156,7 @@ func (this BookInfo) Split() []BookInfo {
 	return bis
 }
 
+//PrintVolumeInfo 用于打印 小说分卷信息
 func (this BookInfo) PrintVolumeInfo() {
 	volumes := this.Volumes
 	if this.VolumeState() {
@@ -165,15 +173,26 @@ func (this BookInfo) PrintVolumeInfo() {
 	}
 }
 
-//生成txt电子书
+//GenerateTxt 生成txt电子书
 func (this BookInfo) GenerateTxt() {
 	chapters := this.Chapters //小说的章节信息
 	volumes := this.Volumes   //小说的分卷信息
 	content := ""             //用于存放（分卷、）章节内容
 	outfpath := "./outputs/" + this.Name + "-" + this.Author + "/"
 	outfname := outfpath + this.Name + "-" + this.Author + ".txt"
+	txtAbsPath, _ := filepath.Abs(outfname)
+	//当txt文件存在的时候删除它
+	if com.IsExist(txtAbsPath) {
+		os.RemoveAll(txtAbsPath)
+	}
+	//创建目录
+	os.MkdirAll(filepath.Dir(txtAbsPath)+string(os.PathSeparator), os.ModePerm)
+	//创建文件
+	fptr, _ := os.Create(txtAbsPath)
+	defer fptr.Close()
 
 	for index := 0; index < len(chapters); index++ {
+		content = "" //每次循环，都初始化一次
 		if len(volumes) > 0 && this.VolumeState() {
 			for vindex := 0; vindex < len(volumes); vindex++ {
 
@@ -189,13 +208,52 @@ func (this BookInfo) GenerateTxt() {
 		//fmt.Printf("Content = %s\n", chapters[index].Content)            //用于测试
 		content += "\n" + "### " + chapters[index].Title + " ###" + "\n" //每一章的标题，使用 ‘### 第n章 标题 ###’ 为格式
 		content += chapters[index].Content + "\n\n"                      //每一章内容的结尾，使用两个换行符
-
+		fptr.Write(([]byte)(content))                                    //一章一章地往txt文件中写入
+		fptr.Sync()                                                      //同步修改的文件
 	}
 
-	WriteFile(outfname, []byte(content))
+	fptr.Close() //关闭文件
+	//WriteFile(outfname, []byte(content))
 }
 
-//生成mobi格式电子书
+//GenerateJSON 生成json格式的数据
+func (this BookInfo) GenerateJSON() error {
+	outfpath := "./outputs/" + this.Name + "-" + this.Author + "/"
+	outfname := outfpath + this.Name + "-" + this.Author + ".json"
+	jsonAbsPath, _ := filepath.Abs(outfname)
+	//fmt.Println(jsonAbsPath)
+	//当txt文件存在的时候删除它
+	if com.IsExist(jsonAbsPath) {
+		os.RemoveAll(jsonAbsPath)
+	}
+	//创建目录
+	fmt.Println("jsonpath=", filepath.Dir(jsonAbsPath))
+	err := os.MkdirAll(filepath.Dir(jsonAbsPath)+string(os.PathSeparator), os.ModePerm)
+	if err != nil {
+		return err
+	}
+	//创建文件
+	fptr, err := os.Create(jsonAbsPath)
+	if err != nil {
+		return err
+	}
+	defer fptr.Close()
+
+	// 带JSON缩进格式写文件
+	data, err := json.MarshalIndent(this, "", "  ")
+	if err != nil {
+		return err
+	}
+
+	//写入文件中
+	fptr.Write(data)
+	fptr.Sync()
+	fptr.Close()
+
+	return nil
+}
+
+//GenerateMobi 生成mobi格式电子书
 func (this BookInfo) GenerateMobi() {
 	chapters := this.Chapters //章节信息
 	Volumes := this.Volumes   //分卷信息
@@ -213,7 +271,7 @@ func (this BookInfo) GenerateMobi() {
 	if com.IsExist(savepath) {
 		os.RemoveAll(savepath)
 	}
-	os.MkdirAll(path.Dir(savepath), os.ModePerm)
+	os.MkdirAll(path.Dir(savepath)+string(os.PathSeparator), os.ModePerm)
 
 	//设置生成mobi的输出目录
 	outputpath := "./outputs/" + this.Name + "-" + this.Author + "/"
@@ -380,7 +438,7 @@ func (this BookInfo) GenerateMobi() {
 	com.Copy(savepath+string(os.PathSeparator)+outfname, outputpath+string(os.PathSeparator)+outfname)
 }
 
-//AsycChapter
+//AsycChapter 同步下载章节的content内容
 func AsycChapter(ResultChan chan chan Chapter, chapter chan Chapter) {
 	for {
 		c := <-ResultChan
