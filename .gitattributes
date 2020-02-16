@@ -1,0 +1,9 @@
+*.go eol=lf
+*.json eol=lf
+*.md eol=lf
+*.ini eol=lf
+*.html eol=lf
+*.opf eol=lf
+*.css eol=lf
+*.ncx eol=lf
+*.sh eol=lf
