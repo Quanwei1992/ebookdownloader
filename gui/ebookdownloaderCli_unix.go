@@ -1,3 +1,7 @@
+//+build !windows
+//+build linux
+//+build darwin
+
 package main
 
 import (
