@@ -16,6 +16,8 @@ import (
 
 //需要参考 https://segmentfault.com/a/1190000018475209 解决 返回的content与title不对应问题
 
+var _ EBookDLInterface = Ebook23US{}
+
 //Ebook23US 顶点小说网 23us.la
 type Ebook23US struct {
 	URL  string
@@ -61,7 +63,7 @@ func (this Ebook23US) GetBookBriefInfo(bookid string, proxy string) BookInfo {
 		//导入信息
 		bi = BookInfo{
 			EBHost:      this.URL,
-			EBookId:     bookid,
+			EBookID:     bookid,
 			Name:        bookName,
 			Author:      author,
 			Description: description,
@@ -90,7 +92,7 @@ func (this Ebook23US) GetBookBriefInfo(bookid string, proxy string) BookInfo {
 		//导入信息
 		bi = BookInfo{
 			EBHost:      this.URL,
-			EBookId:     bookid,
+			EBookID:     bookid,
 			Name:        bookName,
 			Author:      author,
 			Description: description,
@@ -160,7 +162,7 @@ func (this Ebook23US) GetBookInfo(bookid string, proxy string) BookInfo {
 					volumes = append(volumes, tmp)
 				}
 			}
-			volumes[0].PrevChapterId = 0      //第一分卷，前面的章节，设置为0
+			volumes[0].PrevChapterID = 0      //第一分卷，前面的章节，设置为0
 			volumes[0].PrevChapter.Link = ""  //第一分卷，前面的章节，连接设置为空
 			volumes[0].PrevChapter.Title = "" //第一分卷，前面的章节，标题设置为空
 		}
@@ -171,10 +173,10 @@ func (this Ebook23US) GetBookInfo(bookid string, proxy string) BookInfo {
 			aNode, _ := htmlquery.Find(ddNode[i], "//a")
 			tmp.Link = this.URL + htmlquery.SelectAttr(aNode[0], "href")
 			tmp.Title = htmlquery.InnerText(aNode[0])
-			if bi.VolumeState() && len(volumes) >= 2 { //正式写入 PrevChapterId
+			if bi.VolumeState() && len(volumes) >= 2 { //正式写入 PrevChapterID
 				for index := 1; index < len(volumes); index++ { //第二个分卷开始，前面就有章节内容了
 					if volumes[index].PrevChapter.Link == tmp.Link {
-						volumes[index].PrevChapterId = i
+						volumes[index].PrevChapterID = i
 					}
 				}
 			}
@@ -184,7 +186,7 @@ func (this Ebook23US) GetBookInfo(bookid string, proxy string) BookInfo {
 		//导入信息
 		bi = BookInfo{
 			EBHost:      this.URL,
-			EBookId:     bookid,
+			EBookID:     bookid,
 			Name:        bookName,
 			Author:      author,
 			Description: description,
@@ -244,7 +246,7 @@ func (this Ebook23US) GetBookInfo(bookid string, proxy string) BookInfo {
 					volumes = append(volumes, tmp)
 				}
 			}
-			volumes[0].PrevChapterId = 0      //第一分卷，前面的章节，设置为0
+			volumes[0].PrevChapterID = 0      //第一分卷，前面的章节，设置为0
 			volumes[0].PrevChapter.Link = ""  //第一分卷，前面的章节，连接设置为空
 			volumes[0].PrevChapter.Title = "" //第一分卷，前面的章节，标题设置为空
 		}
@@ -258,13 +260,13 @@ func (this Ebook23US) GetBookInfo(bookid string, proxy string) BookInfo {
 			//fmt.Printf("tmp.Link = %s\n", tmp.Link)   //用于测试
 			//fmt.Printf("tmp.Title = %s\n", tmp.Title) //用于测试
 
-			if bi.VolumeState() && len(volumes) >= 2 { //正式写入 PrevChapterId && NextChapterId
+			if bi.VolumeState() && len(volumes) >= 2 { //正式写入 PrevChapterID && NextChapterID
 				for index := 0; index < len(volumes); index++ {
 					if volumes[index].PrevChapter.Link == tmp.Link {
-						volumes[index].PrevChapterId = (i - 12) + 1 //表示 设置 第一个章节为0
+						volumes[index].PrevChapterID = (i - 12) + 1 //表示 设置 第一个章节为0
 					}
 					if volumes[index].NextChapter.Link == tmp.Link {
-						volumes[index].NextChapterId = (i - 12) + 1 //表示 设置 第一个章节为0
+						volumes[index].NextChapterID = (i - 12) + 1 //表示 设置 第一个章节为0
 					}
 				}
 			}
@@ -274,7 +276,7 @@ func (this Ebook23US) GetBookInfo(bookid string, proxy string) BookInfo {
 		//导入信息
 		bi = BookInfo{
 			EBHost:      this.URL,
-			EBookId:     bookid,
+			EBookID:     bookid,
 			Name:        bookName,
 			Author:      author,
 			Description: description,
@@ -349,7 +351,7 @@ ForEnd:
 
 	result := BookInfo{
 		EBHost:      Bi.EBHost,
-		EBookId:     Bi.EBookId,
+		EBookID:     Bi.EBookID,
 		Name:        Bi.Name,
 		Author:      Bi.Author,
 		Description: Bi.Description,

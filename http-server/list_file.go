@@ -42,14 +42,14 @@ func List(c *gin.Context) {
 
 			tmp.Metainfo, err = edl.GetMetaData(metapath)
 			if err == nil {
-				if tmp.Metainfo.CoverUrl != "" {
-					tmp.Metainfo.CoverUrl = conf.URLBase + "/" + tmp.Metainfo.CoverUrl
+				if tmp.Metainfo.CoverURL != "" {
+					tmp.Metainfo.CoverURL = conf.URLBase + "/" + tmp.Metainfo.CoverURL
 				}
-				if tmp.Metainfo.TxtUrlPath != "" {
-					tmp.Metainfo.TxtUrlPath = conf.URLBase + "/" + tmp.Metainfo.TxtUrlPath
+				if tmp.Metainfo.TxtURLPath != "" {
+					tmp.Metainfo.TxtURLPath = conf.URLBase + "/" + tmp.Metainfo.TxtURLPath
 				}
-				if tmp.Metainfo.MobiUrlPath != "" {
-					tmp.Metainfo.MobiUrlPath = conf.URLBase + "/" + tmp.Metainfo.MobiUrlPath
+				if tmp.Metainfo.MobiURLPath != "" {
+					tmp.Metainfo.MobiURLPath = conf.URLBase + "/" + tmp.Metainfo.MobiURLPath
 				}
 				filelist = append(filelist, tmp)
 			}

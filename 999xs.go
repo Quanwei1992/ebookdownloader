@@ -30,15 +30,17 @@ https://www.999xs.com/files/article/html/75/75842/ -> bookid = 75842
  113582 -> {113,582}
 */
 
+var _ EBookDLInterface = Ebook999XS{}
+
 //999小说网 999xs.com
 type Ebook999XS struct {
-	Url  string
+	URL  string
 	Lock *sync.Mutex
 }
 
 func New999XS() Ebook999XS {
 	return Ebook999XS{
-		Url:  "https://www.999xs.com",
+		URL:  "https://www.999xs.com",
 		Lock: new(sync.Mutex),
 	}
 }
@@ -62,7 +64,7 @@ func handleBookid(bookid string) string {
 func (this Ebook999XS) GetBookBriefInfo(bookid string, proxy string) BookInfo {
 
 	var bi BookInfo
-	pollURL := this.Url + "/" + "files/article/html/" + handleBookid(bookid) + "/"
+	pollURL := this.URL + "/" + "files/article/html/" + handleBookid(bookid) + "/"
 
 	//当 proxy 不为空的时候，表示设置代理
 	if proxy != "" {
@@ -88,8 +90,8 @@ func (this Ebook999XS) GetBookBriefInfo(bookid string, proxy string) BookInfo {
 
 		//导入信息
 		bi = BookInfo{
-			EBHost:      this.Url,
-			EBookId:     bookid,
+			EBHost:      this.URL,
+			EBookID:     bookid,
 			Name:        bookName,
 			Author:      author,
 			Description: description,
@@ -117,8 +119,8 @@ func (this Ebook999XS) GetBookBriefInfo(bookid string, proxy string) BookInfo {
 
 		//导入信息
 		bi = BookInfo{
-			EBHost:      this.Url,
-			EBookId:     bookid,
+			EBHost:      this.URL,
+			EBookID:     bookid,
 			Name:        bookName,
 			Author:      author,
 			Description: description,
@@ -131,7 +133,7 @@ func (this Ebook999XS) GetBookInfo(bookid string, proxy string) BookInfo {
 
 	var bi BookInfo
 	var chapters []Chapter
-	pollURL := this.Url + "/" + "files/article/html/" + handleBookid(bookid) + "/"
+	pollURL := this.URL + "/" + "files/article/html/" + handleBookid(bookid) + "/"
 
 	//当 proxy 不为空的时候，表示设置代理
 	if proxy != "" {
@@ -160,15 +162,15 @@ func (this Ebook999XS) GetBookInfo(bookid string, proxy string) BookInfo {
 		for i := 0; i < len(ddNode); i++ {
 			var tmp Chapter
 			aNode, _ := htmlquery.Find(ddNode[i], "//a")
-			tmp.Link = this.Url + htmlquery.SelectAttr(aNode[0], "href")
+			tmp.Link = this.URL + htmlquery.SelectAttr(aNode[0], "href")
 			tmp.Title = htmlquery.InnerText(aNode[0])
 			chapters = append(chapters, tmp)
 		}
 
 		//导入信息
 		bi = BookInfo{
-			EBHost:      this.Url,
-			EBookId:     bookid,
+			EBHost:      this.URL,
+			EBookID:     bookid,
 			Name:        bookName,
 			Author:      author,
 			Description: description,
@@ -207,8 +209,8 @@ func (this Ebook999XS) GetBookInfo(bookid string, proxy string) BookInfo {
 
 		//导入信息
 		bi = BookInfo{
-			EBHost:      this.Url,
-			EBookId:     bookid,
+			EBHost:      this.URL,
+			EBookID:     bookid,
 			Name:        bookName,
 			Author:      author,
 			Description: description,
@@ -236,7 +238,7 @@ func (this Ebook999XS) DownloadChapters(Bi BookInfo, proxy string) BookInfo {
 	return result
 }
 
-//根据每个章节的 url连接，下载每章对应的内容Content当中
+//根据每个章节的 URL连接，下载每章对应的内容Content当中
 func (this Ebook999XS) downloadChapters(Bi BookInfo, proxy string) BookInfo {
 	chapters := Bi.Chapters
 
@@ -279,7 +281,7 @@ ForEnd:
 
 	result := BookInfo{
 		EBHost:      Bi.EBHost,
-		EBookId:     Bi.EBookId,
+		EBookID:     Bi.EBookID,
 		Name:        Bi.Name,
 		Author:      Bi.Author,
 		Description: Bi.Description,

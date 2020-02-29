@@ -120,10 +120,10 @@ func EbookDownloader(c *cli.Context) error {
 				Bookid:      bookid,
 				BookName:    bookinfo.Name,
 				Author:      bookinfo.Author,
-				CoverUrl:    coverURLPath,
+				CoverURL:    coverURLPath,
 				Description: bookinfo.Description,
-				TxtUrlPath:  txtfilepath,
-				MobiUrlPath: mobifilepath,
+				TxtURLPath:  txtfilepath,
+				MobiURLPath: mobifilepath,
 			}
 
 			metainfo.WriteFile("./outputs/" + bookinfo.Name + "-" + bookinfo.Author + "/meta.json")
@@ -202,13 +202,13 @@ func ConvJSON2Ebook(c *cli.Context) error {
 		if isMeta {
 			metainfo = edl.Meta{
 				Ebhost:      bookinfo.EBHost,
-				Bookid:      bookinfo.EBookId,
+				Bookid:      bookinfo.EBookID,
 				BookName:    bookinfo.Name,
 				Author:      bookinfo.Author,
-				CoverUrl:    coverURLPath,
+				CoverURL:    coverURLPath,
 				Description: bookinfo.Description,
-				TxtUrlPath:  txtfilepath,
-				MobiUrlPath: mobifilepath,
+				TxtURLPath:  txtfilepath,
+				MobiURLPath: mobifilepath,
 			}
 
 			metainfo.WriteFile("./outputs/" + bookinfo.Name + "-" + bookinfo.Author + "/meta.json")
