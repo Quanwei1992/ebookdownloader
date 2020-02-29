@@ -17,19 +17,19 @@ var testbi = BookInfo{
 
 var V = []Volume{
 	{
-		PrevChapterId: 0,
+		PrevChapterID: 0,
 		CurrentVolume: "第一卷", //插入位置，第一章前面
-		NextChapterId: 2,
+		NextChapterID: 2,
 	},
 	{
-		PrevChapterId: 2,
+		PrevChapterID: 2,
 		CurrentVolume: "第二卷", //插入位置，第三章前面
-		NextChapterId: 3,
+		NextChapterID: 3,
 	},
 	{
-		PrevChapterId: 5,
+		PrevChapterID: 5,
 		CurrentVolume: "第三卷", //插入位置，第六章前面
-		NextChapterId: 6,
+		NextChapterID: 6,
 	},
 }
 var C = []Chapter{
