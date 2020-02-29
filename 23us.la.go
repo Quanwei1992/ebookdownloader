@@ -330,8 +330,13 @@ func (this Ebook23US) downloadChapters(Bi BookInfo, proxy string) BookInfo {
 	wg.Wait()
 
 	//下载章节的时候显示进度条
-	bar = progressbar.New(NumChapter)
-	bar.RenderBlank()
+	bar = progressbar.NewOptions(
+		NumChapter,
+		progressbar.OptionSetPredictTime(true),
+		progressbar.OptionShowIts(),
+		progressbar.OptionShowCount(),
+		progressbar.OptionSetTheme(progressbar.Theme{Saucer: "#", SaucerPadding: "-", BarStart: ">", BarEnd: "<"}),
+	)
 
 	for index := 0; index <= NumChapter; {
 		select {
