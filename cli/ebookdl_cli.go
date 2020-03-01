@@ -6,12 +6,12 @@ import (
 	"os"
 
 	edl "github.com/sndnvaps/ebookdownloader"
-	"gopkg.in/urfave/cli.v1"
+	cli "gopkg.in/urfave/cli.v1"
 )
 
 var (
 	//Version 版本信息
-	Version string = "1.7.2"
+	Version string = "dev"
 	//Commit git commit信息
 	Commit string = "b40f73c79"
 	//BuildTime 编译时间
@@ -223,6 +223,16 @@ func ConvJSON2Ebook(c *cli.Context) error {
 	return nil
 }
 
+//UpdateCheck 检查更新
+func UpdateCheck(c *cli.Context) error {
+	result, err := edl.UpdateCheck(Version)
+	if err == nil {
+		fmt.Printf(result)
+		return nil
+	}
+	return err
+}
+
 func main() {
 
 	app := cli.NewApp()
@@ -303,6 +313,11 @@ func main() {
 				},
 			},
 			Action: ConvJSON2Ebook,
+		},
+		{
+			Name:   "update_check",
+			Usage:  "检查更新",
+			Action: UpdateCheck,
 		},
 	}
 
