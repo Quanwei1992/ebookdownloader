@@ -18,7 +18,7 @@ import (
 
 var (
 	//Version 版本信息
-	Version string = "1.7.2"
+	Version string = "dev"
 	//Commit git commit信息
 	Commit string = "b40f73c79"
 	//BuildTime 编译时间
@@ -59,6 +59,20 @@ func HTTPStat(c *gin.Context) {
 	c.String(http.StatusOK, "ok")
 }
 
+//CheckUpdate 检查是否需要更新
+func CheckUpdate(c *gin.Context) {
+	result, err := edl.UpdateCheck()
+	if err == nil {
+		compareResult := result.Compare(Version)
+		c.JSON(200, gin.H{
+			"CurrentVersion": Version,
+			"update_check":   compareResult,
+		})
+		c.String(http.StatusOK, "ok")
+		return
+	}
+}
+
 // ParseEbhostAndBookIDPost 处理下载小说的请求
 func ParseEbhostAndBookIDPost(c *gin.Context) {
 
@@ -67,6 +81,7 @@ func ParseEbhostAndBookIDPost(c *gin.Context) {
 
 	isTxtStr := c.DefaultQuery("istxt", "false")   //需要传入bool值 , 0,1,true,false
 	isMobiStr := c.DefaultQuery("ismobi", "false") //需要传入bool值, 0,1,true,false
+	isEpubStr := c.DefaultQuery("isepub", "false") //需要传入bool值，0,1,true,false
 
 	var metainfo edl.Meta //用于保存小说的meta信息
 	var cmdArgs []string  //定义命令用到的参数
@@ -78,6 +93,11 @@ func ParseEbhostAndBookIDPost(c *gin.Context) {
 	isMobi, errMobi := strconv.ParseBool(isMobiStr)
 	if errMobi != nil {
 		isMobi = false
+	}
+
+	isEpub, errEpub := strconv.ParseBool(isEpubStr)
+	if errEpub != nil {
+		isEpub = false
 	}
 
 	//当 bookid没有设置的时候，返回错误
@@ -110,6 +130,10 @@ func ParseEbhostAndBookIDPost(c *gin.Context) {
 	}
 	if isMobi {
 		cmdArgs = append(cmdArgs, "--mobi")
+	}
+
+	if isEpub {
+		cmdArgs = append(cmdArgs, "--epub")
 	}
 
 	//添加生成meta.json参数
@@ -252,6 +276,10 @@ func ebookHTTPServer(c *cli.Context) error {
 		//系统状态信息
 		// http://localhost:8080/auth/stat
 		auth.GET("/stat", HTTPStat)
+
+		//检查是否需要更新
+		// http://localhost:8080/auth/check_update
+		auth.GET("/check_update", CheckUpdate)
 
 	}
 

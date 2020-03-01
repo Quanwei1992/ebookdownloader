@@ -16,6 +16,7 @@ type Meta struct {
 	Description string `json:"description"`
 	TxtURLPath  string `json:"txt_url_path"`
 	MobiURLPath string `json:"mobi_url_path"`
+	EPUBURLPath string `json:"epub_url_path"`
 }
 
 //WriteFile 把json数据写入 filename定义的文件中

@@ -11,6 +11,7 @@ require (
 	github.com/antchfx/xpath v1.1.4 // indirect
 	github.com/appleboy/gin-jwt v2.5.0+incompatible
 	github.com/appleboy/gin-jwt/v2 v2.6.3
+	github.com/bmaupin/go-epub v0.5.3
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/gin-gonic/gin v1.5.0
 	github.com/goki/freetype v0.0.0-20181231101311-fa8a33aabaff

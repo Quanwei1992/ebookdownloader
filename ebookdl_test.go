@@ -128,6 +128,11 @@ func TestGenerateAwz3(t *testing.T) {
 	assert.True(t, true, isExist(savename))
 	//os.RemoveAll(savename)
 }
+func TestGenerateEPUB(t *testing.T) {
+	testbi.GenerateEPUB()
+	savename := "./outputs/" + testbi.Name + "-" + testbi.Author + "/" + testbi.Name + "-" + testbi.Author + ".epub"
+	assert.True(t, true, isExist(savename))
+}
 
 // IsExist checks whether a file or directory exists.
 // It returns false when the file or directory does not exist.

@@ -34,6 +34,7 @@ func EbookDownloader(c *cli.Context) error {
 	isTxt := c.Bool("txt")
 	isMobi := c.Bool("mobi")
 	isAzw3 := c.Bool("azw3")
+	isEpub := c.Bool("epub")
 	isJSON := c.Bool("json")      //把下载到的小说信息保存到json数据当中
 	isPV := c.Bool("printvolume") //打印分卷信息，只用做调试时使用
 	isMeta := c.Bool("meta")      //保存meta信息到 小说目录当中
@@ -45,9 +46,14 @@ func EbookDownloader(c *cli.Context) error {
 	txtfilepath := ""     //定义 txt下载后，获取得到的 地址
 	mobifilepath := ""    //定义 mobi下载后，获取得到的 地址
 	coverURLPath := ""    //定义下载小说后，封面的url地址
+	epubfilepath := ""    //定义 epub下载后，获取得到的 地址
 
 	//isTxt 或者 isMobi必须一个为真，或者两个都为真
-	if (isTxt || isMobi || isAzw3) || (isTxt && isMobi) || (isTxt && isAzw3) || isPV || isJSON {
+	if (isTxt || isMobi || isAzw3 || isEpub) ||
+		(isTxt && isMobi) ||
+		(isTxt && isAzw3) ||
+		(isTxt && isEpub) ||
+		isPV || isJSON {
 
 		if ebhost == "xsbiquge.com" {
 			xsbiquge := edl.NewXSBiquge()
@@ -114,6 +120,17 @@ func EbookDownloader(c *cli.Context) error {
 				coverURLPath = "public/" + bookinfo.Name + "-" + bookinfo.Author + "/" + "cover.jpg"
 			}
 		}
+
+		//生成epub格式电子书
+		if isEpub {
+			fmt.Printf("\n正在生成EPUB版本的电子书，请耐心等待！\n")
+			bookinfo.GenerateEPUB()
+			if isMeta { //配置meta信息
+				epubfilepath = "public/" + bookinfo.Name + "-" + bookinfo.Author + "/" + bookinfo.Name + "-" + bookinfo.Author + ".epub"
+				coverURLPath = "public/" + bookinfo.Name + "-" + bookinfo.Author + "/" + "cover.jpg"
+			}
+		}
+
 		if isMeta {
 			metainfo = edl.Meta{
 				Ebhost:      ebhost,
@@ -124,6 +141,7 @@ func EbookDownloader(c *cli.Context) error {
 				Description: bookinfo.Description,
 				TxtURLPath:  txtfilepath,
 				MobiURLPath: mobifilepath,
+				EPUBURLPath: epubfilepath,
 			}
 
 			metainfo.WriteFile("./outputs/" + bookinfo.Name + "-" + bookinfo.Author + "/meta.json")
@@ -150,18 +168,29 @@ func ConvJSON2Ebook(c *cli.Context) error {
 	isTxt := c.Bool("txt")
 	isMobi := c.Bool("mobi")
 	isAzw3 := c.Bool("azw3")
+	isEpub := c.Bool("epub")
 	isMeta := c.Bool("meta") //保存meta信息到 小说目录当中
 
 	var metainfo edl.Meta //用于保存小说的meta信息
 	txtfilepath := ""     //定义 txt下载后，获取得到的 地址
 	mobifilepath := ""    //定义 mobi下载后，获取得到的 地址
+	epubfilepath := ""    //定义 epub下载后，获取得到的 地址
 	coverURLPath := ""    //定义下载小说后，封面的url地址
 
 	//isTxt 或者 isMobi必须一个为真，或者两个都为真
-	if (isTxt || isMobi || isAzw3) || (isTxt && isMobi) || (isTxt && isAzw3) {
+	if (isTxt || isMobi || isAzw3 || isEpub) ||
+		(isTxt && isMobi) ||
+		(isTxt && isAzw3) ||
+		(isTxt && isEpub) {
 
 		// isMobi && isAzw3 当同时为真的时候，退出进程
-		if isMobi && isAzw3 {
+		// isMobi && isEpub 当同时为真的时候，退出进程
+		// isAzw3 && isEpub 当同时为真的时候，退出进程
+		// isMobi && isAzw3 && isEpub 当同时为真的时候，退出进程
+		if (isMobi && isAzw3) ||
+			(isMobi && isEpub) ||
+			(isAzw3 && isMobi && isEpub) ||
+			(isAzw3 && isEpub) {
 			cli.ShowAppHelpAndExit(c, 0)
 			return nil
 		}
@@ -199,6 +228,16 @@ func ConvJSON2Ebook(c *cli.Context) error {
 				coverURLPath = "public/" + bookinfo.Name + "-" + bookinfo.Author + "/" + "cover.jpg"
 			}
 		}
+
+		//生成epub格式电子书
+		if isEpub {
+			fmt.Printf("\n正在生成EPUB版本的电子书，请耐心等待！\n")
+			bookinfo.GenerateEPUB()
+			if isMeta { //配置meta信息
+				epubfilepath = "public/" + bookinfo.Name + "-" + bookinfo.Author + "/" + bookinfo.Name + "-" + bookinfo.Author + ".epub"
+				coverURLPath = "public/" + bookinfo.Name + "-" + bookinfo.Author + "/" + "cover.jpg"
+			}
+		}
 		if isMeta {
 			metainfo = edl.Meta{
 				Ebhost:      bookinfo.EBHost,
@@ -209,6 +248,7 @@ func ConvJSON2Ebook(c *cli.Context) error {
 				Description: bookinfo.Description,
 				TxtURLPath:  txtfilepath,
 				MobiURLPath: mobifilepath,
+				EPUBURLPath: epubfilepath,
 			}
 
 			metainfo.WriteFile("./outputs/" + bookinfo.Name + "-" + bookinfo.Author + "/meta.json")
@@ -225,9 +265,10 @@ func ConvJSON2Ebook(c *cli.Context) error {
 
 //UpdateCheck 检查更新
 func UpdateCheck(c *cli.Context) error {
-	result, err := edl.UpdateCheck(Version)
+	result, err := edl.UpdateCheck()
 	if err == nil {
-		fmt.Printf(result)
+		CompareResult := result.Compare(Version)
+		fmt.Printf("版本检测结果[%s]\n", CompareResult)
 		return nil
 	}
 	return err
@@ -274,6 +315,10 @@ func main() {
 			Usage: "当使用的时候，生成azw3文件(不可与--mobi同时使用)",
 		},
 		cli.BoolFlag{
+			Name:  "epub",
+			Usage: "当使用的时候，生成epub文件(不可与--mobi同时使用)",
+		},
+		cli.BoolFlag{
 			Name:  "json",
 			Usage: "当使用的时候，把下载得到的小说内容写入到json文件当中",
 		},
@@ -306,6 +351,10 @@ func main() {
 				cli.BoolFlag{
 					Name:  "azw3",
 					Usage: "生成azw3文件",
+				},
+				cli.BoolFlag{
+					Name:  "epub",
+					Usage: "当使用的时候，生成epub文件",
 				},
 				cli.BoolFlag{
 					Name:  "meta",

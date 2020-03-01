@@ -17,8 +17,11 @@ var (
 	itemSelected int32    //0 -> xsbiquge.com ; 1 -> 999xs.com; 2 -> 23us.la
 	checked      bool     //生成txt
 	checked2     bool     //生成mobi
+	checked3     bool     //生成epub
 	multiline    string   //小说简介
 	author       string   //小说作者
+
+	compareResult string //版本对比信息
 
 	bookinfo      edl.BookInfo         //初始化bookinfo变量
 	ebdlInterface edl.EBookDLInterface //初始化接口
@@ -30,7 +33,7 @@ var (
 
 var (
 	//Version 版本信息
-	Version string = "1.7.2"
+	Version string = "dev"
 	//Commit git commit信息
 	Commit string = "b40f73c79"
 	//BuildTime 编译时间
@@ -53,6 +56,14 @@ func btnPopupCLicked1() {
 	imgui.OpenPopup("Confirm1")
 }
 
+func btnPopupCLicked2() {
+	obj, err := edl.UpdateCheck()
+	if err == nil {
+		compareResult = obj.Compare(Version)
+	}
+	imgui.OpenPopup("Comfirm2")
+}
+
 //EbookDownloaderRun 下载小说功能
 func EbookDownloaderRun() {
 	multiline = items[itemSelected]
@@ -60,6 +71,7 @@ func EbookDownloaderRun() {
 	ebhost := items[itemSelected]
 	isTxt := checked
 	isMobi := checked2
+	isEpub := checked3
 	p := proxy
 
 	var cmdArgs []string //定义命令用到的参数
@@ -94,6 +106,9 @@ func EbookDownloaderRun() {
 	if isMobi {
 		cmdArgs = append(cmdArgs, "--mobi")
 	}
+	if isEpub {
+		cmdArgs = append(cmdArgs, "--epub")
+	}
 	//添加生成meta.json参数
 	cmdArgs = append(cmdArgs, "--meta")
 
@@ -115,7 +130,6 @@ func loop() {
 					g.Label("github: https://github.com/sndnvaps"),
 					g.Line(
 						g.Button("Yes", func() { imgui.CloseCurrentPopup() }),
-						g.Button("No", nil),
 					),
 				}),
 
@@ -128,7 +142,16 @@ func loop() {
 					g.Label("编译时间：" + BuildTime),
 					g.Line(
 						g.Button("Yes", func() { imgui.CloseCurrentPopup() }),
-						g.Button("No", nil),
+					),
+				}),
+				g.Button("检查更新", btnPopupCLicked2),
+				g.Popup("Confirm2", g.Layout{
+					g.Label("检查软件是否需要更新"),
+					g.Label("项目地址: https://github.com/sndnvaps/ebookdownloader"),
+					g.Label("当前版本号：" + Version),
+					g.Label("检测结果：" + compareResult),
+					g.Line(
+						g.Button("Yes", func() { imgui.CloseCurrentPopup() }),
 					),
 				}),
 			},
@@ -157,6 +180,9 @@ func loop() {
 			}),
 			g.Checkbox("生成mobi", &checked2, func() {
 				fmt.Println(checked2)
+			}),
+			g.Checkbox("生成epub", &checked3, func() {
+				fmt.Println(checked3)
 			}),
 		),
 
@@ -194,8 +220,8 @@ func loadFont() {
 	builder.AddRanges(fonts.GlyphRangesChineseFull())
 	builder.BuildRanges(ranges)
 
-	fontPath := "./fonts/WenQuanYiMicroHei.ttf"
-	fonts.AddFontFromFileTTFV(fontPath, 14, imgui.DefaultFontConfig, ranges.Data())
+	fontBytes, _ := Asset("fonts/WenQuanYiMicroHei.ttf")
+	fonts.AddFontFromMemoryTTFV(fontBytes, 14, imgui.DefaultFontConfig, ranges.Data())
 }
 func main() {
 
