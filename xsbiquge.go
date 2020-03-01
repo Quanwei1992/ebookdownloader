@@ -10,16 +10,18 @@ import (
 	"github.com/schollz/progressbar/v2"
 )
 
+var _ EBookDLInterface = EbookXSBiquge{}
+
 // EbookXSBiquge xsbiquge.com小说网
 type EbookXSBiquge struct {
-	Url  string
+	URL  string
 	Lock *sync.Mutex
 }
 
 // NewXSBiquge 初始化
 func NewXSBiquge() EbookXSBiquge {
 	return EbookXSBiquge{
-		Url:  "https://www.xsbiquge.com",
+		URL:  "https://www.xsbiquge.com",
 		Lock: new(sync.Mutex),
 	}
 }
@@ -27,7 +29,7 @@ func NewXSBiquge() EbookXSBiquge {
 //GetBookBriefInfo 获取小说的信息
 func (this EbookXSBiquge) GetBookBriefInfo(bookid string, proxy string) BookInfo {
 	var bi BookInfo
-	pollURL := this.Url + "/" + bookid + "/"
+	pollURL := this.URL + "/" + bookid + "/"
 
 	//当 proxy 不为空的时候，表示设置代理
 	if proxy != "" {
@@ -53,8 +55,8 @@ func (this EbookXSBiquge) GetBookBriefInfo(bookid string, proxy string) BookInfo
 
 		//导入信息
 		bi = BookInfo{
-			EBHost:      this.Url,
-			EBookId:     bookid,
+			EBHost:      this.URL,
+			EBookID:     bookid,
 			Name:        bookName,
 			Author:      author,
 			Description: description,
@@ -82,8 +84,8 @@ func (this EbookXSBiquge) GetBookBriefInfo(bookid string, proxy string) BookInfo
 
 		//导入信息
 		bi = BookInfo{
-			EBHost:      this.Url,
-			EBookId:     bookid,
+			EBHost:      this.URL,
+			EBookID:     bookid,
 			Name:        bookName,
 			Author:      author,
 			Description: description,
@@ -97,7 +99,7 @@ func (this EbookXSBiquge) GetBookInfo(bookid string, proxy string) BookInfo {
 
 	var bi BookInfo
 	var chapters []Chapter
-	pollURL := this.Url + "/" + bookid + "/"
+	pollURL := this.URL + "/" + bookid + "/"
 
 	//当 proxy 不为空的时候，表示设置代理
 	if proxy != "" {
@@ -126,15 +128,15 @@ func (this EbookXSBiquge) GetBookInfo(bookid string, proxy string) BookInfo {
 		for i := 0; i < len(ddNode); i++ {
 			var tmp Chapter
 			aNode, _ := htmlquery.Find(ddNode[i], "//a")
-			tmp.Link = this.Url + htmlquery.SelectAttr(aNode[0], "href")
+			tmp.Link = this.URL + htmlquery.SelectAttr(aNode[0], "href")
 			tmp.Title = htmlquery.InnerText(aNode[0])
 			chapters = append(chapters, tmp)
 		}
 
 		//导入信息
 		bi = BookInfo{
-			EBHost:      this.Url,
-			EBookId:     bookid,
+			EBHost:      this.URL,
+			EBookID:     bookid,
 			Name:        bookName,
 			Author:      author,
 			Description: description,
@@ -173,8 +175,8 @@ func (this EbookXSBiquge) GetBookInfo(bookid string, proxy string) BookInfo {
 
 		//导入信息
 		bi = BookInfo{
-			EBHost:      this.Url,
-			EBookId:     bookid,
+			EBHost:      this.URL,
+			EBookID:     bookid,
 			Name:        bookName,
 			Author:      author,
 			Description: description,
@@ -204,7 +206,7 @@ func (this EbookXSBiquge) DownloadChapters(Bi BookInfo, proxy string) BookInfo {
 	return result
 }
 
-//根据每个章节的 url连接，下载每章对应的内容Content当中
+//根据每个章节的 URL连接，下载每章对应的内容Content当中
 func (this EbookXSBiquge) downloadChapters(Bi BookInfo, proxy string) BookInfo {
 	chapters := Bi.Chapters
 
@@ -226,8 +228,13 @@ func (this EbookXSBiquge) downloadChapters(Bi BookInfo, proxy string) BookInfo {
 	wg.Wait()
 
 	//下载章节的时候显示进度条
-	bar = progressbar.New(NumChapter)
-	bar.RenderBlank()
+	bar = progressbar.NewOptions(
+		NumChapter,
+		progressbar.OptionSetPredictTime(true),
+		progressbar.OptionShowIts(),
+		progressbar.OptionShowCount(),
+		progressbar.OptionSetTheme(progressbar.Theme{Saucer: "#", SaucerPadding: "-", BarStart: ">", BarEnd: "<"}),
+	)
 
 	for index := 0; index <= NumChapter; {
 		select {
@@ -247,7 +254,7 @@ ForEnd:
 
 	result := BookInfo{
 		EBHost:      Bi.EBHost,
-		EBookId:     Bi.EBookId,
+		EBookID:     Bi.EBookID,
 		Name:        Bi.Name,
 		Author:      Bi.Author,
 		Description: Bi.Description,

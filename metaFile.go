@@ -12,10 +12,11 @@ type Meta struct {
 	Bookid      string `json:"bookid"`
 	BookName    string `json:"bookname"`
 	Author      string `json:"author"`
-	CoverUrl    string `json:"cover_url"`
+	CoverURL    string `json:"cover_url"`
 	Description string `json:"description"`
-	TxtUrlPath  string `json:"txt_url_path"`
-	MobiUrlPath string `json:"mobi_url_path"`
+	TxtURLPath  string `json:"txt_url_path"`
+	MobiURLPath string `json:"mobi_url_path"`
+	EPUBURLPath string `json:"epub_url_path"`
 }
 
 //WriteFile 把json数据写入 filename定义的文件中

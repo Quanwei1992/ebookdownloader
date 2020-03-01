@@ -13,13 +13,14 @@ import (
 	"time"
 
 	"github.com/Chain-Zhang/pinyin"
+	"github.com/bmaupin/go-epub"
 	"github.com/unknwon/com"
 )
 
 //BookInfo 小说信息
 type BookInfo struct {
 	EBHost      string    `json:"ebook_host"` //下载小说的网站
-	EBookId     string    `json:"ebook_id"`   //对应小说网站的bookid
+	EBookID     string    `json:"ebook_id"`   //对应小说网站的bookid
 	Name        string    `json:"bookname"`
 	Author      string    `json:"author"`
 	Description string    `json:"novel_description"`
@@ -32,10 +33,10 @@ type BookInfo struct {
 
 //Volume 定义小说分卷信息
 type Volume struct {
-	PrevChapterId int     `json:"prev_chapter_id"`
+	PrevChapterID int     `json:"prev_chapter_id"`
 	PrevChapter   Chapter `json:"prev_chapter"`
 	CurrentVolume string  `json:"current_volume_name"`
-	NextChapterId int     `json:"next_chapter_id"`
+	NextChapterID int     `json:"next_chapter_id"`
 	NextChapter   Chapter `json:"next_chapter"`
 }
 
@@ -162,10 +163,10 @@ func (this BookInfo) PrintVolumeInfo() {
 	if this.VolumeState() {
 		for index := 0; index < len(volumes); index++ {
 			fmt.Printf("index = %d\n", index)
-			fmt.Printf("PrevChapterId= %d\n", volumes[index].PrevChapterId)
+			fmt.Printf("PrevChapterID= %d\n", volumes[index].PrevChapterID)
 			fmt.Printf("PrevChapter.Title = %s\n", volumes[index].PrevChapter.Title)
 			fmt.Printf("CurrentVolume = %s\n", volumes[index].CurrentVolume)
-			fmt.Printf("NextChapterId= %d\n", volumes[index].NextChapterId)
+			fmt.Printf("NextChapterID= %d\n", volumes[index].NextChapterID)
 			fmt.Printf("NextChapter.Title = %s\n", volumes[index].NextChapter.Title)
 		}
 	} else {
@@ -196,8 +197,8 @@ func (this BookInfo) GenerateTxt() {
 		if len(volumes) > 0 && this.VolumeState() {
 			for vindex := 0; vindex < len(volumes); vindex++ {
 
-				if volumes[vindex].PrevChapterId == index {
-					//fmt.Printf("volumes[vindex].NextChapterId= %d\n", volumes[vindex].PrevChapterId) //用于测试
+				if volumes[vindex].PrevChapterID == index {
+					//fmt.Printf("volumes[vindex].NextChapterID= %d\n", volumes[vindex].PrevChapterID) //用于测试
 					//fmt.Printf("ChapterIndex =  %d\n", index)                                        //用于测试
 					//fmt.Printf("CurrentVolume = %s\n", volumes[vindex].CurrentVolume)                //用于测试
 					content += "\n" + "## " + volumes[vindex].CurrentVolume + " ##" + "\n"
@@ -214,6 +215,69 @@ func (this BookInfo) GenerateTxt() {
 
 	fptr.Close() //关闭文件
 	//WriteFile(outfname, []byte(content))
+}
+
+//GenerateEPUB 生成ebpub小说
+func (this BookInfo) GenerateEPUB() error {
+	//将文件名转换成拼音
+	strPinyin, _ := pinyin.New(this.Name).Split("-").Mode(pinyin.WithoutTone).Convert()
+	savepath := "./tmp/" + strPinyin
+	savepath, _ = filepath.Abs(savepath) //使用绝对路径
+	if com.IsExist(savepath) {
+		os.RemoveAll(savepath)
+	}
+	os.MkdirAll(path.Dir(savepath)+string(os.PathSeparator), os.ModePerm)
+
+	//设置生成mobi的输出目录
+	outputpath := "./outputs/" + this.Name + "-" + this.Author + "/"
+	outputpath, _ = filepath.Abs(outputpath)
+	outputpath = outputpath + string(os.PathSeparator) //使用绝对路径
+	//fmt.Println(outputpath)
+	if !com.IsExist(outputpath) {
+		os.MkdirAll(outputpath, os.ModePerm)
+	}
+	// 生成封面
+	GenerateCover(this)
+	//把封面复制到 tmp 目录当中
+	coverPath, _ := filepath.Abs("./cover.jpg")
+
+	//把封面复制到 outputs/小说名-作者/cover.jpg
+	err := com.Copy(coverPath, outputpath+"cover.jpg")
+	if err != nil {
+		fmt.Println(err.Error())
+	}
+	//删除当前目前的cover.jpg文件
+	os.RemoveAll(coverPath)
+
+	//创建epub小说信息
+	e := epub.NewEpub(this.Name)
+	e.SetAuthor(this.Author)
+	epubCover, _ := e.AddImage("./outputs/"+this.Name+"-"+this.Author+"/"+"cover.jpg", "cover.jpg")
+	epubCoverCSS, _ := e.AddCSS("./tpls/epub_cover.css", "cover.css")
+	e.SetCover(epubCover, epubCoverCSS)
+	e.SetDescription(this.Description)
+
+	//设置章节信息
+	chapters := this.Chapters
+	for _, chapter := range chapters {
+		sectionBody := "<h1>" + chapter.Title + "</h1>\n<p></p>\n"
+		contentTmp := chapter.Content
+		contentLines := strings.Split(contentTmp, "\r")
+		for _, line := range contentLines {
+			line = strings.Replace(line, "    ", "  ", -1) //将每行前面4个空格都换成二个空格
+			sectionBody += "<p>" + line + "</p>\n"
+		}
+		if _, err := e.AddSection(sectionBody, chapter.Title, "", ""); err != nil {
+			return err
+		}
+
+	}
+
+	if err = e.Write(outputpath + this.Name + "-" + this.Author + ".epub"); err != nil {
+		return err
+	}
+
+	return nil
 }
 
 //GenerateJSON 生成json格式的数据
@@ -258,12 +322,12 @@ func (this BookInfo) GenerateMobi() {
 	chapters := this.Chapters //章节信息
 	Volumes := this.Volumes   //分卷信息
 	//tpl_cover := ReadAllString("./tpls/tpl_cover.html")
-	tpl_book_toc := ReadAllString("./tpls/tpl_book_toc.html")
-	tpl_chapter := ReadAllString("./tpls/tpl_chapter.html")
-	tpl_volume := ReadAllString("./tpls/tpl_volume.html")
-	tpl_content := ReadAllString("./tpls/tpl_content.opf")
-	tpl_style := ReadAllString("./tpls/tpl_style.css")
-	tpl_toc := ReadAllString("./tpls/tpl_toc.ncx")
+	tplBookToc := ReadAllString("./tpls/tpl_book_toc.html")
+	tplChapter := ReadAllString("./tpls/tpl_chapter.html")
+	tplVolume := ReadAllString("./tpls/tpl_volume.html")
+	tplContent := ReadAllString("./tpls/tpl_content.opf")
+	tplStyle := ReadAllString("./tpls/tpl_style.css")
+	tplToc := ReadAllString("./tpls/tpl_toc.ncx")
 	//将文件名转换成拼音
 	strPinyin, _ := pinyin.New(this.Name).Split("-").Mode(pinyin.WithoutTone).Convert()
 	savepath := "./tmp/" + strPinyin
@@ -293,9 +357,9 @@ func (this BookInfo) GenerateMobi() {
 	if this.VolumeState() && len(Volumes) > 0 {
 		for index := 0; index < len(Volumes); index++ {
 			vinfo := Volumes[index] //vinfo表示第一分卷信息
-			tpl_volume_tmp := tpl_volume
+			tplVolumeTmp := tplVolume
 			volumeid := fmt.Sprintf("Volume%d", index)
-			volume := strings.Replace(tpl_volume_tmp, "___VOLUME_ID___", volumeid, -1)
+			volume := strings.Replace(tplVolumeTmp, "___VOLUME_ID___", volumeid, -1)
 			volume = strings.Replace(volume, "___VOLUME_NAME___", vinfo.CurrentVolume, -1)
 			cpath := fmt.Sprintf("%s/volume%d.html", savepath, index)
 			WriteFile(cpath, []byte(volume))
@@ -303,25 +367,25 @@ func (this BookInfo) GenerateMobi() {
 	}
 
 	// 章节
-	toc_content := ""
-	nax_toc_content := ""
-	opf_toc := ""
-	opf_spine := ""
-	toc_line := ""
-	nax_toc_line := ""
-	opf_toc_line := ""
+	tocContent := ""
+	naxTocContent := ""
+	opfToc := ""
+	opfSpine := ""
+	tocLine := ""
+	naxTocLine := ""
+	opfTocLine := ""
 	for index := 0; index < len(chapters); index++ {
 		// cinfo表示第一个章节的内容
 		cinfo := chapters[index]
-		tpl_chapter_tmp := tpl_chapter
+		tplChapterTmp := tplChapter
 		chapterid := fmt.Sprintf("Chapter%d", index)
 		//fmt.Printf("Chapterid =%s", chapterid)
-		chapter := strings.Replace(tpl_chapter_tmp, "___CHAPTER_ID___", chapterid, -1)
+		chapter := strings.Replace(tplChapterTmp, "___CHAPTER_ID___", chapterid, -1)
 		chapter = strings.Replace(chapter, "___CHAPTER_NAME___", cinfo.Title, -1)
-		content_tmp := cinfo.Content
-		content_lines := strings.Split(content_tmp, "\r")
+		contentTmp := cinfo.Content
+		contentLines := strings.Split(contentTmp, "\r")
 		content := ""
-		for _, v := range content_lines {
+		for _, v := range contentLines {
 			content = content + fmt.Sprintf("<p class=\"a\">    %s</p>\n", v)
 		}
 		chapter = strings.Replace(chapter, "___CONTENT___", content, -1)
@@ -335,77 +399,77 @@ func (this BookInfo) GenerateMobi() {
 		//分卷信息
 		if this.VolumeState() && len(Volumes) > 0 {
 			for vindex := 0; vindex < len(Volumes); vindex++ {
-				if Volumes[vindex].PrevChapterId == index {
+				if Volumes[vindex].PrevChapterID == index {
 					//分卷信息,在book-toc.html中插入分卷信息
-					toc_line = fmt.Sprintf("<dt class=\"tocl1\"><a href=\"volume%d.html\">%s</a></dt>\n", vindex, Volumes[vindex].CurrentVolume)
-					toc_content = toc_content + toc_line
+					tocLine = fmt.Sprintf("<dt class=\"tocl1\"><a href=\"volume%d.html\">%s</a></dt>\n", vindex, Volumes[vindex].CurrentVolume)
+					tocContent = tocContent + tocLine
 
 					//分卷信息，在toc.ncx中插入分卷信息
-					nax_toc_line = fmt.Sprintf("<navPoint id=\"volume%d\" playOrder=\"%d\">\n", vindex, vindex+1)
-					nax_toc_content = nax_toc_content + nax_toc_line
+					naxTocLine = fmt.Sprintf("<navPoint id=\"volume%d\" playOrder=\"%d\">\n", vindex, vindex+1)
+					naxTocContent = naxTocContent + naxTocLine
 
-					nax_toc_line = fmt.Sprintf("<navLabel><text>%s</text></navLabel>\n", Volumes[vindex].CurrentVolume)
-					nax_toc_content = nax_toc_content + nax_toc_line
+					naxTocLine = fmt.Sprintf("<navLabel><text>%s</text></navLabel>\n", Volumes[vindex].CurrentVolume)
+					naxTocContent = naxTocContent + naxTocLine
 
-					nax_toc_line = fmt.Sprintf("<content src=\"volume%d.html\"/>\n</navPoint>\n", vindex)
-					nax_toc_content = nax_toc_content + nax_toc_line
+					naxTocLine = fmt.Sprintf("<content src=\"volume%d.html\"/>\n</navPoint>\n", vindex)
+					naxTocContent = naxTocContent + naxTocLine
 
 					//分卷信息,在content.opf中插入分卷信息
-					opf_toc_line = fmt.Sprintf("<item id=\"volume%d\" href=\"volume%d.html\" media-type=\"application/xhtml+xml\"/>\n", vindex, vindex)
-					opf_toc = opf_toc + opf_toc_line
+					opfTocLine = fmt.Sprintf("<item id=\"volume%d\" href=\"volume%d.html\" media-type=\"application/xhtml+xml\"/>\n", vindex, vindex)
+					opfToc = opfToc + opfTocLine
 
-					opf_spine_line := fmt.Sprintf("<itemref idref=\"volume%d\" linear=\"yes\"/>\n", vindex)
-					opf_spine = opf_spine + opf_spine_line
+					opfSpineLine := fmt.Sprintf("<itemref idref=\"volume%d\" linear=\"yes\"/>\n", vindex)
+					opfSpine = opfSpine + opfSpineLine
 				}
 			}
 		}
-		toc_line = fmt.Sprintf("<dt class=\"tocl2\"><a href=\"chapter%d.html\">%s</a></dt>\n", index, cinfo.Title)
-		toc_content = toc_content + toc_line
+		tocLine = fmt.Sprintf("<dt class=\"tocl2\"><a href=\"chapter%d.html\">%s</a></dt>\n", index, cinfo.Title)
+		tocContent = tocContent + tocLine
 
-		// nax_toc
-		nax_toc_line = fmt.Sprintf("<navPoint id=\"chapter%d\" playOrder=\"%d\">\n", index, index+1)
-		nax_toc_content = nax_toc_content + nax_toc_line
+		// naxToc
+		naxTocLine = fmt.Sprintf("<navPoint id=\"chapter%d\" playOrder=\"%d\">\n", index, index+1)
+		naxTocContent = naxTocContent + naxTocLine
 
-		nax_toc_line = fmt.Sprintf("<navLabel><text>%s</text></navLabel>\n", cinfo.Title)
-		nax_toc_content = nax_toc_content + nax_toc_line
+		naxTocLine = fmt.Sprintf("<navLabel><text>%s</text></navLabel>\n", cinfo.Title)
+		naxTocContent = naxTocContent + naxTocLine
 
-		nax_toc_line = fmt.Sprintf("<content src=\"chapter%d.html\"/>\n</navPoint>\n", index)
-		nax_toc_content = nax_toc_content + nax_toc_line
+		naxTocLine = fmt.Sprintf("<content src=\"chapter%d.html\"/>\n</navPoint>\n", index)
+		naxTocContent = naxTocContent + naxTocLine
 
-		opf_toc_line = fmt.Sprintf("<item id=\"chapter%d\" href=\"chapter%d.html\" media-type=\"application/xhtml+xml\"/>\n", index, index)
-		opf_toc = opf_toc + opf_toc_line
+		opfTocLine = fmt.Sprintf("<item id=\"chapter%d\" href=\"chapter%d.html\" media-type=\"application/xhtml+xml\"/>\n", index, index)
+		opfToc = opfToc + opfTocLine
 
-		opf_spine_line := fmt.Sprintf("<itemref idref=\"chapter%d\" linear=\"yes\"/>\n", index)
-		opf_spine = opf_spine + opf_spine_line
+		opfSpineLine := fmt.Sprintf("<itemref idref=\"chapter%d\" linear=\"yes\"/>\n", index)
+		opfSpine = opfSpine + opfSpineLine
 	}
 
 	// style
-	WriteFile(savepath+"/style.css", []byte(tpl_style))
+	WriteFile(savepath+"/style.css", []byte(tplStyle))
 
 	// 目录
-	book_toc := strings.Replace(tpl_book_toc, "___CONTENT___", toc_content, -1)
-	WriteFile(savepath+"/book-toc.html", []byte(book_toc))
+	bookToc := strings.Replace(tplBookToc, "___CONTENT___", tocContent, -1)
+	WriteFile(savepath+"/book-toc.html", []byte(bookToc))
 
-	nax_toc := strings.Replace(tpl_toc, "___BOOK_ID___", "11111", -1)
-	nax_toc = strings.Replace(nax_toc, "___BOOK_NAME___", this.Name, -1)
-	nax_toc = strings.Replace(nax_toc, "___BOOK_AUTHOR___", this.Author, -1)
-	nax_toc = strings.Replace(nax_toc, "___NAV___", nax_toc_content, -1)
-	WriteFile(savepath+"/toc.ncx", []byte(nax_toc))
+	naxToc := strings.Replace(tplToc, "___BOOK_ID___", "11111", -1)
+	naxToc = strings.Replace(naxToc, "___BOOK_NAME___", this.Name, -1)
+	naxToc = strings.Replace(naxToc, "___BOOK_AUTHOR___", this.Author, -1)
+	naxToc = strings.Replace(naxToc, "___NAV___", naxTocContent, -1)
+	WriteFile(savepath+"/toc.ncx", []byte(naxToc))
 
 	// opf
-	opf_content := strings.Replace(tpl_content, "___MANIFEST___", opf_toc, -1)
-	opf_content = strings.Replace(opf_content, "___SPINE___", opf_spine, -1)
-	opf_content = strings.Replace(opf_content, "___BOOK_ID___", "11111", -1)
-	opf_content = strings.Replace(opf_content, "___BOOK_NAME___", this.Name, -1)
-	opf_content = strings.Replace(opf_content, "___BOOK_AUTHOR___", this.Author, -1)
+	opfContent := strings.Replace(tplContent, "___MANIFEST___", opfToc, -1)
+	opfContent = strings.Replace(opfContent, "___SPINE___", opfSpine, -1)
+	opfContent = strings.Replace(opfContent, "___BOOK_ID___", "11111", -1)
+	opfContent = strings.Replace(opfContent, "___BOOK_NAME___", this.Name, -1)
+	opfContent = strings.Replace(opfContent, "___BOOK_AUTHOR___", this.Author, -1)
 	//设置初始时间
-	opf_content = strings.Replace(opf_content, "___CREATE_TIME___", time.Now().Format("2006-01-02 15:04:05"), -1)
+	opfContent = strings.Replace(opfContent, "___CREATE_TIME___", time.Now().Format("2006-01-02 15:04:05"), -1)
 	//写入简介信息
-	opf_content = strings.Replace(opf_content, "___DESCRIPTION___", this.Description, -1)
+	opfContent = strings.Replace(opfContent, "___DESCRIPTION___", this.Description, -1)
 	//写入发布者信息
-	opf_content = strings.Replace(opf_content, "___PUBLISHER___", "sndnvaps", -1)
+	opfContent = strings.Replace(opfContent, "___PUBLISHER___", "sndnvaps", -1)
 	//把修改内容写入到content.opf文件中
-	WriteFile(savepath+"/content.opf", []byte(opf_content))
+	WriteFile(savepath+"/content.opf", []byte(opfContent))
 
 	//把封面复制到 tmp 目录当中
 	coverPath, _ := filepath.Abs("./cover.jpg")
