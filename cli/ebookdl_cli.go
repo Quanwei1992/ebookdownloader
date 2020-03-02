@@ -337,7 +337,7 @@ func main() {
 	app.Commands = []cli.Command{
 		{
 			Name:  "conv",
-			Usage: " 转换json格式到其它格式，支持txt,mobi,azw3",
+			Usage: " 转换json格式到其它格式，支持txt,mobi,azw3,epub",
 			Flags: []cli.Flag{
 				cli.StringFlag{
 					Name:  "json",
