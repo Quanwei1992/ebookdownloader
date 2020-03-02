@@ -86,6 +86,7 @@ func EbookDownloader(c *cli.Context) error {
 
 		if isJSON {
 			//生成 json格式后，直接退出程序
+			fmt.Printf("\n正在生成json版本的电子书数据，请耐心等待！\n")
 			err := bookinfo.GenerateJSON()
 			if err != nil {
 				fmt.Println(err.Error())
@@ -136,6 +137,7 @@ func EbookDownloader(c *cli.Context) error {
 				Ebhost:      ebhost,
 				Bookid:      bookid,
 				BookName:    bookinfo.Name,
+				BookISBN:    bookinfo.ISBN(),
 				Author:      bookinfo.Author,
 				CoverURL:    coverURLPath,
 				Description: bookinfo.Description,
@@ -243,6 +245,7 @@ func ConvJSON2Ebook(c *cli.Context) error {
 				Ebhost:      bookinfo.EBHost,
 				Bookid:      bookinfo.EBookID,
 				BookName:    bookinfo.Name,
+				BookISBN:    bookinfo.ISBN(),
 				Author:      bookinfo.Author,
 				CoverURL:    coverURLPath,
 				Description: bookinfo.Description,

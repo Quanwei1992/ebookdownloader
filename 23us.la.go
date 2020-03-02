@@ -183,6 +183,7 @@ func (this Ebook23US) GetBookInfo(bookid string, proxy string) BookInfo {
 			chapters = append(chapters, tmp)
 		}
 		HasVolume := bi.VolumeState() //先赋值给 HasVolume,再把值导入到结构体中，用于数据返回
+
 		//导入信息
 		bi = BookInfo{
 			EBHost:      this.URL,
@@ -273,6 +274,7 @@ func (this Ebook23US) GetBookInfo(bookid string, proxy string) BookInfo {
 			chapters = append(chapters, tmp)
 		}
 		HasVolume := bi.VolumeState() //先赋值给 HasVolume,再把值导入到结构体中，用于数据返回
+
 		//导入信息
 		bi = BookInfo{
 			EBHost:      this.URL,
@@ -285,6 +287,8 @@ func (this Ebook23US) GetBookInfo(bookid string, proxy string) BookInfo {
 			Chapters:    chapters,
 		}
 	}
+	//生成ISBN码
+	bi.GenerateISBN()
 	return bi
 }
 
@@ -357,6 +361,7 @@ ForEnd:
 	result := BookInfo{
 		EBHost:      Bi.EBHost,
 		EBookID:     Bi.EBookID,
+		BookISBN:    Bi.ISBN(),
 		Name:        Bi.Name,
 		Author:      Bi.Author,
 		Description: Bi.Description,
@@ -427,7 +432,7 @@ func (this Ebook23US) DownloaderChapter(ResultChan chan chan Chapter, pc ProxyCh
 	}(pc)
 }
 
-//检测是 第一个 dt标签是否包含 “正文卷”，如果不包含就表示是分卷
+//TestContainVolume 检测是 第一个 dt标签是否包含 “正文卷”，如果不包含就表示是分卷
 func TestContainVolume(src string) bool {
 	return !strings.Contains(src, "正文")
 }

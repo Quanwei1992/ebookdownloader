@@ -206,7 +206,6 @@ func (this Ebook999XS) GetBookInfo(bookid string, proxy string) BookInfo {
 			tmp.Title = htmlquery.InnerText(aNode[0])
 			chapters = append(chapters, tmp)
 		}
-
 		//导入信息
 		bi = BookInfo{
 			EBHost:      this.URL,
@@ -216,7 +215,10 @@ func (this Ebook999XS) GetBookInfo(bookid string, proxy string) BookInfo {
 			Description: description,
 			Chapters:    chapters,
 		}
+
 	}
+	//生成ISBN码
+	bi.GenerateISBN()
 	return bi
 }
 func (this Ebook999XS) DownloadChapters(Bi BookInfo, proxy string) BookInfo {
@@ -287,6 +289,7 @@ ForEnd:
 	result := BookInfo{
 		EBHost:      Bi.EBHost,
 		EBookID:     Bi.EBookID,
+		BookISBN:    Bi.ISBN(),
 		Name:        Bi.Name,
 		Author:      Bi.Author,
 		Description: Bi.Description,

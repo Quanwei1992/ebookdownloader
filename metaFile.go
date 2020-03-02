@@ -11,6 +11,7 @@ type Meta struct {
 	Ebhost      string `json:"ebhost"`
 	Bookid      string `json:"bookid"`
 	BookName    string `json:"bookname"`
+	BookISBN    string `json:"isbn"`
 	Author      string `json:"author"`
 	CoverURL    string `json:"cover_url"`
 	Description string `json:"description"`

@@ -13,6 +13,7 @@ import (
 	"time"
 
 	"github.com/Chain-Zhang/pinyin"
+	"github.com/hidapple/isbn-gen/isbn"
 	"github.com/unknwon/com"
 )
 
@@ -20,6 +21,7 @@ import (
 type BookInfo struct {
 	EBHost      string    `json:"ebook_host"` //下载小说的网站
 	EBookID     string    `json:"ebook_id"`   //对应小说网站的bookid
+	BookISBN    string    `json:"isbn"`       //生成一个isbn码
 	Name        string    `json:"bookname"`
 	Author      string    `json:"author"`
 	Description string    `json:"novel_description"`
@@ -71,6 +73,25 @@ func WriteFile(filename string, data []byte) error {
 	filepathAbs, _ := filepath.Abs(filename)
 	os.MkdirAll(path.Dir(filename), os.ModePerm)
 	return ioutil.WriteFile(filepathAbs, data, 0655)
+}
+
+//GenerateISBN GenerateISBN
+func (this *BookInfo) GenerateISBN() {
+	//bookISBN 设置小说的urn码
+	bookISBN, _ := isbn.NewISBN("cn", "")
+	bookISBNStr := bookISBN.Number()
+	this.BookISBN = bookISBNStr
+	//fmt.Printf("bookISBN = %s\n", bookISBNStr)
+}
+
+//SetISBN 对小说的ISBN码进行设置
+func (this *BookInfo) SetISBN(value string) {
+	this.BookISBN = value
+}
+
+//ISBN 返回小说的ISBN码
+func (this BookInfo) ISBN() string {
+	return this.BookISBN
 }
 
 //SetKindleEbookType 现在设置，mobi和awz3格式不能同时设置为true
@@ -285,6 +306,10 @@ func (this BookInfo) GenerateMobi() {
 	// 生成封面
 	GenerateCover(this)
 
+	//bookISBN 设置小说的urn码
+	bookISBNStr := this.ISBN()
+	//fmt.Printf("bookISBN = %s\n", bookISBNStr)
+
 	//cover := strings.Replace(tpl_cover, "___BOOK_NAME___", this.Name, -1)
 	//cover = strings.Replace(cover, "___BOOK_AUTHOR___", this.Author, -1)
 	//WriteFile(savepath+"/cover.html", []byte(cover))
@@ -398,6 +423,7 @@ func (this BookInfo) GenerateMobi() {
 	opfContent = strings.Replace(opfContent, "___BOOK_ID___", "11111", -1)
 	opfContent = strings.Replace(opfContent, "___BOOK_NAME___", this.Name, -1)
 	opfContent = strings.Replace(opfContent, "___BOOK_AUTHOR___", this.Author, -1)
+	opfContent = strings.Replace(opfContent, "__ISBN__", bookISBNStr, -1)
 	//设置初始时间
 	opfContent = strings.Replace(opfContent, "___CREATE_TIME___", time.Now().Format("2006-01-02 15:04:05"), -1)
 	//写入简介信息

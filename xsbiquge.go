@@ -142,6 +142,8 @@ func (this EbookXSBiquge) GetBookInfo(bookid string, proxy string) BookInfo {
 			Description: description,
 			Chapters:    chapters,
 		}
+		//生成ISBN码
+		bi.GenerateISBN()
 	} else { //没有设置代理
 		doc, err := htmlquery.LoadURL(pollURL)
 		if err != nil {
@@ -182,6 +184,8 @@ func (this EbookXSBiquge) GetBookInfo(bookid string, proxy string) BookInfo {
 			Description: description,
 			Chapters:    chapters,
 		}
+		//生成ISBN码
+		bi.GenerateISBN()
 	}
 	return bi
 }
@@ -255,6 +259,7 @@ ForEnd:
 	result := BookInfo{
 		EBHost:      Bi.EBHost,
 		EBookID:     Bi.EBookID,
+		BookISBN:    Bi.ISBN(),
 		Name:        Bi.Name,
 		Author:      Bi.Author,
 		Description: Bi.Description,

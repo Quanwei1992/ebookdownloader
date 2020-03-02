@@ -112,6 +112,7 @@ func TestGenerateTxt(t *testing.T) {
 func TestGenerateMobi(t *testing.T) {
 	testbi.ChangeVolumeState(true /* hasVolume */)
 	testbi.SetKindleEbookType(true /* isMobi */, false /* isAwz3 */)
+	testbi.GenerateISBN() //先生成ISBN码
 	testbi.GenerateMobi()
 	savename := "./outputs/" + testbi.Name + "-" + testbi.Author + "/" + testbi.Name + "-" + testbi.Author + ".mobi"
 
@@ -122,6 +123,7 @@ func TestGenerateMobi(t *testing.T) {
 func TestGenerateAwz3(t *testing.T) {
 	testbi.ChangeVolumeState(true /* hasVolume */)
 	testbi.SetKindleEbookType(false /* isMobi */, true /* isAwz3 */)
+	testbi.GenerateISBN() //先生成ISBN码
 	testbi.GenerateMobi()
 	savename := "./outputs/" + testbi.Name + "-" + testbi.Author + "/" + testbi.Name + "-" + testbi.Author + ".awz3"
 
@@ -129,6 +131,7 @@ func TestGenerateAwz3(t *testing.T) {
 	//os.RemoveAll(savename)
 }
 func TestGenerateEPUB(t *testing.T) {
+	testbi.GenerateISBN() //先生成ISBN码
 	testbi.GenerateEPUB()
 	savename := "./outputs/" + testbi.Name + "-" + testbi.Author + "/" + testbi.Name + "-" + testbi.Author + ".epub"
 	assert.True(t, true, isExist(savename))

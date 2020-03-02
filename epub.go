@@ -23,6 +23,9 @@ func (this BookInfo) GenerateEPUB() error {
 	}
 	os.MkdirAll(path.Dir(savepath)+string(os.PathSeparator), os.ModePerm)
 
+	//bookISBN 设置小说的urn码
+	bookISBNStr := this.ISBN()
+
 	//设置生成mobi的输出目录
 	outputpath := "./outputs/" + this.Name + "-" + this.Author + "/"
 	outputpath, _ = filepath.Abs(outputpath)
@@ -49,9 +52,10 @@ func (this BookInfo) GenerateEPUB() error {
 	e.SetAuthor(this.Author)
 	epubCover, _ := e.AddImage("./outputs/"+this.Name+"-"+this.Author+"/"+"cover.jpg", "cover.jpg")
 	epubCoverCSS, _ := e.AddCSS("./tpls/epub_cover.css", "cover.css")
-	e.SetCover(epubCover, epubCoverCSS) //设置封面
-	e.SetDescription(this.Description)  //设置小说简介
-	e.SetLang("zh-CN")                  //设置小说的语言为中文
+	e.SetCover(epubCover, epubCoverCSS)        //设置封面
+	e.SetDescription(this.Description)         //设置小说简介
+	e.SetIdentifier("urn:isbn:" + bookISBNStr) //设置小说的urn:isbn编码
+	e.SetLang("zh-CN")                         //设置小说的语言为中文
 
 	//设置章节信息
 	chapters := this.Chapters
