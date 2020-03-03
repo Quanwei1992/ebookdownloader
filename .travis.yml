@@ -59,6 +59,9 @@ script: |-
     linux)
       case $TRAVIS_ARCH in
        amd64)
+          echo "Run go test first"
+          cd $TRAVIS_BUILD_DIR
+          go test
           cd $TRAVIS_BUILD_DIR/cli
           GOOS=linux  GOARCH=amd64 go build -ldflags "-s -w -X main.Version=${TRAVIS_TAG} -X main.Commit=${TRAVIS_COMMIT} -X main.BuildTime=$(date +'%Y-%m-%d_%T')" -o ebookdownloader_linux_-amd64-cli
           cp ebookdownloader_linux_-amd64-cli ../
@@ -70,6 +73,9 @@ script: |-
           cp ebookdownloader_linux_-amd64-http-server ../
           ;;
        arm64)
+          echo "Run go test first"
+          cd $TRAVIS_BUILD_DIR
+          go test
           cd $TRAVIS_BUILD_DIR/cli
           GOOS=linux  GOARCH=arm64 go build -ldflags "-s -w -X main.Version=${TRAVIS_TAG} -X main.Commit=${TRAVIS_COMMIT} -X main.BuildTime=$(date +'%Y-%m-%d_%T')" -o ebookdownloader_linux_-arm64-cli
           cp ebookdownloader_linux_-arm64-cli ../
@@ -87,6 +93,9 @@ script: |-
         esac
       ;;
     osx)
+      echo "Run go test first"
+      cd $TRAVIS_BUILD_DIR
+      go test
       cd $TRAVIS_BUILD_DIR/cli
       GOOS=darwin  GOARCH=amd64 go build -ldflags "-s -w -X main.Version=${TRAVIS_TAG} -X main.Commit=${TRAVIS_COMMIT} -X main.BuildTime=$(date +'%Y-%m-%d_%T')" -o ebookdownloader_darwin_-amd64-cli
       cp ebookdownloader_darwin_-amd64-cli ../
@@ -98,6 +107,9 @@ script: |-
       cp ebookdownloader_darwin_-amd64-http-server ../
       ;;
    windows)
+      powershell Write-Host "Run go test first"
+      cd $TRAVIS_BUILD_DIR
+      go test
       cd $TRAVIS_BUILD_DIR/cli
       GOOS=windows  GOARCH=amd64 go build -ldflags "-s -w -X main.Version=${TRAVIS_TAG} -X main.Commit=${TRAVIS_COMMIT} -X main.BuildTime=$(date +'%Y-%m-%d_%T')" -o ebookdownloader_windows_-amd64-cli.exe
       powershell copy-item ebookdownloader_windows_-amd64-cli.exe ../
