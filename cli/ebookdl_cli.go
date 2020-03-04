@@ -45,8 +45,15 @@ func EbookDownloader(c *cli.Context) error {
 	var metainfo edl.Meta //用于保存小说的meta信息
 	txtfilepath := ""     //定义 txt下载后，获取得到的 地址
 	mobifilepath := ""    //定义 mobi下载后，获取得到的 地址
-	coverURLPath := ""    //定义下载小说后，封面的url地址
+	azw3filepath := ""    //定义 azw3下载后，获取得到的 地址
 	epubfilepath := ""    //定义 epub下载后，获取得到的 地址
+
+	txtMD5Str := ""  //定义txt小说的md5信息
+	mobiMD5Str := "" //定义mobi小说的md5信息
+	epubMD5Str := "" //定义epub小说的md5信息
+	azw3MD5Str := "" //定义azw3小说的md5信息
+
+	coverURLPath := "" //定义下载小说后，封面的url地址
 
 	//isTxt 或者 isMobi必须一个为真，或者两个都为真
 	if (isTxt || isMobi || isAzw3 || isEpub) ||
@@ -98,6 +105,7 @@ func EbookDownloader(c *cli.Context) error {
 			bookinfo.GenerateTxt()
 			if isMeta { //配置meta信息
 				txtfilepath = "public/" + bookinfo.Name + "-" + bookinfo.Author + "/" + bookinfo.Name + "-" + bookinfo.Author + ".txt"
+				txtMD5Str, _ = edl.CreateMD5("./outputs/" + bookinfo.Name + "-" + bookinfo.Author + "/" + bookinfo.Name + "-" + bookinfo.Author + ".txt")
 			}
 		}
 		//生成mobi格式电子书
@@ -107,6 +115,7 @@ func EbookDownloader(c *cli.Context) error {
 			bookinfo.GenerateMobi()
 			if isMeta { //配置meta信息
 				mobifilepath = "public/" + bookinfo.Name + "-" + bookinfo.Author + "/" + bookinfo.Name + "-" + bookinfo.Author + ".mobi"
+				mobiMD5Str, _ = edl.CreateMD5("./outputs/" + bookinfo.Name + "-" + bookinfo.Author + "/" + bookinfo.Name + "-" + bookinfo.Author + ".mobi")
 				coverURLPath = "public/" + bookinfo.Name + "-" + bookinfo.Author + "/" + "cover.jpg"
 			}
 
@@ -117,7 +126,8 @@ func EbookDownloader(c *cli.Context) error {
 			bookinfo.SetKindleEbookType(false /* isMobi */, true /* isAzw3 */)
 			bookinfo.GenerateMobi()
 			if isMeta { //配置meta信息
-				mobifilepath = "public/" + bookinfo.Name + "-" + bookinfo.Author + "/" + bookinfo.Name + "-" + bookinfo.Author + ".azw3"
+				azw3filepath = "public/" + bookinfo.Name + "-" + bookinfo.Author + "/" + bookinfo.Name + "-" + bookinfo.Author + ".azw3"
+				azw3MD5Str, _ = edl.CreateMD5("./outputs/" + bookinfo.Name + "-" + bookinfo.Author + "/" + bookinfo.Name + "-" + bookinfo.Author + ".azw3")
 				coverURLPath = "public/" + bookinfo.Name + "-" + bookinfo.Author + "/" + "cover.jpg"
 			}
 		}
@@ -128,6 +138,7 @@ func EbookDownloader(c *cli.Context) error {
 			bookinfo.GenerateEPUB()
 			if isMeta { //配置meta信息
 				epubfilepath = "public/" + bookinfo.Name + "-" + bookinfo.Author + "/" + bookinfo.Name + "-" + bookinfo.Author + ".epub"
+				epubMD5Str, _ = edl.CreateMD5("./outputs/" + bookinfo.Name + "-" + bookinfo.Author + "/" + bookinfo.Name + "-" + bookinfo.Author + ".epub")
 				coverURLPath = "public/" + bookinfo.Name + "-" + bookinfo.Author + "/" + "cover.jpg"
 			}
 		}
@@ -138,12 +149,18 @@ func EbookDownloader(c *cli.Context) error {
 				Bookid:      bookid,
 				BookName:    bookinfo.Name,
 				BookISBN:    bookinfo.ISBN(),
+				BookUUID:    bookinfo.UUID(),
 				Author:      bookinfo.Author,
 				CoverURL:    coverURLPath,
 				Description: bookinfo.Description,
 				TxtURLPath:  txtfilepath,
 				MobiURLPath: mobifilepath,
+				AZW3URLPath: azw3filepath,
 				EPUBURLPath: epubfilepath,
+				TxtMD5:      txtMD5Str,
+				MobiMD5:     mobiMD5Str,
+				AZW3MD5:     azw3MD5Str,
+				EPUBMD5:     epubMD5Str,
 			}
 
 			metainfo.WriteFile("./outputs/" + bookinfo.Name + "-" + bookinfo.Author + "/meta.json")

@@ -289,6 +289,8 @@ func (this Ebook23US) GetBookInfo(bookid string, proxy string) BookInfo {
 	}
 	//生成ISBN码
 	bi.GenerateISBN()
+	//生成UUID
+	bi.GenerateUUID()
 	return bi
 }
 
@@ -362,6 +364,7 @@ ForEnd:
 		EBHost:      Bi.EBHost,
 		EBookID:     Bi.EBookID,
 		BookISBN:    Bi.ISBN(),
+		BookUUID:    Bi.UUID(),
 		Name:        Bi.Name,
 		Author:      Bi.Author,
 		Description: Bi.Description,

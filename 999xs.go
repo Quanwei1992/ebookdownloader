@@ -219,6 +219,8 @@ func (this Ebook999XS) GetBookInfo(bookid string, proxy string) BookInfo {
 	}
 	//生成ISBN码
 	bi.GenerateISBN()
+	//生成UUID
+	bi.GenerateUUID()
 	return bi
 }
 func (this Ebook999XS) DownloadChapters(Bi BookInfo, proxy string) BookInfo {
@@ -290,6 +292,7 @@ ForEnd:
 		EBHost:      Bi.EBHost,
 		EBookID:     Bi.EBookID,
 		BookISBN:    Bi.ISBN(),
+		BookUUID:    Bi.UUID(),
 		Name:        Bi.Name,
 		Author:      Bi.Author,
 		Description: Bi.Description,

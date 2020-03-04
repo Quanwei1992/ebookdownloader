@@ -142,8 +142,6 @@ func (this EbookXSBiquge) GetBookInfo(bookid string, proxy string) BookInfo {
 			Description: description,
 			Chapters:    chapters,
 		}
-		//生成ISBN码
-		bi.GenerateISBN()
 	} else { //没有设置代理
 		doc, err := htmlquery.LoadURL(pollURL)
 		if err != nil {
@@ -184,9 +182,12 @@ func (this EbookXSBiquge) GetBookInfo(bookid string, proxy string) BookInfo {
 			Description: description,
 			Chapters:    chapters,
 		}
-		//生成ISBN码
-		bi.GenerateISBN()
+
 	}
+	//生成ISBN码
+	bi.GenerateISBN()
+	//生成UUID
+	bi.GenerateUUID()
 	return bi
 }
 
@@ -260,6 +261,7 @@ ForEnd:
 		EBHost:      Bi.EBHost,
 		EBookID:     Bi.EBookID,
 		BookISBN:    Bi.ISBN(),
+		BookUUID:    Bi.UUID(),
 		Name:        Bi.Name,
 		Author:      Bi.Author,
 		Description: Bi.Description,
@@ -271,7 +273,7 @@ ForEnd:
 	return result
 }
 
-//func DownloaderChapter(ResultChan chan chan Chapter)
+//DownloaderChapter 一个章节一个章节得下载
 func (this EbookXSBiquge) DownloaderChapter(ResultChan chan chan Chapter, pc ProxyChapter, wg *sync.WaitGroup) {
 	wg.Add(1)
 	defer wg.Done()

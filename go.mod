@@ -15,6 +15,7 @@ require (
 	github.com/gin-gonic/gin v1.5.0
 	github.com/goki/freetype v0.0.0-20181231101311-fa8a33aabaff
 	github.com/hidapple/isbn-gen v1.0.0
+	github.com/satori/go.uuid v1.2.0
 	github.com/schollz/progressbar/v2 v2.15.0
 	github.com/sndnvaps/go-epub v1.0.0
 	github.com/stretchr/testify v1.4.0

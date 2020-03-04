@@ -19,6 +19,7 @@ type BookInfo struct {
 	EBHost      string    `json:"ebook_host"` //下载小说的网站
 	EBookID     string    `json:"ebook_id"`   //对应小说网站的bookid
 	BookISBN    string    `json:"isbn"`       //生成一个isbn码
+	BookUUID    string    `json:"uuid"`       //生成一个uuid码，准备用于boltdb
 	Name        string    `json:"bookname"`
 	Author      string    `json:"author"`
 	Description string    `json:"novel_description"`

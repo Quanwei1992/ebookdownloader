@@ -85,7 +85,7 @@ var C = []Chapter{
 	},
 }
 
-var savePath = "./outputs/"  + testbi.Name + "-" + testbi.Author
+var savePath = "./outputs/" + testbi.Name + "-" + testbi.Author
 
 func TestBookInfo(t *testing.T) {
 	bookname := "我是谁"
@@ -104,7 +104,7 @@ func TestBookInfo(t *testing.T) {
 func TestGenerateTxt(t *testing.T) {
 	testbi.ChangeVolumeState(true /* hasVolume */)
 	testbi.GenerateTxt()
-	savename := savePath +  "/" + testbi.Name + "-" + testbi.Author + ".txt"
+	savename := savePath + "/" + testbi.Name + "-" + testbi.Author + ".txt"
 	assert.True(t, true, isExist(savename))
 	os.RemoveAll(savePath)
 
@@ -115,7 +115,7 @@ func TestGenerateMobi(t *testing.T) {
 	testbi.SetKindleEbookType(true /* isMobi */, false /* isAwz3 */)
 	testbi.GenerateISBN() //先生成ISBN码
 	testbi.GenerateMobi()
-	savename := savePath +  "/" + testbi.Name + "-" + testbi.Author + ".mobi"
+	savename := savePath + "/" + testbi.Name + "-" + testbi.Author + ".mobi"
 	assert.True(t, true, isExist(savename))
 	os.RemoveAll(savePath)
 }
@@ -125,14 +125,14 @@ func TestGenerateAzw3(t *testing.T) {
 	testbi.SetKindleEbookType(false /* isMobi */, true /* isAzw3 */)
 	testbi.GenerateISBN() //先生成ISBN码
 	testbi.GenerateMobi()
-	savename := savePath +  "/" + testbi.Name + "-" + testbi.Author + ".azw3"
+	savename := savePath + "/" + testbi.Name + "-" + testbi.Author + ".azw3"
 	assert.True(t, true, isExist(savename))
 	os.RemoveAll(savePath)
 }
 func TestGenerateEPUB(t *testing.T) {
 	testbi.GenerateISBN() //先生成ISBN码
 	testbi.GenerateEPUB()
-	savename := savePath +  "/" + testbi.Name + "-" + testbi.Author + ".epub"
+	savename := savePath + "/" + testbi.Name + "-" + testbi.Author + ".epub"
 	assert.True(t, true, isExist(savename))
 	os.RemoveAll(savePath)
 }

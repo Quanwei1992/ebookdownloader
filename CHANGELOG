@@ -1,5 +1,10 @@
 ## 更新日志文件
 
+    2020.03.04 go版本
+               1. meta.json文件添加生成md5信息（对应mobi,azw3,txt,epub小说）
+               2. meta.json添加生成uuid信息(对应每本小说，生成规则为UUID_V5)
+               
+
     2020.03.03 go版本
                1. Travis-ci:在编译生成程序前，先进行go test测试当前平台是否有问题
 			   2. Travis-ci:在编译和打包的时候打印信息
