@@ -65,6 +65,9 @@ func EbookDownloader(c *cli.Context) error {
 		if ebhost == "xsbiquge.com" {
 			xsbiquge := edl.NewXSBiquge()
 			EBDLInterface = xsbiquge //实例化接口
+		} else if ebhost == "biduo.cc" {
+			biduo := edl.NewBiDuo()
+			EBDLInterface = biduo
 		} else if ebhost == "999xs.com" {
 			xs999 := edl.New999XS()
 			EBDLInterface = xs999 //实例化接口
@@ -306,17 +309,17 @@ func main() {
 		},
 	}
 	app.Copyright = "© 2019 - 2020 Jimes Yang<sndnvaps@gmail.com>"
-	app.Usage = "用于下载 笔趣阁(https://www.xsbiquge.com),999小说网(https://www.999xs.com/) ,顶点小说网(https://www.23us.la) 上面的电子书，并保存为txt格式或者(mobi格式,awz3格式)的电子书"
+	app.Usage = "用于下载 笔趣阁(https://www.xsbiquge.com, https://www.biduo.cc),999小说网(https://www.999xs.com/) ,顶点小说网(https://www.23us.la) 上面的电子书，并保存为txt格式或者(mobi格式,awz3格式)的电子书"
 	app.Action = EbookDownloader
 	app.Flags = []cli.Flag{
 		cli.StringFlag{
 			Name:  "ebhost",
 			Value: "xsbiquge.com",
-			Usage: "定义下载ebook的网站地址(可选择xsbiquge.com,999xs.com,23us.la)",
+			Usage: "定义下载ebook的网站地址(可选择xsbiquge.com,999xs.com,23us.la,biduo.cc)",
 		},
 		cli.StringFlag{
 			Name:  "bookid,id",
-			Usage: "对应笔趣阁id(https://www.xsbiquge.com/0_642/),其中0_642就是book_id;\n对应999小说网id(https://www.999xs.com/files/article/html/0/591/),其中591为book_id;\n对应顶点小说网id(https://www.23us.la/html/113/113444/),其中113444为bookid",
+			Usage: "对应笔趣阁id(https://www.xsbiquge.com/0_642/,https://www.biduo.cc/biquge/35_35532/),其中0_642和35_35532就是book_id;\n对应999小说网id(https://www.999xs.com/files/article/html/0/591/),其中591为book_id;\n对应顶点小说网id(https://www.23us.la/html/113/113444/),其中113444为bookid",
 		},
 		cli.StringFlag{
 			Name:  "proxy,p",

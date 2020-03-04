@@ -81,6 +81,10 @@ func EbookDownloaderRun() {
 		cmdArgs = append(cmdArgs, "--ebhost=xsbiquge.com")
 		xsbiquge := edl.NewXSBiquge()
 		ebdlInterface = xsbiquge //实例化接口
+	case "biduo.cc":
+		cmdArgs = append(cmdArgs, "--ebhost=biduo.cc")
+		biduo := edl.NewBiDuo()
+		ebdlInterface = biduo //实例化接口
 	case "999xs.com":
 		cmdArgs = append(cmdArgs, "--ebhost=999xs.com")
 		xs999 := edl.New999XS()
@@ -228,11 +232,12 @@ func main() {
 	//初始化配置文件
 	ConfInit()
 
-	items = make([]string, 3)
+	items = make([]string, 4)
 	//定义items里面的变量
 	items[0] = "xsbiquge.com"
-	items[1] = "999xs.com"
-	items[2] = "23us.la"
+	items[1] = "biduo.cc"
+	items[2] = "999xs.com"
+	items[3] = "23us.la"
 
 	w := g.NewMasterWindow("EBookDownloader@"+Version, 800, 600, false, loadFont)
 	w.Main(loop)
