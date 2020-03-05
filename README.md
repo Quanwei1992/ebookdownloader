@@ -71,12 +71,12 @@
 
   ## 支持的小说网站
 
-  网站名 | 网址
-  :-: | :-: |
-  笔趣阁 | https://www.xsbiquge.com/ |
-  笔趣阁 | https://www.biduo.cc/ |
-  999小说 | https://www.999xs.com/ |
-  顶点小说网 | <s>https://www.23us.la</s> |
+  网站名 | 网址 | 是否支持 | 备注 |
+  :-: | :-: | :-: | :-: |
+  笔趣阁 | https://www.xsbiquge.com/ | √ |
+  笔趣阁 | https://www.biduo.cc/ | √ |
+  999小说 | https://www.999xs.com/ | √ |
+  顶点小说网 | <s>https://www.23us.la</s> | × | 因为网站原因无法打开，暂定无法使用 |
 
 
   ## To Do List
