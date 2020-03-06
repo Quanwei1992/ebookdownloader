@@ -9,7 +9,7 @@ import (
 
 	"github.com/ajvb/kala/job"
 	"github.com/gin-gonic/gin"
-	edl "github.com/sndnvaps/ebookdownloader"
+	ebook "github.com/sndnvaps/ebookdownloader/ebook-sources"
 )
 
 //EbookDLCreateJob 基于kala Job Schedule创建的下载任务
@@ -39,15 +39,19 @@ func EbookDLCreateJob(c *gin.Context) {
 	switch ebhost {
 	case "xsbiquge.com":
 		cmdArgs = append(cmdArgs, "--ebhost=xsbiquge.com")
-		xsbiquge := edl.NewXSBiquge()
+		xsbiquge := ebook.NewXSBiquge()
 		ebdlInterface = xsbiquge //实例化接口
+	case "biduo.cc":
+		cmdArgs = append(cmdArgs, "--ebhost=biduo.cc")
+		biduo := ebook.NewBiDuo()
+		ebdlInterface = biduo
 	case "999xs.com":
 		cmdArgs = append(cmdArgs, "--ebhost=999xs.com")
-		xs999 := edl.New999XS()
+		xs999 := ebook.New999XS()
 		ebdlInterface = xs999 //实例化接口
 	case "23us.la":
 		cmdArgs = append(cmdArgs, "--ebhost=23us.la")
-		xs23 := edl.New23US()
+		xs23 := ebook.New23US()
 		ebdlInterface = xs23 //实例化接口
 	}
 

@@ -12,6 +12,7 @@ import (
 	jwt "github.com/appleboy/gin-jwt/v2"
 	"github.com/gin-gonic/gin"
 	edl "github.com/sndnvaps/ebookdownloader"
+	ebook "github.com/sndnvaps/ebookdownloader/ebook-sources"
 	"github.com/sndnvaps/ebookdownloader/http-server/middleware"
 	"gopkg.in/urfave/cli.v1"
 )
@@ -108,15 +109,23 @@ func ParseEbhostAndBookIDPost(c *gin.Context) {
 	switch ebhost {
 	case "xsbiquge.com":
 		cmdArgs = append(cmdArgs, "--ebhost=xsbiquge.com")
-		xsbiquge := edl.NewXSBiquge()
+		xsbiquge := ebook.NewXSBiquge()
 		ebdlInterface = xsbiquge //实例化接口
+	case "biduo.cc":
+		cmdArgs = append(cmdArgs, "--ebhost=biduo.cc")
+		biduo := ebook.NewBiDuo()
+		ebdlInterface = biduo //实例化接口
+	case "booktxt.net":
+		cmdArgs = append(cmdArgs, "--ebhost=booktxt.net")
+		booktxt := ebook.NewBookTXT()
+		ebdlInterface = booktxt
 	case "999xs.com":
 		cmdArgs = append(cmdArgs, "--ebhost=999xs.com")
-		xs999 := edl.New999XS()
+		xs999 := ebook.New999XS()
 		ebdlInterface = xs999 //实例化接口
 	case "23us.la":
 		cmdArgs = append(cmdArgs, "--ebhost=23us.la")
-		xs23 := edl.New23US()
+		xs23 := ebook.New23US()
 		ebdlInterface = xs23 //实例化接口
 	}
 

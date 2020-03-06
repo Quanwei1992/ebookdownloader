@@ -11,12 +11,19 @@ type Meta struct {
 	Ebhost      string `json:"ebhost"`
 	Bookid      string `json:"bookid"`
 	BookName    string `json:"bookname"`
+	BookISBN    string `json:"isbn"`
+	BookUUID    string `json:"uuid"`
 	Author      string `json:"author"`
 	CoverURL    string `json:"cover_url"`
 	Description string `json:"description"`
 	TxtURLPath  string `json:"txt_url_path"`
 	MobiURLPath string `json:"mobi_url_path"`
 	EPUBURLPath string `json:"epub_url_path"`
+	AZW3URLPath string `json:"azw3_url_path"`
+	TxtMD5      string `json:"txt_md5_info"`
+	MobiMD5     string `json:"mobi_md5_info"`
+	EPUBMD5     string `json:"epub_md5_info"`
+	AZW3MD5     string `json:"azw3_md5_info"`
 }
 
 //WriteFile 把json数据写入 filename定义的文件中

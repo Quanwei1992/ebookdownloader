@@ -1,5 +1,26 @@
 ## 更新日志文件
 
+    2020.03.06 go版本
+              1. 把小说下载源独立成一个package ebookdownloader
+              2. 添加小说下载源 booktxt.com
+			  3. 更新版本到 1.7.4
+
+    2020.03.04 go版本
+               1. meta.json文件添加生成md5信息（对应mobi,azw3,txt,epub小说）
+               2. meta.json添加生成uuid信息(对应每本小说，生成规则为UUID_V5)
+               3. 添加新下载源 www.biduo.cc
+               
+
+    2020.03.03 go版本
+               1. Travis-ci:在编译生成程序前，先进行go test测试当前平台是否有问题
+			   2. Travis-ci:在编译和打包的时候打印信息
+			   3. ebookdownloader:把生成mobi功能，单独成一个文件
+			   4. test: go test完成后，删除生成的测试文件和目录
+
+    2020.03.02 go版本
+               1. 更新go-epub版本到v1.0.0,感谢@ystyle提交的修改
+               2. 添加生成统一isbn功能（当同时生成mobi,azw3,epub的时候才能统一；如果分开生成，isbn码是不一样的）
+    
     2020.03.01 go版本
                 1. cli版本:添加检查最新版本功能 update_check功能
                 2. cli版本：添加生成epub功能

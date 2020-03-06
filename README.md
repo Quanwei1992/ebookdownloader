@@ -69,6 +69,17 @@
 
   ----------
 
+  ## 支持的小说网站
+
+  网站名 | 网址 | 是否支持 | 备注 |
+  :-: | :-: | :-: | :-: |
+  笔趣阁 | https://www.xsbiquge.com/ | √ |
+  笔趣阁 | https://www.biduo.cc/ | √ |
+  999小说 | https://www.999xs.com/ | √ |
+  顶点小说网 | https://www.booktxt.net/ | √ |
+  顶点小说网 | <s>https://www.23us.la</s> | × | 因为网站原因无法打开，暂定无法使用 |
+
+
   ## To Do List
 
      [√]  1. 添加生成封面功能
@@ -78,3 +89,7 @@
      [√]  5. 添加http-server,做为后端
      [√]  6. 添加linux arm,arm64平台支持
      [√]  7. 需要限制并发数量，因为vps性能有限 -> 目前限制的并发数量为(300+49)*2 = 698
+     [ ]  8. 使用boltdb记录小说数据（小说下载网站，bookid,uuid->NewV5格式，cover.jpg,mobi,azw3,txt,epub等位置及md5验证信息）
+     [√]  9. 添加https://www.biduo.cc/ 小说网站支持
+     [√]  10. 添加 https://www.booktxt.net/ 顶点小说网支持
+

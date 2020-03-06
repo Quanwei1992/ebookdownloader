@@ -6,6 +6,7 @@ import (
 	"os"
 
 	edl "github.com/sndnvaps/ebookdownloader"
+	ebook "github.com/sndnvaps/ebookdownloader/ebook-sources"
 	cli "gopkg.in/urfave/cli.v1"
 )
 
@@ -45,8 +46,15 @@ func EbookDownloader(c *cli.Context) error {
 	var metainfo edl.Meta //用于保存小说的meta信息
 	txtfilepath := ""     //定义 txt下载后，获取得到的 地址
 	mobifilepath := ""    //定义 mobi下载后，获取得到的 地址
-	coverURLPath := ""    //定义下载小说后，封面的url地址
+	azw3filepath := ""    //定义 azw3下载后，获取得到的 地址
 	epubfilepath := ""    //定义 epub下载后，获取得到的 地址
+
+	txtMD5Str := ""  //定义txt小说的md5信息
+	mobiMD5Str := "" //定义mobi小说的md5信息
+	epubMD5Str := "" //定义epub小说的md5信息
+	azw3MD5Str := "" //定义azw3小说的md5信息
+
+	coverURLPath := "" //定义下载小说后，封面的url地址
 
 	//isTxt 或者 isMobi必须一个为真，或者两个都为真
 	if (isTxt || isMobi || isAzw3 || isEpub) ||
@@ -56,13 +64,19 @@ func EbookDownloader(c *cli.Context) error {
 		isPV || isJSON {
 
 		if ebhost == "xsbiquge.com" {
-			xsbiquge := edl.NewXSBiquge()
+			xsbiquge := ebook.NewXSBiquge()
 			EBDLInterface = xsbiquge //实例化接口
+		} else if ebhost == "biduo.cc" {
+			biduo := ebook.NewBiDuo()
+			EBDLInterface = biduo
+		} else if ebhost == "booktxt.net" {
+			booktxt := ebook.NewBookTXT()
+			EBDLInterface = booktxt
 		} else if ebhost == "999xs.com" {
-			xs999 := edl.New999XS()
+			xs999 := ebook.New999XS()
 			EBDLInterface = xs999 //实例化接口
 		} else if ebhost == "23us.la" {
-			xs23 := edl.New23US()
+			xs23 := ebook.New23US()
 			EBDLInterface = xs23 //实例化接口
 		} else {
 			cli.ShowAppHelpAndExit(c, 0)
@@ -86,6 +100,7 @@ func EbookDownloader(c *cli.Context) error {
 
 		if isJSON {
 			//生成 json格式后，直接退出程序
+			fmt.Printf("\n正在生成json版本的电子书数据，请耐心等待！\n")
 			err := bookinfo.GenerateJSON()
 			if err != nil {
 				fmt.Println(err.Error())
@@ -97,6 +112,7 @@ func EbookDownloader(c *cli.Context) error {
 			bookinfo.GenerateTxt()
 			if isMeta { //配置meta信息
 				txtfilepath = "public/" + bookinfo.Name + "-" + bookinfo.Author + "/" + bookinfo.Name + "-" + bookinfo.Author + ".txt"
+				txtMD5Str, _ = edl.CreateMD5("./outputs/" + bookinfo.Name + "-" + bookinfo.Author + "/" + bookinfo.Name + "-" + bookinfo.Author + ".txt")
 			}
 		}
 		//生成mobi格式电子书
@@ -106,6 +122,7 @@ func EbookDownloader(c *cli.Context) error {
 			bookinfo.GenerateMobi()
 			if isMeta { //配置meta信息
 				mobifilepath = "public/" + bookinfo.Name + "-" + bookinfo.Author + "/" + bookinfo.Name + "-" + bookinfo.Author + ".mobi"
+				mobiMD5Str, _ = edl.CreateMD5("./outputs/" + bookinfo.Name + "-" + bookinfo.Author + "/" + bookinfo.Name + "-" + bookinfo.Author + ".mobi")
 				coverURLPath = "public/" + bookinfo.Name + "-" + bookinfo.Author + "/" + "cover.jpg"
 			}
 
@@ -116,7 +133,8 @@ func EbookDownloader(c *cli.Context) error {
 			bookinfo.SetKindleEbookType(false /* isMobi */, true /* isAzw3 */)
 			bookinfo.GenerateMobi()
 			if isMeta { //配置meta信息
-				mobifilepath = "public/" + bookinfo.Name + "-" + bookinfo.Author + "/" + bookinfo.Name + "-" + bookinfo.Author + ".azw3"
+				azw3filepath = "public/" + bookinfo.Name + "-" + bookinfo.Author + "/" + bookinfo.Name + "-" + bookinfo.Author + ".azw3"
+				azw3MD5Str, _ = edl.CreateMD5("./outputs/" + bookinfo.Name + "-" + bookinfo.Author + "/" + bookinfo.Name + "-" + bookinfo.Author + ".azw3")
 				coverURLPath = "public/" + bookinfo.Name + "-" + bookinfo.Author + "/" + "cover.jpg"
 			}
 		}
@@ -127,6 +145,7 @@ func EbookDownloader(c *cli.Context) error {
 			bookinfo.GenerateEPUB()
 			if isMeta { //配置meta信息
 				epubfilepath = "public/" + bookinfo.Name + "-" + bookinfo.Author + "/" + bookinfo.Name + "-" + bookinfo.Author + ".epub"
+				epubMD5Str, _ = edl.CreateMD5("./outputs/" + bookinfo.Name + "-" + bookinfo.Author + "/" + bookinfo.Name + "-" + bookinfo.Author + ".epub")
 				coverURLPath = "public/" + bookinfo.Name + "-" + bookinfo.Author + "/" + "cover.jpg"
 			}
 		}
@@ -136,12 +155,19 @@ func EbookDownloader(c *cli.Context) error {
 				Ebhost:      ebhost,
 				Bookid:      bookid,
 				BookName:    bookinfo.Name,
+				BookISBN:    bookinfo.ISBN(),
+				BookUUID:    bookinfo.UUID(),
 				Author:      bookinfo.Author,
 				CoverURL:    coverURLPath,
 				Description: bookinfo.Description,
 				TxtURLPath:  txtfilepath,
 				MobiURLPath: mobifilepath,
+				AZW3URLPath: azw3filepath,
 				EPUBURLPath: epubfilepath,
+				TxtMD5:      txtMD5Str,
+				MobiMD5:     mobiMD5Str,
+				AZW3MD5:     azw3MD5Str,
+				EPUBMD5:     epubMD5Str,
 			}
 
 			metainfo.WriteFile("./outputs/" + bookinfo.Name + "-" + bookinfo.Author + "/meta.json")
@@ -243,6 +269,7 @@ func ConvJSON2Ebook(c *cli.Context) error {
 				Ebhost:      bookinfo.EBHost,
 				Bookid:      bookinfo.EBookID,
 				BookName:    bookinfo.Name,
+				BookISBN:    bookinfo.ISBN(),
 				Author:      bookinfo.Author,
 				CoverURL:    coverURLPath,
 				Description: bookinfo.Description,
@@ -286,17 +313,17 @@ func main() {
 		},
 	}
 	app.Copyright = "© 2019 - 2020 Jimes Yang<sndnvaps@gmail.com>"
-	app.Usage = "用于下载 笔趣阁(https://www.xsbiquge.com),999小说网(https://www.999xs.com/) ,顶点小说网(https://www.23us.la) 上面的电子书，并保存为txt格式或者(mobi格式,awz3格式)的电子书"
+	app.Usage = "用于下载 笔趣阁(https://www.xsbiquge.com, https://www.biduo.cc),999小说网(https://www.999xs.com/) ,顶点小说网(https://www.23us.la , https://www.booktxt.net) 上面的电子书，并保存为txt格式或者(mobi格式,awz3格式)的电子书"
 	app.Action = EbookDownloader
 	app.Flags = []cli.Flag{
 		cli.StringFlag{
 			Name:  "ebhost",
 			Value: "xsbiquge.com",
-			Usage: "定义下载ebook的网站地址(可选择xsbiquge.com,999xs.com,23us.la)",
+			Usage: "定义下载ebook的网站地址(可选择xsbiquge.com,999xs.com,23us.la,biduo.cc,booktxt.net)",
 		},
 		cli.StringFlag{
 			Name:  "bookid,id",
-			Usage: "对应笔趣阁id(https://www.xsbiquge.com/0_642/),其中0_642就是book_id;\n对应999小说网id(https://www.999xs.com/files/article/html/0/591/),其中591为book_id;\n对应顶点小说网id(https://www.23us.la/html/113/113444/),其中113444为bookid",
+			Usage: "对应小说网链接最后一串数字,例如：1_1902",
 		},
 		cli.StringFlag{
 			Name:  "proxy,p",
@@ -334,7 +361,7 @@ func main() {
 	app.Commands = []cli.Command{
 		{
 			Name:  "conv",
-			Usage: " 转换json格式到其它格式，支持txt,mobi,azw3",
+			Usage: " 转换json格式到其它格式，支持txt,mobi,azw3,epub",
 			Flags: []cli.Flag{
 				cli.StringFlag{
 					Name:  "json",
