@@ -6,6 +6,7 @@ import (
 	"os"
 
 	edl "github.com/sndnvaps/ebookdownloader"
+	ebook "github.com/sndnvaps/ebookdownloader/ebook-sources"
 	cli "gopkg.in/urfave/cli.v1"
 )
 
@@ -63,16 +64,19 @@ func EbookDownloader(c *cli.Context) error {
 		isPV || isJSON {
 
 		if ebhost == "xsbiquge.com" {
-			xsbiquge := edl.NewXSBiquge()
+			xsbiquge := ebook.NewXSBiquge()
 			EBDLInterface = xsbiquge //实例化接口
 		} else if ebhost == "biduo.cc" {
-			biduo := edl.NewBiDuo()
+			biduo := ebook.NewBiDuo()
 			EBDLInterface = biduo
+		} else if ebhost == "booktxt.net" {
+			booktxt := ebook.NewBookTXT()
+			EBDLInterface = booktxt
 		} else if ebhost == "999xs.com" {
-			xs999 := edl.New999XS()
+			xs999 := ebook.New999XS()
 			EBDLInterface = xs999 //实例化接口
 		} else if ebhost == "23us.la" {
-			xs23 := edl.New23US()
+			xs23 := ebook.New23US()
 			EBDLInterface = xs23 //实例化接口
 		} else {
 			cli.ShowAppHelpAndExit(c, 0)
@@ -309,17 +313,17 @@ func main() {
 		},
 	}
 	app.Copyright = "© 2019 - 2020 Jimes Yang<sndnvaps@gmail.com>"
-	app.Usage = "用于下载 笔趣阁(https://www.xsbiquge.com, https://www.biduo.cc),999小说网(https://www.999xs.com/) ,顶点小说网(https://www.23us.la) 上面的电子书，并保存为txt格式或者(mobi格式,awz3格式)的电子书"
+	app.Usage = "用于下载 笔趣阁(https://www.xsbiquge.com, https://www.biduo.cc),999小说网(https://www.999xs.com/) ,顶点小说网(https://www.23us.la , https://www.booktxt.net) 上面的电子书，并保存为txt格式或者(mobi格式,awz3格式)的电子书"
 	app.Action = EbookDownloader
 	app.Flags = []cli.Flag{
 		cli.StringFlag{
 			Name:  "ebhost",
 			Value: "xsbiquge.com",
-			Usage: "定义下载ebook的网站地址(可选择xsbiquge.com,999xs.com,23us.la,biduo.cc)",
+			Usage: "定义下载ebook的网站地址(可选择xsbiquge.com,999xs.com,23us.la,biduo.cc,booktxt.net)",
 		},
 		cli.StringFlag{
 			Name:  "bookid,id",
-			Usage: "对应笔趣阁id(https://www.xsbiquge.com/0_642/,https://www.biduo.cc/biquge/35_35532/),其中0_642和35_35532就是book_id;\n对应999小说网id(https://www.999xs.com/files/article/html/0/591/),其中591为book_id;\n对应顶点小说网id(https://www.23us.la/html/113/113444/),其中113444为bookid",
+			Usage: "对应小说网链接最后一串数字,例如：1_1902",
 		},
 		cli.StringFlag{
 			Name:  "proxy,p",

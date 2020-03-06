@@ -1,5 +1,9 @@
 ## 更新日志文件
 
+    2020.03.06 go版本
+              1. 把小说下载源独立成一个package ebookdownloader
+              2. 添加小说下载源 booktxt.com
+
     2020.03.04 go版本
                1. meta.json文件添加生成md5信息（对应mobi,azw3,txt,epub小说）
                2. meta.json添加生成uuid信息(对应每本小说，生成规则为UUID_V5)

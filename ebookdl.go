@@ -271,13 +271,3 @@ func (this BookInfo) GenerateJSON() error {
 
 	return nil
 }
-
-//AsycChapter 同步下载章节的content内容
-func AsycChapter(ResultChan chan chan Chapter, chapter chan Chapter) {
-	for {
-		c := <-ResultChan
-		tmp := <-c
-		chapter <- tmp
-	}
-
-}

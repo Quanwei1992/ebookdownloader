@@ -1,4 +1,4 @@
-package ebookdownloader
+package ebook
 
 import (
 	"fmt"
@@ -8,28 +8,29 @@ import (
 
 	"github.com/Aiicy/htmlquery"
 	"github.com/schollz/progressbar/v2"
+	edl "github.com/sndnvaps/ebookdownloader"
 )
 
-var _ EBookDLInterface = EbookXSBiquge{}
+var _ edl.EBookDLInterface = BiDuo{}
 
-// EbookXSBiquge xsbiquge.com小说网
-type EbookXSBiquge struct {
+// BiDuo www.biduo.cc小说网
+type BiDuo struct {
 	URL  string
 	Lock *sync.Mutex
 }
 
-// NewXSBiquge 初始化
-func NewXSBiquge() EbookXSBiquge {
-	return EbookXSBiquge{
-		URL:  "https://www.xsbiquge.com",
+// NewBiDuo 初始化
+func NewBiDuo() BiDuo {
+	return BiDuo{
+		URL:  "https://www.biduo.cc",
 		Lock: new(sync.Mutex),
 	}
 }
 
 //GetBookBriefInfo 获取小说的信息
-func (this EbookXSBiquge) GetBookBriefInfo(bookid string, proxy string) BookInfo {
-	var bi BookInfo
-	pollURL := this.URL + "/" + bookid + "/"
+func (this BiDuo) GetBookBriefInfo(bookid string, proxy string) edl.BookInfo {
+	var bi edl.BookInfo
+	pollURL := this.URL + "/biquge/" + bookid + "/"
 
 	//当 proxy 不为空的时候，表示设置代理
 	if proxy != "" {
@@ -54,7 +55,7 @@ func (this EbookXSBiquge) GetBookBriefInfo(bookid string, proxy string) BookInfo
 		fmt.Println("简介 = ", description)
 
 		//导入信息
-		bi = BookInfo{
+		bi = edl.BookInfo{
 			EBHost:      this.URL,
 			EBookID:     bookid,
 			Name:        bookName,
@@ -83,7 +84,7 @@ func (this EbookXSBiquge) GetBookBriefInfo(bookid string, proxy string) BookInfo
 		fmt.Println("简介 = ", description)
 
 		//导入信息
-		bi = BookInfo{
+		bi = edl.BookInfo{
 			EBHost:      this.URL,
 			EBookID:     bookid,
 			Name:        bookName,
@@ -95,11 +96,11 @@ func (this EbookXSBiquge) GetBookBriefInfo(bookid string, proxy string) BookInfo
 }
 
 //GetBookInfo 获取小说的信息
-func (this EbookXSBiquge) GetBookInfo(bookid string, proxy string) BookInfo {
+func (this BiDuo) GetBookInfo(bookid string, proxy string) edl.BookInfo {
 
-	var bi BookInfo
-	var chapters []Chapter
-	pollURL := this.URL + "/" + bookid + "/"
+	var bi edl.BookInfo
+	var chapters []edl.Chapter
+	pollURL := this.URL + "/biquge/" + bookid + "/"
 
 	//当 proxy 不为空的时候，表示设置代理
 	if proxy != "" {
@@ -126,7 +127,7 @@ func (this EbookXSBiquge) GetBookInfo(bookid string, proxy string) BookInfo {
 		//获取书章节列表
 		ddNode, _ := htmlquery.Find(doc, "//div[@id='list']//dl//dd")
 		for i := 0; i < len(ddNode); i++ {
-			var tmp Chapter
+			var tmp edl.Chapter
 			aNode, _ := htmlquery.Find(ddNode[i], "//a")
 			tmp.Link = this.URL + htmlquery.SelectAttr(aNode[0], "href")
 			tmp.Title = htmlquery.InnerText(aNode[0])
@@ -134,7 +135,7 @@ func (this EbookXSBiquge) GetBookInfo(bookid string, proxy string) BookInfo {
 		}
 
 		//导入信息
-		bi = BookInfo{
+		bi = edl.BookInfo{
 			EBHost:      this.URL,
 			EBookID:     bookid,
 			Name:        bookName,
@@ -166,15 +167,15 @@ func (this EbookXSBiquge) GetBookInfo(bookid string, proxy string) BookInfo {
 		//获取书章节列表
 		ddNode, _ := htmlquery.Find(doc, "//div[@id='list']//dl//dd")
 		for i := 0; i < len(ddNode); i++ {
-			var tmp Chapter
+			var tmp edl.Chapter
 			aNode, _ := htmlquery.Find(ddNode[i], "//a")
-			tmp.Link = "https://www.xsbiquge.com" + htmlquery.SelectAttr(aNode[0], "href")
+			tmp.Link = this.URL + htmlquery.SelectAttr(aNode[0], "href")
 			tmp.Title = htmlquery.InnerText(aNode[0])
 			chapters = append(chapters, tmp)
 		}
 
 		//导入信息
-		bi = BookInfo{
+		bi = edl.BookInfo{
 			EBHost:      this.URL,
 			EBookID:     bookid,
 			Name:        bookName,
@@ -192,9 +193,9 @@ func (this EbookXSBiquge) GetBookInfo(bookid string, proxy string) BookInfo {
 }
 
 //DownloadChapters 下载所有章节
-func (this EbookXSBiquge) DownloadChapters(Bi BookInfo, proxy string) BookInfo {
+func (this BiDuo) DownloadChapters(Bi edl.BookInfo, proxy string) edl.BookInfo {
 	result := Bi //先进行赋值，把数据
-	var chapters []Chapter
+	var chapters []edl.Chapter
 	result.Chapters = chapters //把原来的数据清空
 	bis := Bi.Split()
 
@@ -212,18 +213,18 @@ func (this EbookXSBiquge) DownloadChapters(Bi BookInfo, proxy string) BookInfo {
 }
 
 //根据每个章节的 URL连接，下载每章对应的内容Content当中
-func (this EbookXSBiquge) downloadChapters(Bi BookInfo, proxy string) BookInfo {
+func (this BiDuo) downloadChapters(Bi edl.BookInfo, proxy string) edl.BookInfo {
 	chapters := Bi.Chapters
 
 	NumChapter := len(chapters)
-	tmpChapter := make(chan Chapter, NumChapter)
-	ResultCh := make(chan chan Chapter, NumChapter)
+	tmpChapter := make(chan edl.Chapter, NumChapter)
+	ResultCh := make(chan chan edl.Chapter, NumChapter)
 	wg := sync.WaitGroup{}
-	var c []Chapter
+	var c []edl.Chapter
 	var bar *progressbar.ProgressBar
 	go AsycChapter(ResultCh, tmpChapter)
 	for index := 0; index < NumChapter; index++ {
-		tmp := ProxyChapter{
+		tmp := edl.ProxyChapter{
 			Proxy: proxy,
 			C:     chapters[index],
 		}
@@ -257,7 +258,7 @@ func (this EbookXSBiquge) downloadChapters(Bi BookInfo, proxy string) BookInfo {
 	}
 ForEnd:
 
-	result := BookInfo{
+	result := edl.BookInfo{
 		EBHost:      Bi.EBHost,
 		EBookID:     Bi.EBookID,
 		BookISBN:    Bi.ISBN(),
@@ -274,16 +275,16 @@ ForEnd:
 }
 
 //DownloaderChapter 一个章节一个章节得下载
-func (this EbookXSBiquge) DownloaderChapter(ResultChan chan chan Chapter, pc ProxyChapter, wg *sync.WaitGroup) {
+func (this BiDuo) DownloaderChapter(ResultChan chan chan edl.Chapter, pc edl.ProxyChapter, wg *sync.WaitGroup) {
 	wg.Add(1)
 	defer wg.Done()
-	c := make(chan Chapter)
+	c := make(chan edl.Chapter)
 	ResultChan <- c
 
-	go func(pc ProxyChapter) {
+	go func(pc edl.ProxyChapter) {
 		pollURL := pc.C.Link
 		proxy := pc.Proxy
-		var result Chapter
+		var result edl.Chapter
 
 		if proxy != "" {
 			doc, _ := htmlquery.LoadURLWithProxy(pollURL, proxy)
@@ -299,7 +300,7 @@ func (this EbookXSBiquge) DownloaderChapter(ResultChan chan chan Chapter, pc Pro
 			tmp = strings.Replace(tmp, "readx();", "", -1)
 			//tmp = tmp + "\r\n"
 			//返回数据，填写Content内容
-			result = Chapter{
+			result = edl.Chapter{
 				Title:   pc.C.Title,
 				Link:    pc.C.Link,
 				Content: tmp,
@@ -318,7 +319,7 @@ func (this EbookXSBiquge) DownloaderChapter(ResultChan chan chan Chapter, pc Pro
 			tmp = strings.Replace(tmp, "readx();", "", -1)
 			//tmp = tmp + "\r\n"
 			//返回数据，填写Content内容
-			result = Chapter{
+			result = edl.Chapter{
 				Title:   pc.C.Title,
 				Link:    pc.C.Link,
 				Content: tmp,

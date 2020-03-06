@@ -7,6 +7,7 @@ import (
 	g "github.com/AllenDang/giu"
 	"github.com/AllenDang/giu/imgui"
 	edl "github.com/sndnvaps/ebookdownloader"
+	ebook "github.com/sndnvaps/ebookdownloader/ebook-sources"
 )
 
 var (
@@ -79,19 +80,23 @@ func EbookDownloaderRun() {
 	switch ebhost {
 	case "xsbiquge.com":
 		cmdArgs = append(cmdArgs, "--ebhost=xsbiquge.com")
-		xsbiquge := edl.NewXSBiquge()
+		xsbiquge := ebook.NewXSBiquge()
 		ebdlInterface = xsbiquge //实例化接口
 	case "biduo.cc":
 		cmdArgs = append(cmdArgs, "--ebhost=biduo.cc")
-		biduo := edl.NewBiDuo()
+		biduo := ebook.NewBiDuo()
 		ebdlInterface = biduo //实例化接口
+	case "booktxt.net":
+		cmdArgs = append(cmdArgs, "--ebhost=booktxt.net")
+		booktxt := ebook.NewBookTXT()
+		ebdlInterface = booktxt
 	case "999xs.com":
 		cmdArgs = append(cmdArgs, "--ebhost=999xs.com")
-		xs999 := edl.New999XS()
+		xs999 := ebook.New999XS()
 		ebdlInterface = xs999 //实例化接口
 	case "23us.la":
 		cmdArgs = append(cmdArgs, "--ebhost=23us.la")
-		xs23 := edl.New23US()
+		xs23 := ebook.New23US()
 		ebdlInterface = xs23 //实例化接口
 	}
 
@@ -236,8 +241,9 @@ func main() {
 	//定义items里面的变量
 	items[0] = "xsbiquge.com"
 	items[1] = "biduo.cc"
-	items[2] = "999xs.com"
-	items[3] = "23us.la"
+	items[2] = "booktxt.net"
+	items[3] = "999xs.com"
+	items[4] = "23us.la"
 
 	w := g.NewMasterWindow("EBookDownloader@"+Version, 800, 600, false, loadFont)
 	w.Main(loop)

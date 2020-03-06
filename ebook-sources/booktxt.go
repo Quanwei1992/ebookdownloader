@@ -1,4 +1,4 @@
-package ebookdownloader
+package ebook
 
 import (
 	"fmt"
@@ -7,36 +7,31 @@ import (
 
 	"github.com/Aiicy/htmlquery"
 	"github.com/schollz/progressbar/v2"
+	edl "github.com/sndnvaps/ebookdownloader"
 )
 
-//参考地址，创建规则
-//https://www.23us.la/html/151/151850/ -> 罪域的骨终为王
-//https://www.23us.la/html/209/209550/ -> 文娱万岁
-//https://www.23us.la/html/113/113444/ -> 不朽凡人
+var _ edl.EBookDLInterface = BookTXT{}
 
-//需要参考 https://segmentfault.com/a/1190000018475209 解决 返回的content与title不对应问题
-
-var _ EBookDLInterface = Ebook23US{}
-
-//Ebook23US 顶点小说网 23us.la
-type Ebook23US struct {
+//BookTXT 顶点小说网 www.booktxt.net
+type BookTXT struct {
 	URL  string
 	Lock *sync.Mutex
 }
 
-//New23US 初始化
-func New23US() Ebook23US {
-	return Ebook23US{
-		URL:  "https://www.23us.la",
+//NewBookTXT 初始化
+func NewBookTXT() BookTXT {
+	return BookTXT{
+		URL:  "https://www.booktxt.net/",
 		Lock: new(sync.Mutex),
 	}
 }
 
 //GetBookBriefInfo 获取小说的信息
-func (this Ebook23US) GetBookBriefInfo(bookid string, proxy string) BookInfo {
+func (this BookTXT) GetBookBriefInfo(bookid string, proxy string) edl.BookInfo {
 
-	var bi BookInfo
-	pollURL := this.URL + "/" + "html/" + handleBookid(bookid) + "/"
+	var bi edl.BookInfo
+	pollURL := this.URL + bookid
+	fmt.Printf("pollURL = %s", pollURL)
 
 	//当 proxy 不为空的时候，表示设置代理
 	if proxy != "" {
@@ -61,7 +56,7 @@ func (this Ebook23US) GetBookBriefInfo(bookid string, proxy string) BookInfo {
 		fmt.Println("简介 = ", description)
 
 		//导入信息
-		bi = BookInfo{
+		bi = edl.BookInfo{
 			EBHost:      this.URL,
 			EBookID:     bookid,
 			Name:        bookName,
@@ -90,7 +85,7 @@ func (this Ebook23US) GetBookBriefInfo(bookid string, proxy string) BookInfo {
 		fmt.Println("简介 = ", description)
 
 		//导入信息
-		bi = BookInfo{
+		bi = edl.BookInfo{
 			EBHost:      this.URL,
 			EBookID:     bookid,
 			Name:        bookName,
@@ -102,12 +97,12 @@ func (this Ebook23US) GetBookBriefInfo(bookid string, proxy string) BookInfo {
 }
 
 //GetBookInfo 下载小说信息
-func (this Ebook23US) GetBookInfo(bookid string, proxy string) BookInfo {
+func (this BookTXT) GetBookInfo(bookid string, proxy string) edl.BookInfo {
 
-	var bi BookInfo
-	var volumes []Volume
-	var chapters []Chapter
-	pollURL := this.URL + "/" + "html/" + handleBookid(bookid) + "/"
+	var bi edl.BookInfo
+	var volumes []edl.Volume
+	var chapters []edl.Chapter
+	pollURL := this.URL + bookid
 
 	//当 proxy 不为空的时候，表示设置代理
 	if proxy != "" {
@@ -134,28 +129,28 @@ func (this Ebook23US) GetBookInfo(bookid string, proxy string) BookInfo {
 		//替换掉 volume是最前面的 作品名字
 		replaceStr := fmt.Sprintf("《%s》", bookName)
 		//获取书分卷信息
-		dtNode, _ := htmlquery.Find(doc, "//dl[@class='chapterlist']//dt") //获取书分卷信息
+		dtNode, _ := htmlquery.Find(doc, "//div[@id='list']//dl/dd") //获取书分卷信息
 		testVolStr := htmlquery.InnerText(dtNode[1])
 
 		if TestContainVolume(testVolStr) {
 			bi.ChangeVolumeState(true)
 			if len(dtNode) == 2 { //就是说刚好两个节点，我们要去除第一个，只保留第二个
-				var tmp Volume
+				var tmp edl.Volume
 				tmp.CurrentVolume = htmlquery.InnerText(dtNode[1])
 				volumes = append(volumes, tmp)
 			} else { //当len(dtNode) >= 3
 				for index := 0; index < len(dtNode); index++ { //因为第一个为 最新章节部分，需要去掉
-					var tmp Volume
+					var tmp edl.Volume
 					// 根据当前节点，查找上一个dd节点
 					PrevChapter, _ := htmlquery.FindOne(dtNode[index], "//preceding-sibling::dd[1]")
 					aNode, _ := htmlquery.Find(PrevChapter, "//a")
-					tmp.PrevChapter.Link = this.URL + htmlquery.SelectAttr(aNode[0], "href")
+					tmp.PrevChapter.Link = this.URL + bookid + "/" + htmlquery.SelectAttr(aNode[0], "href")
 					tmp.PrevChapter.Title = htmlquery.InnerText(aNode[0])
 
 					//根据当前节点，查找下一个dd节点
 					NextChapter, _ := htmlquery.FindOne(dtNode[index], "//following-sibling::dd[1]")
 					aNode, _ = htmlquery.Find(NextChapter, "//a")
-					tmp.NextChapter.Link = this.URL + htmlquery.SelectAttr(aNode[0], "href")
+					tmp.NextChapter.Link = this.URL + bookid + "/" + htmlquery.SelectAttr(aNode[0], "href")
 					CurrentVolume := htmlquery.InnerText(dtNode[index])
 					tmp.CurrentVolume = strings.Replace(CurrentVolume, replaceStr, "", -1)
 					tmp.NextChapter.Title = htmlquery.InnerText(aNode[0])
@@ -167,11 +162,12 @@ func (this Ebook23US) GetBookInfo(bookid string, proxy string) BookInfo {
 			volumes[0].PrevChapter.Title = "" //第一分卷，前面的章节，标题设置为空
 		}
 		//获取书章节列表
-		ddNode, _ := htmlquery.Find(doc, "//dl[@class='chapterlist']//dd")
-		for i := 0; i < len(ddNode); i++ {
-			var tmp Chapter
+		ddNode, _ := htmlquery.Find(doc, "//div[@id='list']//dl/dd")
+		//i := 5，因为最前面的6章是：显示最新章节信息，需要忽略掉
+		for i := 5; i < len(ddNode); i++ {
+			var tmp edl.Chapter
 			aNode, _ := htmlquery.Find(ddNode[i], "//a")
-			tmp.Link = this.URL + htmlquery.SelectAttr(aNode[0], "href")
+			tmp.Link = this.URL + bookid + "/" + htmlquery.SelectAttr(aNode[0], "href")
 			tmp.Title = htmlquery.InnerText(aNode[0])
 			if bi.VolumeState() && len(volumes) >= 2 { //正式写入 PrevChapterID
 				for index := 1; index < len(volumes); index++ { //第二个分卷开始，前面就有章节内容了
@@ -185,7 +181,7 @@ func (this Ebook23US) GetBookInfo(bookid string, proxy string) BookInfo {
 		HasVolume := bi.VolumeState() //先赋值给 HasVolume,再把值导入到结构体中，用于数据返回
 
 		//导入信息
-		bi = BookInfo{
+		bi = edl.BookInfo{
 			EBHost:      this.URL,
 			EBookID:     bookid,
 			Name:        bookName,
@@ -220,27 +216,27 @@ func (this Ebook23US) GetBookInfo(bookid string, proxy string) BookInfo {
 		replaceStr := fmt.Sprintf("《%s》", bookName)
 
 		//获取书分卷信息
-		dtNode, _ := htmlquery.Find(doc, "//dl[@class='chapterlist']//dt") //获取书分卷信息
+		dtNode, _ := htmlquery.Find(doc, "//div[@id='list']//dl/dt") //获取书分卷信息
 		testVolStr := htmlquery.InnerText(dtNode[1])
 		if TestContainVolume(testVolStr) {
 			bi.ChangeVolumeState(true)
 			if len(dtNode) == 2 { //就是说刚好两个节点，我们要去除第一个，只保留第二个
-				var tmp Volume
+				var tmp edl.Volume
 				tmp.CurrentVolume = htmlquery.InnerText(dtNode[1])
 				volumes = append(volumes, tmp)
 			} else { //当len(dtNode) >= 3
 				for index := 1; index < len(dtNode); index++ { //因为第一个为 最新章节部分，需要去掉
-					var tmp Volume
+					var tmp edl.Volume
 					// 根据当前节点，查找上一个dd节点
 					PrevChapter, _ := htmlquery.FindOne(dtNode[index], "//preceding-sibling::dd[1]")
 					aNode, _ := htmlquery.Find(PrevChapter, "//a")
-					tmp.PrevChapter.Link = this.URL + htmlquery.SelectAttr(aNode[0], "href")
+					tmp.PrevChapter.Link = this.URL + bookid + "/" + htmlquery.SelectAttr(aNode[0], "href")
 					tmp.PrevChapter.Title = htmlquery.InnerText(aNode[0])
 
 					//根据当前节点，查找下一个dd节点
 					NextChapter, _ := htmlquery.FindOne(dtNode[index], "//following-sibling::dd[1]")
 					aNode, _ = htmlquery.Find(NextChapter, "//a")
-					tmp.NextChapter.Link = this.URL + htmlquery.SelectAttr(aNode[0], "href")
+					tmp.NextChapter.Link = this.URL + bookid + "/" + htmlquery.SelectAttr(aNode[0], "href")
 					tmp.NextChapter.Title = htmlquery.InnerText(aNode[0])
 					CurrentVolume := htmlquery.InnerText(dtNode[index])
 					tmp.CurrentVolume = strings.Replace(CurrentVolume, replaceStr, "", -1)
@@ -252,11 +248,11 @@ func (this Ebook23US) GetBookInfo(bookid string, proxy string) BookInfo {
 			volumes[0].PrevChapter.Title = "" //第一分卷，前面的章节，标题设置为空
 		}
 		//获取书章节列表
-		ddNode, _ := htmlquery.Find(doc, "//dl[@class='chapterlist']//dd")
-		for i := 12; i < len(ddNode); i++ { //因为前面的12个ddNode为显示最新的12章，与后面的会重复，所以直接Drop
-			var tmp Chapter
+		ddNode, _ := htmlquery.Find(doc, "//div[@id='list']//dl/dd")
+		for i := 6; i < len(ddNode); i++ { //因为前面的6个ddNode为显示最新的12章，与后面的会重复，所以直接Drop
+			var tmp edl.Chapter
 			aNode, _ := htmlquery.Find(ddNode[i], "//a")
-			tmp.Link = this.URL + htmlquery.SelectAttr(aNode[0], "href")
+			tmp.Link = this.URL + bookid + "/" + htmlquery.SelectAttr(aNode[0], "href")
 			tmp.Title = htmlquery.InnerText(aNode[0])
 			//fmt.Printf("tmp.Link = %s\n", tmp.Link)   //用于测试
 			//fmt.Printf("tmp.Title = %s\n", tmp.Title) //用于测试
@@ -276,7 +272,7 @@ func (this Ebook23US) GetBookInfo(bookid string, proxy string) BookInfo {
 		HasVolume := bi.VolumeState() //先赋值给 HasVolume,再把值导入到结构体中，用于数据返回
 
 		//导入信息
-		bi = BookInfo{
+		bi = edl.BookInfo{
 			EBHost:      this.URL,
 			EBookID:     bookid,
 			Name:        bookName,
@@ -295,9 +291,9 @@ func (this Ebook23US) GetBookInfo(bookid string, proxy string) BookInfo {
 }
 
 //DownloadChapters 下载小说章节
-func (this Ebook23US) DownloadChapters(Bi BookInfo, proxy string) BookInfo {
+func (this BookTXT) DownloadChapters(Bi edl.BookInfo, proxy string) edl.BookInfo {
 	result := Bi //先进行赋值，把数据
-	var chapters []Chapter
+	var chapters []edl.Chapter
 	result.Chapters = chapters //把原来的数据清空
 	bis := Bi.Split()
 
@@ -315,18 +311,18 @@ func (this Ebook23US) DownloadChapters(Bi BookInfo, proxy string) BookInfo {
 }
 
 //根据每个章节的 url连接，下载每章对应的内容Content当中
-func (this Ebook23US) downloadChapters(Bi BookInfo, proxy string) BookInfo {
+func (this BookTXT) downloadChapters(Bi edl.BookInfo, proxy string) edl.BookInfo {
 	chapters := Bi.Chapters
 
 	NumChapter := len(chapters)
-	tmpChapter := make(chan Chapter, NumChapter)
-	ResultCh := make(chan chan Chapter, NumChapter)
+	tmpChapter := make(chan edl.Chapter, NumChapter)
+	ResultCh := make(chan chan edl.Chapter, NumChapter)
 	wg := sync.WaitGroup{}
-	var c []Chapter
+	var c []edl.Chapter
 	var bar *progressbar.ProgressBar
 	go AsycChapter(ResultCh, tmpChapter)
 	for index := 0; index < NumChapter; index++ {
-		tmp := ProxyChapter{
+		tmp := edl.ProxyChapter{
 			Proxy: proxy,
 			C:     chapters[index],
 		}
@@ -360,7 +356,7 @@ func (this Ebook23US) downloadChapters(Bi BookInfo, proxy string) BookInfo {
 	}
 ForEnd:
 
-	result := BookInfo{
+	result := edl.BookInfo{
 		EBHost:      Bi.EBHost,
 		EBookID:     Bi.EBookID,
 		BookISBN:    Bi.ISBN(),
@@ -377,14 +373,14 @@ ForEnd:
 }
 
 // DownloaderChapter 下载小说章节
-func (this Ebook23US) DownloaderChapter(ResultChan chan chan Chapter, pc ProxyChapter, wg *sync.WaitGroup) {
-	c := make(chan Chapter)
+func (this BookTXT) DownloaderChapter(ResultChan chan chan edl.Chapter, pc edl.ProxyChapter, wg *sync.WaitGroup) {
+	c := make(chan edl.Chapter)
 	ResultChan <- c
 	wg.Add(1)
-	go func(pc ProxyChapter) {
+	go func(pc edl.ProxyChapter) {
 		pollURL := pc.C.Link
 		proxy := pc.Proxy
-		var result Chapter
+		var result edl.Chapter
 
 		if proxy != "" {
 			doc, _ := htmlquery.LoadURLWithProxy(pollURL, proxy)
@@ -400,17 +396,22 @@ func (this Ebook23US) DownloaderChapter(ResultChan chan chan Chapter, pc ProxyCh
 			tmp = strings.Replace(tmp, "</p>", "", -1)
 			tmp = strings.Replace(tmp, "(https://)", "", -1)
 
+			tmp = strings.Replace(tmp, "请记住本书首发域名：booktxt.net。顶点小说手机版阅读网址：m.booktxt.net", "", -1)
+
 			//tmp = tmp + "\r\n"
 			//返回数据，填写Content内容
-			result = Chapter{
+			result = edl.Chapter{
 				Title:   pc.C.Title,
 				Link:    pc.C.Link,
 				Content: tmp,
 			}
 		} else {
 			doc, _ := htmlquery.LoadURL(pollURL)
-			contentNode, _ := htmlquery.FindOne(doc, "//div[@id='content']")
-			contentText := htmlquery.OutputHTML(contentNode, false)
+			contentNode, err := htmlquery.FindOne(doc, "//div[@id='content']")
+			if err != nil {
+				fmt.Println(err.Error())
+			}
+			contentText := htmlquery.OutputHTML(contentNode, true)
 
 			//替换两个 html换行
 			tmp := strings.Replace(contentText, "<br/><br/>", "\r\n", -1)
@@ -421,9 +422,11 @@ func (this Ebook23US) DownloaderChapter(ResultChan chan chan Chapter, pc ProxyCh
 			tmp = strings.Replace(tmp, "</p>", "", -1)
 			tmp = strings.Replace(tmp, "(https://)", "", -1)
 
+			tmp = strings.Replace(tmp, "请记住本书首发域名：booktxt.net。顶点小说手机版阅读网址：m.booktxt.net", "", -1)
+
 			//tmp = tmp + "\r\n"
 			//返回数据，填写Content内容
-			result = Chapter{
+			result = edl.Chapter{
 				Title:   pc.C.Title,
 				Link:    pc.C.Link,
 				Content: tmp,
@@ -433,9 +436,4 @@ func (this Ebook23US) DownloaderChapter(ResultChan chan chan Chapter, pc ProxyCh
 		c <- result
 		wg.Done()
 	}(pc)
-}
-
-//TestContainVolume 检测是 第一个 dt标签是否包含 “正文卷”，如果不包含就表示是分卷
-func TestContainVolume(src string) bool {
-	return !strings.Contains(src, "正文")
 }
