@@ -10,7 +10,7 @@
 <dc:description>___DESCRIPTION___</dc:description>
 <dc:identifier opf:scheme="ISBN">__ISBN__</dc:identifier>
 <dc:publisher>___PUBLISHER___</dc:publisher>
-<dc:rights>Created with Ebookdownloader v1.7.3</dc:rights>
+<dc:rights>Created with Ebookdownloader v1.7.4</dc:rights>
 <dc:language>zh-CN</dc:language>
 </dc-metadata>
 <meta name="cover" content="Cover" />
