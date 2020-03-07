@@ -249,11 +249,11 @@ func (this XSBiquge) downloadChapters(Bi edl.BookInfo, proxy string) edl.BookInf
 			//fmt.Printf("tmp.Content= %s\n", tmp.Content)
 			c = append(c, tmp)
 			index++
+			bar.Add(1)
 			if index == NumChapter {
 				goto ForEnd
 			}
 		}
-		bar.Add(1)
 
 	}
 ForEnd:
