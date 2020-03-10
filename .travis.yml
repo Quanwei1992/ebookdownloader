@@ -140,7 +140,7 @@ after_success: |-
           rm -rf upx-3.96-amd64_linux
           $TRAVIS_BUILD_DIR/ebookdownloader_linux_-amd64-cli
           echo "Packing ebookdownloader-${TRAVIS_TAG}-${TRAVIS_OS_NAME}-${TRAVIS_ARCH}.zip"
-          7z a -tzip ebookdownloader-${TRAVIS_TAG}-${TRAVIS_OS_NAME}-${TRAVIS_ARCH}.zip tools/kindlegenLinux tpls/* fonts/* conf/* LICENSE CHANGELOG README.md ebookdownloader_linux_-amd64-cli ebookdownloader_linux_-amd64-gui ebookdownloader_linux_-amd64-http-server
+          7z a -tzip ebookdownloader-${TRAVIS_TAG}-${TRAVIS_OS_NAME}-${TRAVIS_ARCH}.zip tools/kindlegenLinux tpls/* fonts/* conf/* qrcode/* LICENSE CHANGELOG README.md ebookdownloader_linux_-amd64-cli ebookdownloader_linux_-amd64-gui ebookdownloader_linux_-amd64-http-server
           ;;
        arm64)
           cd $TRAVIS_BUILD_DIR/
@@ -155,8 +155,8 @@ after_success: |-
           rm -rf upx-3.96-arm64_linux
           $TRAVIS_BUILD_DIR/ebookdownloader_linux_-arm64-cli
           echo "Packing ebookdownloader-${TRAVIS_TAG}-${TRAVIS_OS_NAME}-${TRAVIS_ARCH}.zip"
-          7z a -tzip ebookdownloader-${TRAVIS_TAG}-linux-arm64.zip tools/kindlegenLinux tools/qemu-i386-static-arm64 tpls/* fonts/* conf/* LICENSE CHANGELOG README.md ebookdownloader_linux_-arm64-cli ebookdownloader_linux_-arm64-gui ebookdownloader_linux_-arm64-http-server
-          7z a -tzip ebookdownloader-${TRAVIS_TAG}-linux-armv7.zip tools/kindlegenLinux tools/qemu-i386-static-armhf tpls/* fonts/* conf/* LICENSE CHANGELOG README.md ebookdownloader_linux_-armv7-cli ebookdownloader_linux_-armv7-http-server
+          7z a -tzip ebookdownloader-${TRAVIS_TAG}-linux-arm64.zip tools/kindlegenLinux tools/qemu-i386-static-arm64 tpls/* fonts/* conf/* qrcode/* LICENSE CHANGELOG README.md ebookdownloader_linux_-arm64-cli ebookdownloader_linux_-arm64-gui ebookdownloader_linux_-arm64-http-server
+          7z a -tzip ebookdownloader-${TRAVIS_TAG}-linux-armv7.zip tools/kindlegenLinux tools/qemu-i386-static-armhf tpls/* fonts/* conf/* qrcode/* LICENSE CHANGELOG README.md ebookdownloader_linux_-armv7-cli ebookdownloader_linux_-armv7-http-server
           ;;
        esac
       ;;
@@ -164,7 +164,7 @@ after_success: |-
      echo "Packing ebookdownloader-${TRAVIS_TAG}-${TRAVIS_OS_NAME}-${TRAVIS_ARCH}.zip"
      cd $TRAVIS_BUILD_DIR/
      $TRAVIS_BUILD_DIR/ebookdownloader_darwin_-amd64-cli
-     7z a -tzip ebookdownloader-${TRAVIS_TAG}-darwin-amd64.zip tools/kindlegenMac tpls/* fonts/* conf/* LICENSE CHANGELOG README.md ebookdownloader_darwin_-amd64-cli ebookdownloader_darwin_-amd64-gui ebookdownloader_darwin_-amd64-http-server
+     7z a -tzip ebookdownloader-${TRAVIS_TAG}-darwin-amd64.zip tools/kindlegenMac tpls/* fonts/* conf/* qrcode/* LICENSE CHANGELOG README.md ebookdownloader_darwin_-amd64-cli ebookdownloader_darwin_-amd64-gui ebookdownloader_darwin_-amd64-http-server
       ;;
    windows)
      cd $TRAVIS_BUILD_DIR/
@@ -177,7 +177,7 @@ after_success: |-
      powershell Remove-Item upx.exe
      powershell Write-Host "Packing ebookdownloader-${TRAVIS_TAG}-${TRAVIS_OS_NAME}-${TRAVIS_ARCH}.zip"
      $TRAVIS_BUILD_DIR/ebookdownloader_windows_-amd64-cli.exe
-     7z a -tzip ebookdownloader-${TRAVIS_TAG}-windows-amd64.zip tools/kindlegen.exe tpls/* fonts/* conf/* LICENSE CHANGELOG README.md ebookdownloader_windows_-amd64-cli.exe ebookdownloader_windows_-amd64-gui.exe ebookdownloader_windows_-amd64-http-server.exe
+     7z a -tzip ebookdownloader-${TRAVIS_TAG}-windows-amd64.zip tools/kindlegen.exe tpls/* fonts/* conf/* qrcode/* LICENSE CHANGELOG README.md ebookdownloader_windows_-amd64-cli.exe ebookdownloader_windows_-amd64-gui.exe ebookdownloader_windows_-amd64-http-server.exe
       ;;
   esac
 
