@@ -71,10 +71,9 @@
 ## ❤️ 赞助
 如果你觉得EbookDownloader项目对你有帮助。你可以给我来一杯啤酒！
 
-| PayPal打赏 | 微信打赏Pay | BTC打赏
-| :---: | :---: | :---: |
-| [paypal.me/sndnvaps](https://paypal.me/sndnvaps)  |  <img src="qrcode/Donate_WeChatPay.jpg" width="300" height="300" alt="给sndnvaps来一杯啤酒"/>| 
-bc1qs4zkl0fgh8csu7qnq547hymn0pxr68qrqwszst3e304grayanm4se8asf8 |
+| PayPal打赏 | 微信打赏Pay | BTC打赏|
+| :-: | :-: | :-: |
+| <a href="https://paypal.me/sndnvaps"> paypal.me/sndnvaps </a>  |  <img src="qrcode/Donate_WeChatPay.jpg" width="250" height="250" alt="给sndnvaps来一杯啤酒"/>| bc1qs4zkl0fgh8csu7qn<br/>q547hymn0pxr68qrqw<br/>szst3e304grayanm4se<br/>8asf8 |
 
 
 -------------
