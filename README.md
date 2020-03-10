@@ -71,9 +71,9 @@
 ## ❤️ 赞助
 如果你觉得EbookDownloader项目对你有帮助。你可以给我来一杯啤酒！
 
-| PayPal | WechatPay |
-| --- | --- |
-| [paypal.me/sndnvaps](https://paypal.me/sndnvaps)  | ![WeChatPay](qrcode/Donate_WeChatPay.jpg) |
+| PayPal打赏 | 微信打赏Pay |
+| :---: | :---: |
+| [paypal.me/sndnvaps](https://paypal.me/sndnvaps)  |  <img src="qrcode/Donate_WeChatPay.jpg" width="300" height="300" alt="给sndnvaps来一杯啤酒"/>|
 
 
 -------------
