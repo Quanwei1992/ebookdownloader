@@ -395,6 +395,7 @@ func (this BookTXT) DownloaderChapter(ResultChan chan chan edl.Chapter, pc edl.P
 			//把 readx(); 替换成 ""
 			tmp = strings.Replace(tmp, "</p>", "", -1)
 			tmp = strings.Replace(tmp, "(https://)", "", -1)
+			tmp = strings.Replace(tmp,"<script>chaptererror();</script>","", -1)
 
 			tmp = strings.Replace(tmp, "请记住本书首发域名：booktxt.net。顶点小说手机版阅读网址：m.booktxt.net", "", -1)
 
@@ -411,7 +412,7 @@ func (this BookTXT) DownloaderChapter(ResultChan chan chan edl.Chapter, pc edl.P
 			if err != nil {
 				fmt.Println(err.Error())
 			}
-			contentText := htmlquery.OutputHTML(contentNode, true)
+			contentText := htmlquery.OutputHTML(contentNode, false)
 
 			//替换两个 html换行
 			tmp := strings.Replace(contentText, "<br/><br/>", "\r\n", -1)
@@ -421,6 +422,7 @@ func (this BookTXT) DownloaderChapter(ResultChan chan chan edl.Chapter, pc edl.P
 			//把 readx(); 替换成 ""
 			tmp = strings.Replace(tmp, "</p>", "", -1)
 			tmp = strings.Replace(tmp, "(https://)", "", -1)
+			tmp = strings.Replace(tmp,"<script>chaptererror();</script>","", -1)
 
 			tmp = strings.Replace(tmp, "请记住本书首发域名：booktxt.net。顶点小说手机版阅读网址：m.booktxt.net", "", -1)
 

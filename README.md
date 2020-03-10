@@ -5,6 +5,8 @@
 
 [![Build Status](https://travis-ci.org/sndnvaps/ebookdownloader.svg?branch=master)](https://travis-ci.org/sndnvaps/ebookdownloader)[![release_version](https://img.shields.io/github/release/sndnvaps/ebookdownloader.svg)](https://github.com/sndnvaps/ebookdownloader/releases)[![Download Count](https://img.shields.io/github/downloads/sndnvaps/ebookdownloader/total.svg)](https://github.com/sndnvaps/ebookdownloader/releases)
 
+[![Donate on PayPal](https://img.shields.io/badge/support-PayPal-blue?style=flat-square&logo=PayPal)](https://paypal.me/sndnvaps)
+
 
 
 [![godoc](https://img.shields.io/badge/godoc-reference-blue.svg)](https://godoc.org/github.com/sndnvaps/ebookdownloader/)
@@ -62,12 +64,19 @@
 
   [github ebookdownloader release page](https://github.com/sndnvaps/ebookdownloader/releases "https://github.com/sndnvaps/ebookdownloader/releases")
 
+---------------------
 
-  ## 更新日志
 
-  [CHANGELOG](./CHANGELOG "日志文件")
 
-  ----------
+## ❤️ 赞助
+如果你觉得EbookDownloader项目对你有帮助。你可以给我来一杯啤酒！
+
+| PayPal打赏 | 微信打赏Pay | BTC打赏|
+| :-: | :-: | :-: |
+| <a href="https://paypal.me/sndnvaps"> paypal.me/sndnvaps </a>  |  <img src="qrcode/Donate_WeChatPay.jpg" width="250" height="250" alt="给sndnvaps来一杯啤酒"/>| bc1qs4zkl0fgh8csu7qn<br/>q547hymn0pxr68qrqw<br/>szst3e304grayanm4se<br/>8asf8 |
+
+
+-------------
 
   ## 支持的小说网站
 
@@ -79,6 +88,13 @@
   顶点小说网 | https://www.booktxt.net/ | √ |
   顶点小说网 | <s>https://www.23us.la</s> | × | 因为网站原因无法打开，暂定无法使用 |
 
+------------
+
+  ## 更新日志
+
+  [CHANGELOG](./CHANGELOG "日志文件")
+
+  -----------
 
   ## To Do List
 
@@ -92,4 +108,4 @@
      [ ]  8. 使用boltdb记录小说数据（小说下载网站，bookid,uuid->NewV5格式，cover.jpg,mobi,azw3,txt,epub等位置及md5验证信息）
      [√]  9. 添加https://www.biduo.cc/ 小说网站支持
      [√]  10. 添加 https://www.booktxt.net/ 顶点小说网支持
-
+     [ ]  11. 添加 https://www.biquwu.cc/ 笔趣阁小说网支持
