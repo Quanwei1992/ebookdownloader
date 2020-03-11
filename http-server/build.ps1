@@ -9,5 +9,8 @@ Write-Host "BuildTime = $build_time"
 Write-Host "CommitID = $commit_id"
 Write-Host "last_tag = $last_tag"
 
+rsrc -manifest ebookdownloader_http.manifest -ico ebookdownloader.ico -o rsrc.syso
+
 go build -ldflags "-X main.Commit=$commit_id -X 'main.BuildTime=$build_time' -X main.Version=$last_tag" -o ebookdownloader_http-server.exe
 Copy-Item ebookdownloader_http-server.exe ..\
+Remove-Item rsrc.syso

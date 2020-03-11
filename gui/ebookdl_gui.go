@@ -237,7 +237,7 @@ func main() {
 	//初始化配置文件
 	ConfInit()
 
-	items = make([]string, 4)
+	items = make([]string, 5)
 	//定义items里面的变量
 	items[0] = "xsbiquge.com"
 	items[1] = "biduo.cc"

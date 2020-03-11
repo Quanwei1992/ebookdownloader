@@ -1,5 +1,9 @@
 ## 更新日志文件
 
+    2020.03.12 go版本
+	          1. 紧急修复gui中的致命错误
+			  2. 给windows平台的cli,http-server添加图标(Linux,Mac不支持此方法)
+
     2020.03.08 go版本
 	          1. 顶点小说下载源:booktxt.go 删除下载的txt文件中包含非小说的内容
 

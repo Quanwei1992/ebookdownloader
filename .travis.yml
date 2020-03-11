@@ -111,16 +111,20 @@ script: |-
       cd $TRAVIS_BUILD_DIR
       go test
       cd $TRAVIS_BUILD_DIR/cli
+      rsrc -manifest ./ebookdownloader_cli.manifest -ico ./ebookdownloader.ico -arch amd64 -o rsrc_x64.syso
       GOOS=windows  GOARCH=amd64 go build -ldflags "-s -w -X main.Version=${TRAVIS_TAG} -X main.Commit=${TRAVIS_COMMIT} -X main.BuildTime=$(date +'%Y-%m-%d_%T')" -o ebookdownloader_windows_-amd64-cli.exe
       powershell copy-item ebookdownloader_windows_-amd64-cli.exe ../
+      powershell remove-item rsrc_x64.syso
       cd $TRAVIS_BUILD_DIR/gui
       rsrc -manifest ./ebookdownloader_gui.manifest -ico ./ebookdownloader.ico -arch amd64 -o rsrc_x64.syso
       GOOS=windows  GOARCH=amd64 go build -ldflags "-H windowsgui -w -s -X main.Version=${TRAVIS_TAG} -X main.Commit=${TRAVIS_COMMIT} -X main.BuildTime=$(date +'%Y-%m-%d_%T') -linkmode external -extldflags '-static'" -o ebookdownloader_windows_-amd64-gui.exe
       powershell copy-item ebookdownloader_windows_-amd64-gui.exe ../
       powershell remove-item rsrc_x64.syso
       cd $TRAVIS_BUILD_DIR/http-server
+      rsrc -manifest ./ebookdownloader_http.manifest -ico ./ebookdownloader.ico -arch amd64 -o rsrc_x64.syso
       GOOS=windows  GOARCH=amd64 go build -ldflags "-s -w -X main.Version=${TRAVIS_TAG} -X main.Commit=${TRAVIS_COMMIT} -X main.BuildTime=$(date +'%Y-%m-%d_%T')" -o ebookdownloader_windows_-amd64-http-server.exe
       powershell copy-item ebookdownloader_windows_-amd64-http-server.exe ../
+      powershell remove-item rsrc_x64.syso
       ;;
      esac
 
