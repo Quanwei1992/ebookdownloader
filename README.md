@@ -84,6 +84,7 @@
   :-: | :-: | :-: | :-: |
   笔趣阁 | https://www.xsbiquge.com/ | √ |
   笔趣阁 | https://www.biduo.cc/ | √ |
+  笔趣阁 | https://www.biquwu.cc/ | √ | 网站的速度比较慢 |
   999小说 | https://www.999xs.com/ | √ |
   顶点小说网 | https://www.booktxt.net/ | √ |
   顶点小说网 | <s>https://www.23us.la</s> | × | 因为网站原因无法打开，暂定无法使用 |
@@ -108,4 +109,4 @@
      [ ]  8. 使用boltdb记录小说数据（小说下载网站，bookid,uuid->NewV5格式，cover.jpg,mobi,azw3,txt,epub等位置及md5验证信息）
      [√]  9. 添加https://www.biduo.cc/ 小说网站支持
      [√]  10. 添加 https://www.booktxt.net/ 顶点小说网支持
-     [ ]  11. 添加 https://www.biquwu.cc/ 笔趣阁小说网支持
+     [√]  11. 添加 https://www.biquwu.cc/ 笔趣阁小说网支持

@@ -11,26 +11,27 @@ import (
 	edl "github.com/sndnvaps/ebookdownloader"
 )
 
-var _ edl.EBookDLInterface = XSBiquge{}
+var _ edl.EBookDLInterface = Biquwu{}
 
-// XSBiquge xsbiquge.com小说网
-type XSBiquge struct {
+//Biquwu www.biquwu.cc 小说网
+type Biquwu struct {
 	URL  string
 	Lock *sync.Mutex
 }
 
-// NewXSBiquge 初始化
-func NewXSBiquge() XSBiquge {
-	return XSBiquge{
-		URL:  "https://www.xsbiquge.com",
+// NewBiquwu 初始化
+func NewBiquwu() Biquwu {
+	return Biquwu{
+		URL:  "https://www.biquwu.cc",
 		Lock: new(sync.Mutex),
 	}
 }
 
 //GetBookBriefInfo 获取小说的信息
-func (this XSBiquge) GetBookBriefInfo(bookid string, proxy string) edl.BookInfo {
+func (this Biquwu) GetBookBriefInfo(bookid string, proxy string) edl.BookInfo {
 	var bi edl.BookInfo
-	pollURL := this.URL + "/" + bookid + "/"
+	pollURL := this.URL + "/biquge/" + bookid + "/"
+	fmt.Println("poolURL= ", pollURL)
 
 	//当 proxy 不为空的时候，表示设置代理
 	if proxy != "" {
@@ -96,11 +97,12 @@ func (this XSBiquge) GetBookBriefInfo(bookid string, proxy string) edl.BookInfo 
 }
 
 //GetBookInfo 获取小说的信息
-func (this XSBiquge) GetBookInfo(bookid string, proxy string) edl.BookInfo {
+func (this Biquwu) GetBookInfo(bookid string, proxy string) edl.BookInfo {
 
 	var bi edl.BookInfo
 	var chapters []edl.Chapter
-	pollURL := this.URL + "/" + bookid + "/"
+	pollURL := this.URL + "/biquge/" + bookid + "/"
+	//fmt.Println("pollURL= ", pollURL)
 
 	//当 proxy 不为空的时候，表示设置代理
 	if proxy != "" {
@@ -125,7 +127,7 @@ func (this XSBiquge) GetBookInfo(bookid string, proxy string) edl.BookInfo {
 		fmt.Println("简介 = ", description)
 
 		//获取书章节列表
-		ddNode, _ := htmlquery.Find(doc, "//div[@id='list']//dl//dd")
+		ddNode, _ := htmlquery.Find(doc, "//div[@class='listmain']//dl//dd")
 		for i := 0; i < len(ddNode); i++ {
 			var tmp edl.Chapter
 			aNode, _ := htmlquery.Find(ddNode[i], "//a")
@@ -165,7 +167,7 @@ func (this XSBiquge) GetBookInfo(bookid string, proxy string) edl.BookInfo {
 		fmt.Println("简介 = ", description)
 
 		//获取书章节列表
-		ddNode, _ := htmlquery.Find(doc, "//div[@id='list']//dl//dd")
+		ddNode, _ := htmlquery.Find(doc, "//div[@class='listmain']//dl//dd")
 		for i := 0; i < len(ddNode); i++ {
 			var tmp edl.Chapter
 			aNode, _ := htmlquery.Find(ddNode[i], "//a")
@@ -193,7 +195,7 @@ func (this XSBiquge) GetBookInfo(bookid string, proxy string) edl.BookInfo {
 }
 
 //DownloadChapters 下载所有章节
-func (this XSBiquge) DownloadChapters(Bi edl.BookInfo, proxy string) edl.BookInfo {
+func (this Biquwu) DownloadChapters(Bi edl.BookInfo, proxy string) edl.BookInfo {
 	result := Bi //先进行赋值，把数据
 	var chapters []edl.Chapter
 	result.Chapters = chapters //把原来的数据清空
@@ -213,7 +215,7 @@ func (this XSBiquge) DownloadChapters(Bi edl.BookInfo, proxy string) edl.BookInf
 }
 
 //根据每个章节的 URL连接，下载每章对应的内容Content当中
-func (this XSBiquge) downloadChapters(Bi edl.BookInfo, proxy string) edl.BookInfo {
+func (this Biquwu) downloadChapters(Bi edl.BookInfo, proxy string) edl.BookInfo {
 	chapters := Bi.Chapters
 
 	NumChapter := len(chapters)
@@ -275,7 +277,7 @@ ForEnd:
 }
 
 //DownloaderChapter 一个章节一个章节得下载
-func (this XSBiquge) DownloaderChapter(ResultChan chan chan edl.Chapter, pc edl.ProxyChapter, wg *sync.WaitGroup) {
+func (this Biquwu) DownloaderChapter(ResultChan chan chan edl.Chapter, pc edl.ProxyChapter, wg *sync.WaitGroup) {
 	wg.Add(1)
 	defer wg.Done()
 	c := make(chan edl.Chapter)
@@ -300,6 +302,7 @@ func (this XSBiquge) DownloaderChapter(ResultChan chan chan edl.Chapter, pc edl.
 			tmp = strings.Replace(tmp, "readx();", "", -1)
 			//tmp = tmp + "\r\n"
 			//返回数据，填写Content内容
+			//fmt.Println(tmp) //测试开关，查看是否获致到章节内容
 			result = edl.Chapter{
 				Title:   pc.C.Title,
 				Link:    pc.C.Link,
@@ -319,6 +322,7 @@ func (this XSBiquge) DownloaderChapter(ResultChan chan chan edl.Chapter, pc edl.
 			tmp = strings.Replace(tmp, "readx();", "", -1)
 			//tmp = tmp + "\r\n"
 			//返回数据，填写Content内容
+			//fmt.Println(tmp) //测试开关，查看是否获致到章节内容
 			result = edl.Chapter{
 				Title:   pc.C.Title,
 				Link:    pc.C.Link,

@@ -115,10 +115,14 @@ func ParseEbhostAndBookIDPost(c *gin.Context) {
 		cmdArgs = append(cmdArgs, "--ebhost=biduo.cc")
 		biduo := ebook.NewBiDuo()
 		ebdlInterface = biduo //实例化接口
+	case "biquwu.cc":
+		cmdArgs = append(cmdArgs, "--ebhost=biquwu.cc")
+		biquwu := ebook.NewBiquwu()
+		ebdlInterface = biquwu //实例化接口
 	case "booktxt.net":
 		cmdArgs = append(cmdArgs, "--ebhost=booktxt.net")
 		booktxt := ebook.NewBookTXT()
-		ebdlInterface = booktxt
+		ebdlInterface = booktxt //实例化接口
 	case "999xs.com":
 		cmdArgs = append(cmdArgs, "--ebhost=999xs.com")
 		xs999 := ebook.New999XS()
