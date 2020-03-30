@@ -69,6 +69,9 @@ func EbookDownloader(c *cli.Context) error {
 		} else if ebhost == "biduo.cc" {
 			biduo := ebook.NewBiDuo()
 			EBDLInterface = biduo //实例化接口
+		} else if ebhost == "xixiwx.com" {
+			xixiwx := ebook.NewXixiwx()
+			EBDLInterface = xixiwx //实例化接口
 		} else if ebhost == "booktxt.net" {
 			booktxt := ebook.NewBookTXT()
 			EBDLInterface = booktxt //实例化接口
@@ -322,7 +325,7 @@ func main() {
 		cli.StringFlag{
 			Name:  "ebhost",
 			Value: "xsbiquge.com",
-			Usage: "定义下载ebook的网站地址(可选择xsbiquge.com,biduo.cc,biquwu.cc,999xs.com,23us.la,booktxt.net)",
+			Usage: "定义下载ebook的网站地址(可选择xsbiquge.com,biduo.cc,xixiwx.com,biquwu.cc,999xs.com,23us.la,booktxt.net)",
 		},
 		cli.StringFlag{
 			Name:  "bookid,id",

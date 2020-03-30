@@ -86,6 +86,10 @@ func EbookDownloaderRun() {
 		cmdArgs = append(cmdArgs, "--ebhost=biduo.cc")
 		biduo := ebook.NewBiDuo()
 		ebdlInterface = biduo //实例化接口
+	case "xixiwx.com":
+		cmdArgs = append(cmdArgs, "--ebhost=xixiwx.com")
+		xixiwx := ebook.NewXixiwx()
+		ebdlInterface = xixiwx //实例化接口
 	case "biquwu.cc":
 		cmdArgs = append(cmdArgs, "--ebhost=biquwu.cc")
 		biquwu := ebook.NewBiquwu()
@@ -241,14 +245,15 @@ func main() {
 	//初始化配置文件
 	ConfInit()
 
-	items = make([]string, 6)
+	items = make([]string, 7)
 	//定义items里面的变量
 	items[0] = "xsbiquge.com"
 	items[1] = "biduo.cc"
 	items[2] = "biquwu.cc"
 	items[3] = "booktxt.net"
 	items[4] = "999xs.com"
-	items[5] = "23us.la"
+	items[5] = "xixiwx.com"
+	items[6] = "23us.la"
 
 	w := g.NewMasterWindow("EBookDownloader@"+Version, 800, 600, false, loadFont)
 	w.Main(loop)
