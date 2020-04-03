@@ -8,12 +8,12 @@ import (
 
 //Meta 小说的metainfo
 type Meta struct {
-	Ebhost      string `json:"ebhost"`
+	Ebhost      string `json:"ebhost" storm:"index"`
 	Bookid      string `json:"bookid"`
-	BookName    string `json:"bookname"`
-	BookISBN    string `json:"isbn"`
-	BookUUID    string `json:"uuid"`
-	Author      string `json:"author"`
+	BookName    string `json:"bookname" storm:"index"`
+	BookISBN    string `json:"isbn" storm:"index"`
+	BookUUID    string `json:"uuid" storm:"id,index,unique"`
+	Author      string `json:"author" storm:"index"`
 	CoverURL    string `json:"cover_url"`
 	Description string `json:"description"`
 	TxtURLPath  string `json:"txt_url_path"`
