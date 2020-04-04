@@ -2,6 +2,8 @@
    
     2020.04.04 go版本
             1. 完成boltdb数据库的支持，编码格式使用gob;数据库保存位置为当前目录，命名为ebookdownloader.db
+            2. 当插入的uuid数据已经存在，即表示已经有下载过相应的内容；此时采用Update方法对boltdb数据库进行更新
+            3. 增加boltdb_test.go的添加内容，添加Update测试
 
     2020.04.03 go版本
             1. 使用storm/v3库，添加boltdb的功能接口

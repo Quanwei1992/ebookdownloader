@@ -24,7 +24,7 @@ func InitBoltDB(dbname string) (Boltdb, error) {
 }
 
 //Drop 删除boltdb中的bucket；不要轻易使用，除非是想删除数据库中所有数据
-func (this Boltdb) Drop() error {
+func (this *Boltdb) Drop() error {
 	err := this.db.Drop(&Meta{})
 	return err
 }
@@ -89,17 +89,60 @@ func (this Boltdb) FindAll() ([]Meta, error) {
 	return metainfo, err
 }
 
-func (this Boltdb) UpdateEpubInfo(uuid string, epubpath string, epubmd5 string) error {
+//UpdateEpubInfo 更新boltdb中uuid指定的epub数据
+func (this *Boltdb) UpdateEpubInfo(uuid string, coverpath string, epubpath string, epubmd5 string) error {
 	err := this.db.Update(&Meta{BookUUID: uuid, EPUBURLPath: epubpath, EPUBMD5: epubmd5})
 	return err
 }
 
-func (this Boltdb) UpdateMobiInfo(uuid string, mobipath string, mobimd5 string) error {
+//UpdateMobiInfo 更新boltdb中uuid指定的mobi数据
+func (this *Boltdb) UpdateMobiInfo(uuid string, coverpath string, mobipath string, mobimd5 string) error {
 	err := this.db.Update(&Meta{BookUUID: uuid, MobiURLPath: mobipath, MobiMD5: mobimd5})
 	return err
 }
 
-func (this Boltdb) UpdateAzw3Info(uuid string, azw3path string, azw3md5 string) error {
+//UpdateAzw3Info 更新boltdb中uuid指定的azw3数据
+func (this *Boltdb) UpdateAzw3Info(uuid string, coverpath string, azw3path string, azw3md5 string) error {
 	err := this.db.Update(&Meta{BookUUID: uuid, AZW3URLPath: azw3path, AZW3MD5: azw3md5})
 	return err
+}
+
+//UpdateTXTInfo 更新boltdb中uuid指定的txt数据
+func (this *Boltdb) UpdateTXTInfo(uuid string, txtpath string, txtmd5 string) error {
+	err := this.db.Update(&Meta{BookUUID: uuid, TxtURLPath: txtpath, TxtMD5: txtmd5})
+	return err
+}
+
+// Update 更新uuid指定的数据
+func (this *Boltdb) Update(metainfo Meta) error {
+	var err error
+
+	if metainfo.TxtURLPath != "" {
+		err = this.UpdateTXTInfo(metainfo.BookUUID, metainfo.TxtURLPath, metainfo.TxtMD5)
+		if err != nil {
+			return err
+		}
+	}
+	if metainfo.MobiURLPath != "" {
+		err = this.UpdateMobiInfo(metainfo.BookUUID, metainfo.CoverURL, metainfo.MobiURLPath, metainfo.MobiMD5)
+		if err != nil {
+			return err
+		}
+	}
+
+	if metainfo.EPUBURLPath != "" {
+		err = this.UpdateEpubInfo(metainfo.BookUUID, metainfo.CoverURL, metainfo.EPUBURLPath, metainfo.EPUBMD5)
+		if err != nil {
+			return err
+		}
+	}
+
+	if metainfo.AZW3URLPath != "" {
+		err = this.UpdateAzw3Info(metainfo.BookUUID, metainfo.CoverURL, metainfo.AZW3URLPath, metainfo.AZW3MD5)
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
 }

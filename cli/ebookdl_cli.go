@@ -5,6 +5,7 @@ import (
 	"log"
 	"os"
 
+	"github.com/asdine/storm/v3"
 	edl "github.com/sndnvaps/ebookdownloader"
 	ebook "github.com/sndnvaps/ebookdownloader/ebook-sources"
 	cli "gopkg.in/urfave/cli.v1"
@@ -184,7 +185,10 @@ func EbookDownloader(c *cli.Context) error {
 			}
 
 			metainfo.WriteFile("./outputs/" + bookinfo.Name + "-" + bookinfo.Author + "/meta.json")
-			boltdb.Save(metainfo) //保存数据到boltdb中
+			err := boltdb.Save(metainfo)       //保存数据到boltdb中
+			if err == storm.ErrAlreadyExists { //如果uuid信息已经存在；启用更新模式
+				boltdb.Update(metainfo)
+			}
 		}
 
 	} else {
