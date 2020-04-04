@@ -40,6 +40,13 @@ func EbookDownloader(c *cli.Context) error {
 	isPV := c.Bool("printvolume") //打印分卷信息，只用做调试时使用
 	isMeta := c.Bool("meta")      //保存meta信息到 小说目录当中
 
+	var boltdb edl.Boltdb //初始化 boltdb选项
+
+	if isMeta {
+		boltdb, _ = edl.InitBoltDB("ebookdownloader.db") //设置boltdb名字为ebookdownloader.db,存储于程序执行目录
+		defer boltdb.Close()                             //关闭boltdb
+	}
+
 	var bookinfo edl.BookInfo              //初始化变量
 	var EBDLInterface edl.EBookDLInterface //初始化接口
 
@@ -177,6 +184,7 @@ func EbookDownloader(c *cli.Context) error {
 			}
 
 			metainfo.WriteFile("./outputs/" + bookinfo.Name + "-" + bookinfo.Author + "/meta.json")
+			boltdb.Save(metainfo) //保存数据到boltdb中
 		}
 
 	} else {

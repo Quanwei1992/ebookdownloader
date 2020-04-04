@@ -107,7 +107,7 @@
      [√]  5. 添加http-server,做为后端
      [√]  6. 添加linux arm,arm64平台支持
      [√]  7. 需要限制并发数量，因为vps性能有限 -> 目前限制的并发数量为(300+49)*2 = 698
-     [ ]  8. 使用boltdb记录小说数据（小说下载网站，bookid,uuid->NewV5格式，cover.jpg,mobi,azw3,txt,epub等位置及md5验证信息）
+     [√]  8. 使用boltdb记录小说数据（小说下载网站，bookid,uuid->NewV5格式，cover.jpg,mobi,azw3,txt,epub等位置及md5验证信息）
      [√]  9. 添加https://www.biduo.cc/ 小说网站支持
      [√]  10. 添加 https://www.booktxt.net/ 顶点小说网支持
      [√]  11. 添加 https://www.biquwu.cc/ 笔趣阁小说网支持

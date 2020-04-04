@@ -2,8 +2,11 @@ package ebookdownloader
 
 import (
 	"errors"
+	"time"
 
 	"github.com/asdine/storm/v3"
+	"github.com/asdine/storm/v3/codec/gob"
+	"go.etcd.io/bbolt"
 )
 
 //Boltdb 定义boltdb的接口
@@ -11,18 +14,29 @@ type Boltdb struct {
 	db *storm.DB
 }
 
-//InitDB 初始化boltdb数据库，根据dbname
-func InitDB(dbname string) (Boltdb, error) {
-	db, err := storm.Open(dbname)
-	defer db.Close()
+//InitBoltDB 初始化boltdb数据库，根据dbname
+func InitBoltDB(dbname string) (Boltdb, error) {
+	db, err := storm.Open(dbname, storm.Codec(gob.Codec), storm.BoltOptions(0600, &bbolt.Options{Timeout: 1 * time.Second}))
 	boltdb := Boltdb{
 		db: db,
 	}
 	return boltdb, err
 }
 
+//Drop 删除boltdb中的bucket；不要轻易使用，除非是想删除数据库中所有数据
+func (this Boltdb) Drop() error {
+	err := this.db.Drop(&Meta{})
+	return err
+}
+
+//Close 关闭boltdb数据库
+func (this *Boltdb) Close() error {
+	err := this.db.Close()
+	return err
+}
+
 //Save 保存metainfo数据到boltdb数据库中
-func (this Boltdb) Save(metainfo Meta) error {
+func (this *Boltdb) Save(metainfo Meta) error {
 	err := this.db.Save(&metainfo)
 	return err
 }

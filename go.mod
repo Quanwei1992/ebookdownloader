@@ -12,6 +12,7 @@ require (
 	github.com/appleboy/gin-jwt v2.5.0+incompatible
 	github.com/appleboy/gin-jwt/v2 v2.6.3
 	github.com/asdine/storm/v3 v3.1.1
+	github.com/boltdb/bolt v1.3.1-0.20170131192018-e9cf4fae01b5
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/gin-gonic/gin v1.5.0
 	github.com/goki/freetype v0.0.0-20181231101311-fa8a33aabaff
@@ -21,6 +22,7 @@ require (
 	github.com/sndnvaps/go-epub v1.0.0
 	github.com/stretchr/testify v1.4.0
 	github.com/unknwon/com v1.0.1
+	go.etcd.io/bbolt v1.3.4
 	golang.org/x/image v0.0.0-20200119044424-58c23975cae1 // indirect
 	golang.org/x/net v0.0.0-20200114155413-6afb5195e5aa // indirect
 	gopkg.in/dgrijalva/jwt-go.v3 v3.2.0 // indirect
