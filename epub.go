@@ -40,7 +40,7 @@ func (this BookInfo) GenerateEPUB() error {
 	coverPath, _ := filepath.Abs("./cover.jpg")
 
 	//把封面复制到 outputs/小说名-作者/cover.jpg
-	err := com.Copy(coverPath, outputpath+"cover.jpg")
+	err := com.Copy(coverPath, outputpath+string(os.PathSeparator)+"cover.jpg")
 	if err != nil {
 		fmt.Println(err.Error())
 	}

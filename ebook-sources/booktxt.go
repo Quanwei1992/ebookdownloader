@@ -6,7 +6,7 @@ import (
 	"sync"
 
 	"github.com/Aiicy/htmlquery"
-	"github.com/schollz/progressbar/v2"
+	progressbar "github.com/schollz/progressbar/v2"
 	edl "github.com/sndnvaps/ebookdownloader"
 )
 
@@ -43,11 +43,13 @@ func (this BookTXT) GetBookBriefInfo(bookid string, proxy string) edl.BookInfo {
 		//获取书名字
 		bookNameMeta, _ := htmlquery.FindOne(doc, "//meta[@property='og:novel:book_name']")
 		bookName := htmlquery.SelectAttr(bookNameMeta, "content")
+		bookName = SanitizeName(bookName)
 		fmt.Println("书名 = ", bookName)
 
 		//获取书作者
 		AuthorMeta, _ := htmlquery.FindOne(doc, "//meta[@property='og:novel:author']")
 		author := htmlquery.SelectAttr(AuthorMeta, "content")
+		author = SanitizeName(author)
 		fmt.Println("作者 = ", author)
 
 		//获取书的描述信息
@@ -77,6 +79,8 @@ func (this BookTXT) GetBookBriefInfo(bookid string, proxy string) edl.BookInfo {
 		//获取书作者
 		AuthorMeta, _ := htmlquery.FindOne(doc, "//meta[@property='og:novel:author']")
 		author := htmlquery.SelectAttr(AuthorMeta, "content")
+		author = SanitizeName(author)
+		bookName = SanitizeName(bookName)
 		fmt.Println("作者 = ", author)
 
 		//获取书的描述信息
@@ -114,11 +118,13 @@ func (this BookTXT) GetBookInfo(bookid string, proxy string) edl.BookInfo {
 		//获取书名字
 		bookNameMeta, _ := htmlquery.FindOne(doc, "//meta[@property='og:novel:book_name']")
 		bookName := htmlquery.SelectAttr(bookNameMeta, "content")
+		bookName = SanitizeName(bookName)
 		fmt.Println("书名 = ", bookName)
 
 		//获取书作者
 		AuthorMeta, _ := htmlquery.FindOne(doc, "//meta[@property='og:novel:author']")
 		author := htmlquery.SelectAttr(AuthorMeta, "content")
+		author = SanitizeName(author)
 		fmt.Println("作者 = ", author)
 
 		//获取书的描述信息
@@ -200,11 +206,13 @@ func (this BookTXT) GetBookInfo(bookid string, proxy string) edl.BookInfo {
 		//获取书名字
 		bookNameMeta, _ := htmlquery.FindOne(doc, "//meta[@property='og:novel:book_name']")
 		bookName := htmlquery.SelectAttr(bookNameMeta, "content")
+		bookName = SanitizeName(bookName)
 		fmt.Println("书名 = ", bookName)
 
 		//获取书作者
 		AuthorMeta, _ := htmlquery.FindOne(doc, "//meta[@property='og:novel:author']")
 		author := htmlquery.SelectAttr(AuthorMeta, "content")
+		author = SanitizeName(author)
 		fmt.Println("作者 = ", author)
 
 		//获取书的描述信息
