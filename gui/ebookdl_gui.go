@@ -36,9 +36,9 @@ var (
 	//Version 版本信息
 	Version string = "dev"
 	//Commit git commit信息
-	Commit string = "b40f73c79"
+	Commit string = "7caf59d"
 	//BuildTime 编译时间
-	BuildTime string = "2020-02-16 16:34"
+	BuildTime string = "2020-05-01 20:50"
 )
 
 func btnClickMeClicked() {
