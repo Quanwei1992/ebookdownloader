@@ -17,11 +17,14 @@ require (
 	github.com/gin-gonic/gin v1.5.0
 	github.com/goki/freetype v0.0.0-20181231101311-fa8a33aabaff
 	github.com/hidapple/isbn-gen v1.0.0
+	github.com/levigross/grequests v0.0.0-20190908174114-253788527a1a // indirect
 	github.com/satori/go.uuid v1.2.0
 	github.com/schollz/progressbar/v2 v2.15.0
 	github.com/sndnvaps/go-epub v1.0.0
 	github.com/stretchr/testify v1.4.0
 	github.com/unknwon/com v1.0.1
+	github.com/urfave/cli v1.22.4 // indirect
+	github.com/visualfc/goqt v0.0.0-20160901223124-8c774d799233
 	go.etcd.io/bbolt v1.3.4
 	golang.org/x/image v0.0.0-20200119044424-58c23975cae1 // indirect
 	golang.org/x/net v0.0.0-20200114155413-6afb5195e5aa // indirect

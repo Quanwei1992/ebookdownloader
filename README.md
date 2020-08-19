@@ -46,6 +46,10 @@
     8. http-server 项目依赖：
           github.com/ajvb/kala 项目，用于任务控制和管理
           kala需要与ebookdownloader_cli运行在同一个目录里面
+    9. qtgui项目信赖
+          goqt
+          qt
+          gcc
 
   ## 后端服务器 API接口
     主要目的是部署在vps上面，就可以方便随时下载小说了
@@ -112,3 +116,4 @@
      [√]  10. 添加 https://www.booktxt.net/ 顶点小说网支持
      [√]  11. 添加 https://www.biquwu.cc/ 笔趣阁小说网支持
      [√]  12. 添加处理 作者，书名中包含的特殊字符串的方法
+     [ ]  13. 使用goqt对界面进行重写
