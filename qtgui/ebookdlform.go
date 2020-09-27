@@ -124,6 +124,7 @@ func NewEbookDlForm() (*EbookdlForm, error) {
 			w.downloadProgressBar.SetValue(50)
 		}
 		if w.outputMobiCheckBok.IsChecked() {
+			bookinfo.SetKindleEbookType(true /* isMobi */, false /* isAzw3 */)
 			bookinfo.GenerateMobi()
 			w.downloadProgressBar.SetValue(60)
 		}
