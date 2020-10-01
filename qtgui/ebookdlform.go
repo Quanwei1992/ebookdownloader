@@ -11,6 +11,45 @@ import (
 	ebook "github.com/sndnvaps/ebookdownloader/ebook-sources"
 )
 
+//MainWindowForm struct
+type MainWindowForm struct {
+	mw     *ui.QMainWindow
+	widget *EbookdlForm //我们要加载 MainForm 到这里
+}
+
+//func NewMainWindow() *MainWindowForm
+func NewMainWindow() *MainWindowForm {
+
+	w := &MainWindowForm{}
+	w.mw = ui.NewMainWindow()
+	w.mw.InstallEventFilter(w)
+
+	w.widget, _ = NewEbookDlForm()
+
+	w.mw.SetCentralWidget(w.widget.m)
+	w.createActions()
+
+	return w
+}
+
+//func (w *MainWindowForm) createActions()
+func (w *MainWindowForm) createActions() {
+
+	aboutAct := ui.NewActionWithTextParent("关于本软件", w.mw)
+	aboutAct.OnTriggered(func() {
+		ui.QMessageBoxAbout(w.mw, "关于本软件", "本软件用go+goqt编写，主要用于下载小说\n声明：下载的小说只能本人阅读，不可再次分发于网络上！")
+	})
+	aboutQtAct := ui.NewActionWithTextParent("关于QT", w.mw)
+	aboutQtAct.OnTriggered(func() { ui.QApplicationAboutQt() })
+
+	helpMenu := w.mw.MenuBar().AddMenuWithTitle("帮助(H)")
+	helpMenu.AddAction(aboutAct)
+	helpMenu.AddSeparator()
+	helpMenu.AddAction(aboutQtAct)
+
+	w.mw.SetWindowTitle("ebookdownloader")
+}
+
 type EbookdlForm struct {
 	m           *ui.QWidget
 	sfNameLabel *ui.QLabel

@@ -1,7 +1,6 @@
 package main
 
 import (
-	"log"
 	"os"
 
 	"github.com/visualfc/goqt/ui"
@@ -9,10 +8,7 @@ import (
 
 func main() {
 	ui.RunEx(os.Args, func() {
-		w, err := NewEbookDlForm()
-		if err != nil {
-			log.Fatalln(err)
-		}
-		w.m.Show()
+		w := NewMainWindow()
+		w.mw.Show()
 	})
 }
