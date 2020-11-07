@@ -12,6 +12,8 @@ var testMeta = Meta{
 	BookName: "我是谁-sndnvaps",
 	Bookid:   "0000-0001",
 	Author:   "sndnvaps",
+	TxtMD5:   "this-is-md5-string-for-test",
+	EPUBMD5:  "238f5c0d8860fda1618c3c2da1c3b281",
 }
 
 var testMeta01 = Meta{
@@ -49,6 +51,7 @@ func TestBoltdb(t *testing.T) {
 	if err != nil {
 		t.Logf("更新数据到boltdb->ebookdownloader_t.db失败，原因:%s", err.Error())
 	}
+
 	metainfo, err = boltdb.FindOneByUUID("0000-0000-0000-0000")
 	assert.Equal(t, "this-is-md5-string-for-test", metainfo.TxtMD5)
 

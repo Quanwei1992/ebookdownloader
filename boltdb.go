@@ -56,6 +56,11 @@ func (this Boltdb) FindOneByAuthor(author string) (Meta, error) {
 	return this.FindOneByFieldName("Author", author)
 }
 
+//FindOneByMD5 通过电子书的md5信息来查询boltdb中的单一条数据
+func (this Boltdb) FindOneByMD5(md5info string) (Meta, error) {
+	return this.FindOneByFieldName("MD5", md5info)
+}
+
 //FindOneByFieldName 根据fieldname中定义的项目，进行查询，只返回一条结果
 func (this Boltdb) FindOneByFieldName(fieldname string, val string) (Meta, error) {
 	var metainfo Meta
