@@ -35,7 +35,9 @@ func (this BookInfo) GenerateEPUB() error {
 		os.MkdirAll(outputpath, os.ModePerm)
 	}
 	// 生成封面
-	GenerateCover(this)
+	//GenerateCover(this)
+	//下载封面
+	this.DownloadCoverImage()
 	//把封面复制到 tmp 目录当中
 	coverPath, _ := filepath.Abs("./cover.jpg")
 

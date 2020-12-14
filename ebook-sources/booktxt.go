@@ -131,6 +131,10 @@ func (this BookTXT) GetBookInfo(bookid string, proxy string) edl.BookInfo {
 		DescriptionMeta, _ := htmlquery.FindOne(doc, "//meta[@property='og:description']")
 		description := htmlquery.SelectAttr(DescriptionMeta, "content")
 		fmt.Println("简介 = ", description)
+		//获取书的封面下载地址
+		CoverURLMeta, _ := htmlquery.FindOne(doc, "//meta[@property='og:image']")
+		CoverURL := htmlquery.SelectAttr(CoverURLMeta, "content")
+		//fmt.Println("封面下载地址 = ", CoverURL)
 
 		//替换掉 volume是最前面的 作品名字
 		replaceStr := fmt.Sprintf("《%s》", bookName)
@@ -193,6 +197,7 @@ func (this BookTXT) GetBookInfo(bookid string, proxy string) edl.BookInfo {
 			Name:        bookName,
 			Author:      author,
 			Description: description,
+			CoverURL:    CoverURL,
 			Volumes:     volumes,
 			HasVolume:   HasVolume,
 			Chapters:    chapters,
@@ -219,6 +224,11 @@ func (this BookTXT) GetBookInfo(bookid string, proxy string) edl.BookInfo {
 		DescriptionMeta, _ := htmlquery.FindOne(doc, "//meta[@property='og:description']")
 		description := htmlquery.SelectAttr(DescriptionMeta, "content")
 		fmt.Println("简介 = ", description)
+
+		//获取书的封面下载地址
+		CoverURLMeta, _ := htmlquery.FindOne(doc, "//meta[@property='og:image']")
+		CoverURL := htmlquery.SelectAttr(CoverURLMeta, "content")
+		//fmt.Println("封面下载地址 = ", CoverURL)
 
 		//替换掉 volume是最前面的 作品名字
 		replaceStr := fmt.Sprintf("《%s》", bookName)
@@ -286,6 +296,7 @@ func (this BookTXT) GetBookInfo(bookid string, proxy string) edl.BookInfo {
 			Name:        bookName,
 			Author:      author,
 			Description: description,
+			CoverURL:    CoverURL,
 			Volumes:     volumes,
 			HasVolume:   HasVolume,
 			Chapters:    chapters,

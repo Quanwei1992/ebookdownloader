@@ -56,6 +56,11 @@ func (this BiDuo) GetBookBriefInfo(bookid string, proxy string) edl.BookInfo {
 		description := htmlquery.SelectAttr(DescriptionMeta, "content")
 		fmt.Println("简介 = ", description)
 
+		//获取书的封面下载地址
+		CoverURLMeta, _ := htmlquery.FindOne(doc, "//meta[@property='og:image']")
+		CoverURL := htmlquery.SelectAttr(CoverURLMeta, "content")
+		//fmt.Println("封面下载地址 = ", CoverURL)
+
 		//导入信息
 		bi = edl.BookInfo{
 			EBHost:      this.URL,
@@ -63,6 +68,7 @@ func (this BiDuo) GetBookBriefInfo(bookid string, proxy string) edl.BookInfo {
 			Name:        bookName,
 			Author:      author,
 			Description: description,
+			CoverURL:    CoverURL,
 		}
 	} else { //没有设置代理
 		doc, err := htmlquery.LoadURL(pollURL)
@@ -87,6 +93,11 @@ func (this BiDuo) GetBookBriefInfo(bookid string, proxy string) edl.BookInfo {
 		description := htmlquery.SelectAttr(DescriptionMeta, "content")
 		fmt.Println("简介 = ", description)
 
+		//获取书的封面下载地址
+		CoverURLMeta, _ := htmlquery.FindOne(doc, "//meta[@property='og:image']")
+		CoverURL := htmlquery.SelectAttr(CoverURLMeta, "content")
+		//fmt.Println("封面下载地址 = ", CoverURL)
+
 		//导入信息
 		bi = edl.BookInfo{
 			EBHost:      this.URL,
@@ -94,6 +105,7 @@ func (this BiDuo) GetBookBriefInfo(bookid string, proxy string) edl.BookInfo {
 			Name:        bookName,
 			Author:      author,
 			Description: description,
+			CoverURL:    CoverURL,
 		}
 	}
 	return bi
@@ -130,6 +142,11 @@ func (this BiDuo) GetBookInfo(bookid string, proxy string) edl.BookInfo {
 		description := htmlquery.SelectAttr(DescriptionMeta, "content")
 		fmt.Println("简介 = ", description)
 
+		//获取书的封面下载地址
+		CoverURLMeta, _ := htmlquery.FindOne(doc, "//meta[@property='og:image']")
+		CoverURL := htmlquery.SelectAttr(CoverURLMeta, "content")
+		//fmt.Println("封面下载地址 = ", CoverURL)
+
 		//获取书章节列表
 		ddNode, _ := htmlquery.Find(doc, "//div[@id='list']//dl//dd")
 		for i := 0; i < len(ddNode); i++ {
@@ -147,6 +164,7 @@ func (this BiDuo) GetBookInfo(bookid string, proxy string) edl.BookInfo {
 			Name:        bookName,
 			Author:      author,
 			Description: description,
+			CoverURL:    CoverURL,
 			Chapters:    chapters,
 		}
 	} else { //没有设置代理
@@ -172,6 +190,11 @@ func (this BiDuo) GetBookInfo(bookid string, proxy string) edl.BookInfo {
 		description := htmlquery.SelectAttr(DescriptionMeta, "content")
 		fmt.Println("简介 = ", description)
 
+		//获取书的封面下载地址
+		CoverURLMeta, _ := htmlquery.FindOne(doc, "//meta[@property='og:image']")
+		CoverURL := htmlquery.SelectAttr(CoverURLMeta, "content")
+		//fmt.Println("封面下载地址 = ", CoverURL)
+
 		//获取书章节列表
 		ddNode, _ := htmlquery.Find(doc, "//div[@id='list']//dl//dd")
 		for i := 0; i < len(ddNode); i++ {
@@ -189,6 +212,7 @@ func (this BiDuo) GetBookInfo(bookid string, proxy string) edl.BookInfo {
 			Name:        bookName,
 			Author:      author,
 			Description: description,
+			CoverURL:    CoverURL,
 			Chapters:    chapters,
 		}
 

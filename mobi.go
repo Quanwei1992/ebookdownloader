@@ -42,7 +42,10 @@ func (this BookInfo) GenerateMobi() {
 	}
 
 	// 生成封面
-	GenerateCover(this)
+	//GenerateCover(this)
+
+	//下载封面
+	this.DownloadCoverImage()
 
 	//bookISBN 设置小说的urn码
 	bookISBNStr := this.ISBN()

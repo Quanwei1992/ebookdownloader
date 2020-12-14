@@ -1,11 +1,14 @@
 package ebookdownloader
 
 import (
+	"bufio"
 	"fmt"
 	"image"
 	"image/jpeg"
+	"io"
 	"io/ioutil"
 	"log"
+	"net/http"
 	"os"
 	"path/filepath"
 
@@ -81,4 +84,34 @@ func GenerateCover(this BookInfo) {
 	if err != nil {
 		fmt.Println(err.Error())
 	}
+}
+
+//DownloadCoverImage 下载小说的封面图片
+func (this *BookInfo) DownloadCoverImage() {
+	coverURL := this.CoverURL
+	res, err := http.Get(coverURL)
+	if err != nil {
+		fmt.Println(err.Error())
+	}
+	defer res.Body.Close()
+	if res.StatusCode != http.StatusOK {
+		fmt.Printf("封面地址[%s]下载失败，改为直接生成封面!\n", coverURL)
+		GenerateCover(*this)
+		//直接在此处结束进程，返回到上级进程中
+		return
+	}
+
+	reader := bufio.NewReaderSize(res.Body, 32*1024)
+
+	CoverPath, _ := filepath.Abs("./cover.jpg")
+	file, err := os.Create(CoverPath)
+	if err != nil {
+		fmt.Println(err.Error())
+	}
+	defer file.Close()
+
+	writer := bufio.NewWriter(file)
+
+	io.Copy(writer, reader) //把下载到的文件保存到cover.jpg文件当中
+
 }

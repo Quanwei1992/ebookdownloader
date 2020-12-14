@@ -16,18 +16,19 @@ import (
 
 //BookInfo 小说信息
 type BookInfo struct {
-	EBHost      string    `json:"ebook_host"` //下载小说的网站
-	EBookID     string    `json:"ebook_id"`   //对应小说网站的bookid
-	BookISBN    string    `json:"isbn"`       //生成一个isbn码
-	BookUUID    string    `json:"uuid"`       //生成一个uuid码，准备用于boltdb
-	Name        string    `json:"bookname"`
-	Author      string    `json:"author"`
-	Description string    `json:"novel_description"`
-	IsMobi      bool      `json:"is_mobi"`    //当为true的时候生成mobi
-	IsAzw3      bool      `json:"is_azw3"`    //当为true的时候生成azw3,
-	HasVolume   bool      `json:"has_volume"` //是否有小说分卷，默认为false；当设置为true的时候，Volumes里面需要包含分卷信息
-	Volumes     []Volume  `json:"volumes"`    //小说分卷信息，一般不设置
-	Chapters    []Chapter `json:"chapters"`   //小说章节信息
+	EBHost      string    `json:"ebook_host"`        //下载小说的网站
+	EBookID     string    `json:"ebook_id"`          //对应小说网站的bookid
+	BookISBN    string    `json:"isbn"`              //生成一个isbn码
+	BookUUID    string    `json:"uuid"`              //生成一个uuid码，准备用于boltdb
+	Name        string    `json:"bookname"`          //小说名字
+	Author      string    `json:"author"`            //小说作者
+	Description string    `json:"novel_description"` //小说简介
+	CoverURL    string    `json:"cover_url"`         //小说封面图片地址
+	IsMobi      bool      `json:"is_mobi"`           //当为true的时候生成mobi
+	IsAzw3      bool      `json:"is_azw3"`           //当为true的时候生成azw3,
+	HasVolume   bool      `json:"has_volume"`        //是否有小说分卷，默认为false；当设置为true的时候，Volumes里面需要包含分卷信息
+	Volumes     []Volume  `json:"volumes"`           //小说分卷信息，一般不设置
+	Chapters    []Chapter `json:"chapters"`          //小说章节信息
 }
 
 //Volume 定义小说分卷信息
