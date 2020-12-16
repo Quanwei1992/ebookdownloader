@@ -13,6 +13,8 @@ require (
 	github.com/appleboy/gin-jwt/v2 v2.6.3
 	github.com/asdine/storm/v3 v3.1.1
 	github.com/boltdb/bolt v1.3.1-0.20170131192018-e9cf4fae01b5
+	github.com/chromedp/cdproto v0.0.0-20201204063249-be40c824ad18
+	github.com/chromedp/chromedp v0.5.4
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/gin-gonic/gin v1.5.0
 	github.com/goki/freetype v0.0.0-20181231101311-fa8a33aabaff

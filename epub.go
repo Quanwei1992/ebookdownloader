@@ -37,12 +37,15 @@ func (this BookInfo) GenerateEPUB() error {
 	// 生成封面
 	//GenerateCover(this)
 	//下载封面
-	this.DownloadCoverImage()
+	err := this.GetCover()
+	if err != nil {
+		fmt.Println(err.Error())
+	}
 	//把封面复制到 tmp 目录当中
 	coverPath, _ := filepath.Abs("./cover.jpg")
 
 	//把封面复制到 outputs/小说名-作者/cover.jpg
-	err := com.Copy(coverPath, outputpath+string(os.PathSeparator)+"cover.jpg")
+	err = com.Copy(coverPath, outputpath+string(os.PathSeparator)+"cover.jpg")
 	if err != nil {
 		fmt.Println(err.Error())
 	}

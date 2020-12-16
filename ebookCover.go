@@ -1,17 +1,20 @@
 package ebookdownloader
 
 import (
-	"bufio"
+	"context"
+	"errors"
 	"fmt"
 	"image"
 	"image/jpeg"
-	"io"
 	"io/ioutil"
 	"log"
 	"net/http"
 	"os"
 	"path/filepath"
+	"time"
 
+	"github.com/chromedp/cdproto/cdp"
+	"github.com/chromedp/chromedp"
 	"github.com/goki/freetype"
 )
 
@@ -87,31 +90,68 @@ func GenerateCover(this BookInfo) {
 }
 
 //DownloadCoverImage 下载小说的封面图片
-func (this *BookInfo) DownloadCoverImage() {
-	coverURL := this.CoverURL
+func (this BookInfo) DownloadCoverImage(coverURL string) error {
 	res, err := http.Get(coverURL)
 	if err != nil {
-		fmt.Println(err.Error())
+		return err
 	}
 	defer res.Body.Close()
 	if res.StatusCode != http.StatusOK {
 		fmt.Printf("封面地址[%s]下载失败，改为直接生成封面!\n", coverURL)
-		GenerateCover(*this)
+		GenerateCover(this)
 		//直接在此处结束进程，返回到上级进程中
-		return
+		return errors.New("封面下载失败，改为直接生成封面")
 	}
 
-	reader := bufio.NewReaderSize(res.Body, 32*1024)
-
-	CoverPath, _ := filepath.Abs("./cover.jpg")
-	file, err := os.Create(CoverPath)
+	body, err := ioutil.ReadAll(res.Body)
 	if err != nil {
-		fmt.Println(err.Error())
+		fmt.Printf("封面地址[%s]下载失败，改为直接生成封面!\n", coverURL)
+		GenerateCover(this)
+		//直接在此处结束进程，返回到上级进程中
+		return err
 	}
-	defer file.Close()
+	//使用
+	newCoverpath, _ := filepath.Abs("./cover.jpg")
+	ioutil.WriteFile(newCoverpath, body, 0666)
 
-	writer := bufio.NewWriter(file)
+	return nil
 
-	io.Copy(writer, reader) //把下载到的文件保存到cover.jpg文件当中
+}
 
+//GetCover 主要用于从 起点中文网上提取小说的封面
+func (this BookInfo) GetCover() error {
+	options := []chromedp.ExecAllocatorOption{
+		//chromedp.Flag("headless", false), // debug使用
+		chromedp.Flag("blink-settings", "imagesEnabled=false"),
+		chromedp.UserAgent(`Mozilla/5.0 (Windows NT 6.3; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/73.0.3683.103 Safari/537.36`),
+	}
+	options = append(chromedp.DefaultExecAllocatorOptions[:], options...)
+
+	c, _ := chromedp.NewExecAllocator(context.Background(), options...)
+
+	// create context
+	chromeCtx, cancel := chromedp.NewContext(c, chromedp.WithLogf(log.Printf))
+	// 执行一个空task, 用提前创建Chrome实例
+	chromedp.Run(chromeCtx, make([]chromedp.Action, 0, 1)...)
+	timeoutCtx, cancel := context.WithTimeout(chromeCtx, 20*time.Second)
+	defer cancel()
+
+	var nodes []*cdp.Node
+	searchLink := "https://www.qidian.com/search?kw=" + this.Name
+	err := chromedp.Run(timeoutCtx,
+		chromedp.Navigate(searchLink),
+		chromedp.WaitVisible(`div[id="result-list"]`),
+		chromedp.Nodes("//div[@id='result-list']//div[@class='book-img-text']//ul//li[1]//div[@class='book-img-box']//a//img", &nodes),
+	)
+	if err != nil {
+		return err
+	}
+
+	if len(nodes) < 1 {
+		return errors.New("无法获取到封面地址，或者小说名字错误！")
+	}
+	CoverURL := "https:" + nodes[0].AttributeValue("src")
+	this.DownloadCoverImage(CoverURL)
+	//到最后返回nil
+	return this.DownloadCoverImage(CoverURL)
 }
