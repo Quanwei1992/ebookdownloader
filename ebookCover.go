@@ -143,15 +143,17 @@ func (this BookInfo) GetCover() error {
 		chromedp.WaitVisible(`div[id="result-list"]`),
 		chromedp.Nodes("//div[@id='result-list']//div[@class='book-img-text']//ul//li[1]//div[@class='book-img-box']//a//img", &nodes),
 	)
+	//当执行出错的时候，优化执行生成封面，再返回错误信息
 	if err != nil {
+		GenerateCover(this)
 		return err
 	}
-
+	//当执行出错的时候，优化执行生成封面，再返回错误信息
 	if len(nodes) < 1 {
+		GenerateCover(this)
 		return errors.New("无法获取到封面地址，或者小说名字错误！")
 	}
 	CoverURL := "https:" + nodes[0].AttributeValue("src")
-	this.DownloadCoverImage(CoverURL)
 	//到最后返回nil
 	return this.DownloadCoverImage(CoverURL)
 }
