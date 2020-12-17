@@ -37,14 +37,48 @@ before_install: |-
    case $TRAVIS_OS_NAME in
       linux)
         sudo apt-get install -y libgl1-mesa-dev xorg-dev p7zip-full
+        git clone https://github.com/visualfc/goqt/ui $GOPATH/src/github.com/visualfc/goqt
+        cd $GOPATH/src/github.com/visualfc/goqt/qtdrv
+        qmake "CONFIG+=release"
+        make
+        make install
+        cd $GOPATH/src/github.com/visualfc/goqt/ui
+        go build
+        go install
+        cd $GOPATH/src/github.com/visualfc/goqt/tools/rcc
+        qmake "CONFIG+=release"
+        make
+        make install
        ;;
      windows)
        go get github.com/akavel/rsrc
+       git clone https://github.com/visualfc/goqt/ui $GOPATH/src/github.com/visualfc/goqt
+       cd $GOPATH/src/github.com/visualfc/goqt/qtdrv
+       qmake "CONFIG+=release"
+       make
+       cd $GOPATH/src/github.com/visualfc/goqt/ui
+       go build
+       go install
+       cd $GOPATH/src/github.com/visualfc/goqt/tools/rcc
+       qmake "CONFIG+=release"
+       make
        ;;
       osx)
        brew install glew
        brew install glfw3
        brew install p7zip
+       git clone https://github.com/visualfc/goqt/ui $GOPATH/src/github.com/visualfc/goqt
+       cd $GOPATH/src/github.com/visualfc/goqt/qtdrv
+       qmake "CONFIG+=release"
+       make
+       make install
+       cd $GOPATH/src/github.com/visualfc/goqt/ui
+       go build
+       go install
+       cd $GOPATH/src/github.com/visualfc/goqt/tools/rcc
+       qmake "CONFIG+=release"
+       make
+       make install
        ;;
      esac
 
