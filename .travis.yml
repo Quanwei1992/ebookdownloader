@@ -2,28 +2,26 @@
 # test in https://config.travis-ci.com/explore
 language: go
 
-dist: bionic
-
 version: ~> 1.0
 
+# 设置初始环境
 os: linux
+dist: bionic
 
 jobs:
   include:
     - os: linux
       arch: amd64
+      dist: bionic
+      sudo: required
       env: TRAVIS_ARCH="amd64"
-    - os: linux
-      arch: arm64
-      env: TRAVIS_ARCH="arm64"
-    - os: windows
-      arch: amd64
     - os: osx
       arch: amd64
+      osx_image: xcode11
    
 
 go:
-   - 1.13.x
+   - 1.14.x
 
 git:
    depth: 1
@@ -32,12 +30,30 @@ env:
  global:
     - GO111MODULE=on
 
-# 安装依赖程序
+# 更新系统文件
 before_install: |-
    case $TRAVIS_OS_NAME in
       linux)
+        sudo add-apt-repository ppa:dominik-stadler/ppa -y
+        sudo add-apt-repository ppa:hnakamur/yaml-cpp -y
+        sudo add-apt-repository ppa:panfaust/qt3 -y
+        sudo add-apt-repository ppa:ymshenyu/grpc -y
+        sudo add-apt-repository ppa:savoury1/backports -y
+        sudo add-apt-repository ppa:ubuntu-toolchain-r/test -y
+        sudo apt-get update
+        ;;
+      osx)
+         brew update
+        ;;
+      esac
+
+# 安装依赖程序
+install: |-
+   case $TRAVIS_OS_NAME in
+      linux)
         sudo apt-get install -y libgl1-mesa-dev xorg-dev p7zip-full
-        git clone https://github.com/visualfc/goqt/ui $GOPATH/src/github.com/visualfc/goqt
+        sudo apt-get install debhelper gcc-7 g++-7 libqrencode-dev libzbar-dev libgl-dev git build-essential python-dev autoconf autotools-dev libicu-dev libbz2-dev checkinstall zlib1g zlib1g-dev python3 pkg-config libprotobuf-dev libgrpc++-dev protobuf-compiler protobuf-c-compiler protobuf-compiler-grpc libsodium-dev libuv1-dev  libssl-dev libyaml-cpp-dev qtbase5-dev qttools5-dev qt5-default -y
+        git clone https://github.com/visualfc/goqt $GOPATH/src/github.com/visualfc/goqt
         cd $GOPATH/src/github.com/visualfc/goqt/qtdrv
         qmake "CONFIG+=release"
         make
@@ -50,24 +66,14 @@ before_install: |-
         make
         make install
        ;;
-     windows)
-       go get github.com/akavel/rsrc
-       git clone https://github.com/visualfc/goqt/ui $GOPATH/src/github.com/visualfc/goqt
-       cd $GOPATH/src/github.com/visualfc/goqt/qtdrv
-       qmake "CONFIG+=release"
-       make
-       cd $GOPATH/src/github.com/visualfc/goqt/ui
-       go build
-       go install
-       cd $GOPATH/src/github.com/visualfc/goqt/tools/rcc
-       qmake "CONFIG+=release"
-       make
-       ;;
       osx)
-       brew install glew
-       brew install glfw3
-       brew install p7zip
-       git clone https://github.com/visualfc/goqt/ui $GOPATH/src/github.com/visualfc/goqt
+       brew install glew glfw3 p7zip
+       brew install zbar qrencode openssl@1.1 zlib pcre python3 libsodium libuv grpc pkg-config yaml-cpp
+       brew reinstall https://raw.githubusercontent.com/Homebrew/homebrew-core/8846805afc0cb8e5d114d5e222af1de3b35289df/Formula/qt.rb --verbose
+       rm -rf /usr/local/opt/protobuf/lib/libprotobuf-lite.*
+       cp -r framework/Sparkle.framework /usr/local/Cellar/qt/5.14.2/lib
+       cp -r framework/LetsMove.framework /usr/local/Cellar/qt/5.14.2/lib
+       git clone https://github.com/visualfc/goqt $GOPATH/src/github.com/visualfc/goqt
        cd $GOPATH/src/github.com/visualfc/goqt/qtdrv
        qmake "CONFIG+=release"
        make
@@ -84,47 +90,26 @@ before_install: |-
 
 # 运行脚本前
 before_script:
-   - git config --global user.name sndnvaps
-   - git config --global user.email sndnvaps@gmail.com
+   - if [ "$TRAVIS_OS_NAME" = "osx" ]; then
+       export PATH="/usr/local/Cellar/qt/5.14.2/bin:$PATH";
+     fi
 
 # 运行脚本进行编译
 script: |-
   case $TRAVIS_OS_NAME in
     linux)
-      case $TRAVIS_ARCH in
-       amd64)
-          echo "Run go test -> $TRAVIS_OS_NAME-$TRAVIS_ARCH"
-          cd $TRAVIS_BUILD_DIR
-          go test
-          cd $TRAVIS_BUILD_DIR/cli
-          GOOS=linux  GOARCH=amd64 go build -ldflags "-s -w -X main.Version=${TRAVIS_TAG} -X main.Commit=${TRAVIS_COMMIT} -X main.BuildTime=$(date +'%Y-%m-%d_%T')" -o ebookdownloader_linux_-amd64-cli
-          cp ebookdownloader_linux_-amd64-cli ../
-          cd $TRAVIS_BUILD_DIR/gui
-          GOOS=linux  GOARCH=amd64 go build -ldflags "-s -w -X main.Version=${TRAVIS_TAG} -X main.Commit=${TRAVIS_COMMIT} -X main.BuildTime=$(date +'%Y-%m-%d_%T')" -o ebookdownloader_linux_-amd64-gui
-          cp ebookdownloader_linux_-amd64-gui ../
-          cd $TRAVIS_BUILD_DIR/http-server
-          GOOS=linux  GOARCH=amd64 go build -ldflags "-s -w -X main.Version=${TRAVIS_TAG} -X main.Commit=${TRAVIS_COMMIT} -X main.BuildTime=$(date +'%Y-%m-%d_%T')" -o ebookdownloader_linux_-amd64-http-server
-          cp ebookdownloader_linux_-amd64-http-server ../
-          ;;
-       arm64)
-          echo "Run go test -> $TRAVIS_OS_NAME-$TRAVIS_ARCH"
-          cd $TRAVIS_BUILD_DIR
-          go test
-          cd $TRAVIS_BUILD_DIR/cli
-          GOOS=linux  GOARCH=arm64 go build -ldflags "-s -w -X main.Version=${TRAVIS_TAG} -X main.Commit=${TRAVIS_COMMIT} -X main.BuildTime=$(date +'%Y-%m-%d_%T')" -o ebookdownloader_linux_-arm64-cli
-          cp ebookdownloader_linux_-arm64-cli ../
-          GOOS=linux  GOARCH=arm GOARM=7 go build -ldflags "-s -w -X main.Version=${TRAVIS_TAG} -X main.Commit=${TRAVIS_COMMIT} -X main.BuildTime=$(date +'%Y-%m-%d_%T')" -o ebookdownloader_linux_-armv7-cli
-          cp ebookdownloader_linux_-armv7-cli ../
-          cd $TRAVIS_BUILD_DIR/gui
-          GOOS=linux GOARCH=arm64 go build -ldflags "-s -w -X main.Version=${TRAVIS_TAG} -X main.Commit=${TRAVIS_COMMIT} -X main.BuildTime=$(date +'%Y-%m-%d_%T')" -o ebookdownloader_linux_-arm64-gui
-          cp ebookdownloader_linux_-arm64-gui ../
-          cd $TRAVIS_BUILD_DIR/http-server
-          GOOS=linux GOARCH=arm64 go build -ldflags "-s -w -X main.Version=${TRAVIS_TAG} -X main.Commit=${TRAVIS_COMMIT} -X main.BuildTime=$(date +'%Y-%m-%d_%T')" -o ebookdownloader_linux_-arm64-http-server
-          cp ebookdownloader_linux_-arm64-http-server ../
-          GOOS=linux GOARCH=arm GOARM=7 go build -ldflags "-s -w -X main.Version=${TRAVIS_TAG} -X main.Commit=${TRAVIS_COMMIT} -X main.BuildTime=$(date +'%Y-%m-%d_%T')" -o ebookdownloader_linux_-armv7-http-server
-          cp ebookdownloader_linux_-armv7-http-server ../
-          ;;
-        esac
+      echo "Run go test -> $TRAVIS_OS_NAME-$TRAVIS_ARCH"
+      cd $TRAVIS_BUILD_DIR
+      go test
+      cd $TRAVIS_BUILD_DIR/cli
+      GOOS=linux  GOARCH=amd64 go build -ldflags "-s -w -X main.Version=${TRAVIS_TAG} -X main.Commit=${TRAVIS_COMMIT} -X main.BuildTime=$(date +'%Y-%m-%d_%T')" -o ebookdownloader_linux_-amd64-cli
+      cp ebookdownloader_linux_-amd64-cli ../
+      cd $TRAVIS_BUILD_DIR/gui
+      GOOS=linux  GOARCH=amd64 go build -ldflags "-s -w -X main.Version=${TRAVIS_TAG} -X main.Commit=${TRAVIS_COMMIT} -X main.BuildTime=$(date +'%Y-%m-%d_%T')" -o ebookdownloader_linux_-amd64-gui
+      cp ebookdownloader_linux_-amd64-gui ../
+      cd $TRAVIS_BUILD_DIR/http-server
+      GOOS=linux  GOARCH=amd64 go build -ldflags "-s -w -X main.Version=${TRAVIS_TAG} -X main.Commit=${TRAVIS_COMMIT} -X main.BuildTime=$(date +'%Y-%m-%d_%T')" -o ebookdownloader_linux_-amd64-http-server
+      cp ebookdownloader_linux_-amd64-http-server ../
       ;;
     osx)
       echo "Run go test -> $TRAVIS_OS_NAME-$TRAVIS_ARCH"
@@ -140,82 +125,29 @@ script: |-
       GOOS=darwin  GOARCH=amd64 go build -ldflags "-s -w -X main.Version=${TRAVIS_TAG} -X main.Commit=${TRAVIS_COMMIT} -X main.BuildTime=$(date +'%Y-%m-%d_%T')" -o ebookdownloader_darwin_-amd64-http-server
       cp ebookdownloader_darwin_-amd64-http-server ../
       ;;
-   windows)
-      powershell Write-Host "Run go test -> $TRAVIS_OS_NAME-$TRAVIS_ARCH"
-      cd $TRAVIS_BUILD_DIR
-      go test
-      cd $TRAVIS_BUILD_DIR/cli
-      rsrc -manifest ./ebookdownloader_cli.manifest -ico ./ebookdownloader.ico -arch amd64 -o rsrc_x64.syso
-      GOOS=windows  GOARCH=amd64 go build -ldflags "-s -w -X main.Version=${TRAVIS_TAG} -X main.Commit=${TRAVIS_COMMIT} -X main.BuildTime=$(date +'%Y-%m-%d_%T')" -o ebookdownloader_windows_-amd64-cli.exe
-      powershell copy-item ebookdownloader_windows_-amd64-cli.exe ../
-      powershell remove-item rsrc_x64.syso
-      cd $TRAVIS_BUILD_DIR/gui
-      rsrc -manifest ./ebookdownloader_gui.manifest -ico ./ebookdownloader.ico -arch amd64 -o rsrc_x64.syso
-      GOOS=windows  GOARCH=amd64 go build -ldflags "-H windowsgui -w -s -X main.Version=${TRAVIS_TAG} -X main.Commit=${TRAVIS_COMMIT} -X main.BuildTime=$(date +'%Y-%m-%d_%T') -linkmode external -extldflags '-static'" -o ebookdownloader_windows_-amd64-gui.exe
-      powershell copy-item ebookdownloader_windows_-amd64-gui.exe ../
-      powershell remove-item rsrc_x64.syso
-      cd $TRAVIS_BUILD_DIR/http-server
-      rsrc -manifest ./ebookdownloader_http.manifest -ico ./ebookdownloader.ico -arch amd64 -o rsrc_x64.syso
-      GOOS=windows  GOARCH=amd64 go build -ldflags "-s -w -X main.Version=${TRAVIS_TAG} -X main.Commit=${TRAVIS_COMMIT} -X main.BuildTime=$(date +'%Y-%m-%d_%T')" -o ebookdownloader_windows_-amd64-http-server.exe
-      powershell copy-item ebookdownloader_windows_-amd64-http-server.exe ../
-      powershell remove-item rsrc_x64.syso
-      ;;
      esac
 
 # 编译完成后，打包
 after_success: |-
  case $TRAVIS_OS_NAME in
     linux)
-      case $TRAVIS_ARCH in
-       amd64)
-          cd $TRAVIS_BUILD_DIR/
-          wget https://github.com/upx/upx/releases/download/v3.96/upx-3.96-amd64_linux.tar.xz -O $TRAVIS_BUILD_DIR/upx-3.96-amd64_linux.tar.xz
-          tar -xvJf $TRAVIS_BUILD_DIR/upx-3.96-amd64_linux.tar.xz -C $TRAVIS_BUILD_DIR/ upx-3.96-amd64_linux/upx
-          rm -rf upx-3.96-amd64_linux.tar.xz
-          $TRAVIS_BUILD_DIR/upx-3.96-amd64_linux/upx -9 ebookdownloader_linux_-amd64-cli
-          $TRAVIS_BUILD_DIR/upx-3.96-amd64_linux/upx -9 ebookdownloader_linux_-amd64-gui
-          $TRAVIS_BUILD_DIR/upx-3.96-amd64_linux/upx -9 ebookdownloader_linux_-amd64-http-server
-          rm -rf upx-3.96-amd64_linux
-          $TRAVIS_BUILD_DIR/ebookdownloader_linux_-amd64-cli
-          echo "Packing ebookdownloader-${TRAVIS_TAG}-${TRAVIS_OS_NAME}-${TRAVIS_ARCH}.zip"
-          7z a -tzip ebookdownloader-${TRAVIS_TAG}-${TRAVIS_OS_NAME}-${TRAVIS_ARCH}.zip tools/kindlegenLinux tpls/* fonts/* conf/* qrcode/* LICENSE CHANGELOG README.md ebookdownloader_linux_-amd64-cli ebookdownloader_linux_-amd64-gui ebookdownloader_linux_-amd64-http-server
-          ;;
-       arm64)
-          cd $TRAVIS_BUILD_DIR/
-          wget https://github.com/upx/upx/releases/download/v3.96/upx-3.96-arm64_linux.tar.xz -O $TRAVIS_BUILD_DIR/upx-3.96-arm64_linux.tar.xz
-          tar -xvJf $TRAVIS_BUILD_DIR/upx-3.96-arm64_linux.tar.xz -C $TRAVIS_BUILD_DIR/ upx-3.96-arm64_linux/upx         
-          rm -rf upx-3.96-arm64_linux.tar.xz
-          $TRAVIS_BUILD_DIR/upx-3.96-arm64_linux/upx -9 ebookdownloader_linux_-arm64-cli
-          $TRAVIS_BUILD_DIR/upx-3.96-arm64_linux/upx -9 ebookdownloader_linux_-arm64-gui
-          $TRAVIS_BUILD_DIR/upx-3.96-arm64_linux/upx -9 ebookdownloader_linux_-arm64-http-server
-          $TRAVIS_BUILD_DIR/upx-3.96-arm64_linux/upx -9 ebookdownloader_linux_-armv7-cli
-          $TRAVIS_BUILD_DIR/upx-3.96-arm64_linux/upx -9 ebookdownloader_linux_-armv7-http-server
-          rm -rf upx-3.96-arm64_linux
-          $TRAVIS_BUILD_DIR/ebookdownloader_linux_-arm64-cli
-          echo "Packing ebookdownloader-${TRAVIS_TAG}-${TRAVIS_OS_NAME}-${TRAVIS_ARCH}.zip"
-          7z a -tzip ebookdownloader-${TRAVIS_TAG}-linux-arm64.zip tools/kindlegenLinux tools/qemu-i386-static-arm64 tpls/* fonts/* conf/* qrcode/* LICENSE CHANGELOG README.md ebookdownloader_linux_-arm64-cli ebookdownloader_linux_-arm64-gui ebookdownloader_linux_-arm64-http-server
-          7z a -tzip ebookdownloader-${TRAVIS_TAG}-linux-armv7.zip tools/kindlegenLinux tools/qemu-i386-static-armhf tpls/* fonts/* conf/* qrcode/* LICENSE CHANGELOG README.md ebookdownloader_linux_-armv7-cli ebookdownloader_linux_-armv7-http-server
-          ;;
-       esac
+     cd $TRAVIS_BUILD_DIR/
+     wget https://github.com/upx/upx/releases/download/v3.96/upx-3.96-amd64_linux.tar.xz -O $TRAVIS_BUILD_DIR/upx-3.96-amd64_linux.tar.xz
+     tar -xvJf $TRAVIS_BUILD_DIR/upx-3.96-amd64_linux.tar.xz -C $TRAVIS_BUILD_DIR/ upx-3.96-amd64_linux/upx
+     rm -rf upx-3.96-amd64_linux.tar.xz
+     $TRAVIS_BUILD_DIR/upx-3.96-amd64_linux/upx -9 ebookdownloader_linux_-amd64-cli
+     $TRAVIS_BUILD_DIR/upx-3.96-amd64_linux/upx -9 ebookdownloader_linux_-amd64-gui
+     $TRAVIS_BUILD_DIR/upx-3.96-amd64_linux/upx -9 ebookdownloader_linux_-amd64-http-server
+     rm -rf upx-3.96-amd64_linux
+     $TRAVIS_BUILD_DIR/ebookdownloader_linux_-amd64-cli
+     echo "Packing ebookdownloader-${TRAVIS_TAG}-${TRAVIS_OS_NAME}-${TRAVIS_ARCH}.zip"
+     7z a -tzip ebookdownloader-${TRAVIS_TAG}-${TRAVIS_OS_NAME}-${TRAVIS_ARCH}.zip tools/kindlegenLinux tpls/* fonts/* conf/* qrcode/* LICENSE CHANGELOG README.md ebookdownloader_linux_-amd64-cli ebookdownloader_linux_-amd64-gui ebookdownloader_linux_-amd64-http-server
       ;;
     osx)
      echo "Packing ebookdownloader-${TRAVIS_TAG}-${TRAVIS_OS_NAME}-${TRAVIS_ARCH}.zip"
      cd $TRAVIS_BUILD_DIR/
      $TRAVIS_BUILD_DIR/ebookdownloader_darwin_-amd64-cli
      7z a -tzip ebookdownloader-${TRAVIS_TAG}-darwin-amd64.zip tools/kindlegenMac tpls/* fonts/* conf/* qrcode/* LICENSE CHANGELOG README.md ebookdownloader_darwin_-amd64-cli ebookdownloader_darwin_-amd64-gui ebookdownloader_darwin_-amd64-http-server
-      ;;
-   windows)
-     cd $TRAVIS_BUILD_DIR/
-     wget https://github.com/upx/upx/releases/download/v3.96/upx-3.96-win64.zip -O upx-3.96-win64.zip
-     7z e upx-3.96-win64.zip -O$TRAVIS_BUILD_DIR/ upx-3.96-win64/upx.exe
-     $TRAVIS_BUILD_DIR/upx -9 ebookdownloader_windows_-amd64-cli.exe
-     $TRAVIS_BUILD_DIR/upx -9 ebookdownloader_windows_-amd64-gui.exe
-     $TRAVIS_BUILD_DIR/upx -9 ebookdownloader_windows_-amd64-http-server.exe
-     powershell Remove-Item upx-3.96-win64.zip
-     powershell Remove-Item upx.exe
-     powershell Write-Host "Packing ebookdownloader-${TRAVIS_TAG}-${TRAVIS_OS_NAME}-${TRAVIS_ARCH}.zip"
-     $TRAVIS_BUILD_DIR/ebookdownloader_windows_-amd64-cli.exe
-     7z a -tzip ebookdownloader-${TRAVIS_TAG}-windows-amd64.zip tools/kindlegen.exe tpls/* fonts/* conf/* qrcode/* LICENSE CHANGELOG README.md ebookdownloader_windows_-amd64-cli.exe ebookdownloader_windows_-amd64-gui.exe ebookdownloader_windows_-amd64-http-server.exe
       ;;
   esac
 
@@ -230,10 +162,7 @@ deploy:
   token: ${GITHUB_TOKEN}
   file:
     - "$TRAVIS_BUILD_DIR/ebookdownloader-${TRAVIS_TAG}-linux-amd64.zip"
-    - "$TRAVIS_BUILD_DIR/ebookdownloader-${TRAVIS_TAG}-linux-arm64.zip"
-    - "$TRAVIS_BUILD_DIR/ebookdownloader-${TRAVIS_TAG}-linux-armv7.zip"
     - "$TRAVIS_BUILD_DIR/ebookdownloader-${TRAVIS_TAG}-darwin-amd64.zip"
-    - "$TRAVIS_BUILD_DIR/ebookdownloader-${TRAVIS_TAG}-windows-amd64.zip"
   skip_cleanup: true
   on:
     tags: true
