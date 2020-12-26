@@ -11,6 +11,15 @@ import (
 	ebook "github.com/sndnvaps/ebookdownloader/ebook-sources"
 )
 
+var (
+	//Version 版本信息
+	Version string = "dev"
+	//Commit git commit信息
+	Commit string = "7caf59d"
+	//BuildTime 编译时间
+	BuildTime string = "2020-05-01 20:50"
+)
+
 //MainWindowForm struct
 type MainWindowForm struct {
 	mw     *ui.QMainWindow
@@ -24,9 +33,16 @@ func NewMainWindow() *MainWindowForm {
 	w.mw = ui.NewMainWindow()
 	w.mw.InstallEventFilter(w)
 
+	//设置程序图标
+	Icon := ui.NewPixmap()
+	IconData, _ := Asset("ebookdownloader.ico")
+	Icon.LoadFromData(IconData)
+	EBDIcon := ui.NewIconWithPixmap(Icon)
+	w.mw.SetWindowIcon(EBDIcon) //设置图标
+
 	w.widget, _ = NewEbookDlForm()
 
-	w.mw.SetCentralWidget(w.widget.m)
+	w.mw.SetCentralWidget(w.widget)
 	w.createActions()
 
 	return w
@@ -36,8 +52,9 @@ func NewMainWindow() *MainWindowForm {
 func (w *MainWindowForm) createActions() {
 
 	aboutAct := ui.NewActionWithTextParent("关于本软件", w.mw)
+	AboutMessage := fmt.Sprintf("本软件用go+goqt编写，主要用于下载小说\n编译版本:%s\nCommitHash:%s\n编译时间:%s\n声明：下载的小说只能本人阅读，不可再次分发于网络上！", Version, Commit, BuildTime)
 	aboutAct.OnTriggered(func() {
-		ui.QMessageBoxAbout(w.mw, "关于本软件", "本软件用go+goqt编写，主要用于下载小说\n声明：下载的小说只能本人阅读，不可再次分发于网络上！")
+		ui.QMessageBoxAbout(w.mw, "关于本软件", AboutMessage)
 	})
 	aboutQtAct := ui.NewActionWithTextParent("关于QT", w.mw)
 	aboutQtAct.OnTriggered(func() { ui.QApplicationAboutQt() })
@@ -51,7 +68,7 @@ func (w *MainWindowForm) createActions() {
 }
 
 type EbookdlForm struct {
-	m           *ui.QWidget
+	*ui.QWidget
 	sfNameLabel *ui.QLabel
 	bookIdLabel *ui.QLabel
 	proxyLabel  *ui.QLabel
@@ -73,8 +90,9 @@ type EbookdlForm struct {
 
 func NewEbookDlForm() (*EbookdlForm, error) {
 	w := &EbookdlForm{}
-	w.m = ui.NewWidget()
-	w.m.SetFixedSizeWithWidthHeight(400, 400) //设置固定大小的窗口
+	w.QWidget = ui.NewWidget()
+
+	w.SetFixedSizeWithWidthHeight(400, 400) //设置固定大小的窗口
 
 	file := ui.NewFileWithName(":/forms/ebookdlform.ui")
 
@@ -182,8 +200,8 @@ func NewEbookDlForm() (*EbookdlForm, error) {
 
 	layout := ui.NewVBoxLayout()
 	layout.AddWidget(formWidget)
-	w.m.SetLayout(layout)
+	w.SetLayout(layout)
 
-	w.m.SetWindowTitle("Ebookdownloader")
+	w.SetWindowTitle("Ebookdownloader")
 	return w, nil
 }
