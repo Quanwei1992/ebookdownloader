@@ -52,23 +52,24 @@ install: |-
    case $TRAVIS_OS_NAME in
       linux)
         sudo apt-get install -y libgl1-mesa-dev xorg-dev p7zip-full
-        sudo apt-get install debhelper gcc-7 g++-7 libqrencode-dev libzbar-dev libgl-dev git build-essential python-dev autoconf autotools-dev libicu-dev libbz2-dev checkinstall zlib1g zlib1g-dev python3 pkg-config libprotobuf-dev libgrpc++-dev protobuf-compiler protobuf-c-compiler protobuf-compiler-grpc libsodium-dev libuv1-dev  libssl-dev libyaml-cpp-dev qtbase5-dev qttools5-dev qt5-default -y
+        sudo apt-get install debhelper gcc-7 g++-7 libqrencode-dev libzbar-dev libgl-dev git build-essential python-dev autoconf autotools-dev libicu-dev libbz2-dev checkinstall zlib1g zlib1g-dev python3 pkg-config libsodium-dev libuv1-dev  libssl-dev libyaml-cpp-dev qtbase5-dev qttools5-dev qt5-default -y
         git clone https://github.com/visualfc/goqt $GOPATH/src/github.com/visualfc/goqt
         cd $GOPATH/src/github.com/visualfc/goqt/qtdrv
         qmake "CONFIG+=release"
-        make
-        make install
+        sudo make
+        sudo make install
         cd $GOPATH/src/github.com/visualfc/goqt/ui
         go build
         go install
         cd $GOPATH/src/github.com/visualfc/goqt/tools/rcc
         qmake "CONFIG+=release"
-        make
-        make install
+        sudo make
+        sudo make install
+        sudo install $GOPATH/src/github.com/visualfc/goqt/bin/goqt_rcc /usr/local/bin/goqt_rcc
        ;;
       osx)
        brew install glew glfw3 p7zip
-       brew install zbar qrencode openssl@1.1 zlib pcre python3 libsodium libuv grpc pkg-config yaml-cpp
+       brew install zbar qrencode openssl@1.1 zlib pcre python3 libsodium libuv  pkg-config yaml-cpp
        brew reinstall https://raw.githubusercontent.com/Homebrew/homebrew-core/8846805afc0cb8e5d114d5e222af1de3b35289df/Formula/qt.rb --verbose
        rm -rf /usr/local/opt/protobuf/lib/libprotobuf-lite.*
        cp -r framework/Sparkle.framework /usr/local/Cellar/qt/5.14.2/lib
@@ -92,6 +93,12 @@ install: |-
 before_script:
    - if [ "$TRAVIS_OS_NAME" = "osx" ]; then
        export PATH="/usr/local/Cellar/qt/5.14.2/bin:$PATH";
+       export PATH="/usr/local/opt/qt/bin:$PATH";
+       export LDFLAGS="-L/usr/local/opt/qt/lib";
+       export CPPFLAGS="-I/usr/local/opt/qt/include";
+       export PATH="/usr/local/opt/python@3.8/bin:$PATH";
+       export LDFLAGS="-L/usr/local/opt/python@3.8/lib";
+       export PKG_CONFIG_PATH="/usr/local/opt/python@3.8/lib/pkgconfig";
      fi
 
 # 运行脚本进行编译
@@ -110,6 +117,9 @@ script: |-
       cd $TRAVIS_BUILD_DIR/http-server
       GOOS=linux  GOARCH=amd64 go build -ldflags "-s -w -X main.Version=${TRAVIS_TAG} -X main.Commit=${TRAVIS_COMMIT} -X main.BuildTime=$(date +'%Y-%m-%d_%T')" -o ebookdownloader_linux_-amd64-http-server
       cp ebookdownloader_linux_-amd64-http-server ../
+      cd $TRAVIS_BUILD_DIR/qtgui
+      GOOS=linux  GOARCH=amd64 go build -ldflags "-s -w -X main.Version=${TRAVIS_TAG} -X main.Commit=${TRAVIS_COMMIT} -X main.BuildTime=$(date +'%Y-%m-%d_%T')" -o ebookdownloader_linux_-amd64-http-server
+      cp ebookdownloader_linux_-amd64-qtgui ../
       ;;
     osx)
       echo "Run go test -> $TRAVIS_OS_NAME-$TRAVIS_ARCH"
