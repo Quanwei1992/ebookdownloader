@@ -118,7 +118,7 @@ script: |-
       GOOS=linux  GOARCH=amd64 go build -ldflags "-s -w -X main.Version=${TRAVIS_TAG} -X main.Commit=${TRAVIS_COMMIT} -X main.BuildTime=$(date +'%Y-%m-%d_%T')" -o ebookdownloader_linux_-amd64-http-server
       cp ebookdownloader_linux_-amd64-http-server ../
       cd $TRAVIS_BUILD_DIR/qtgui
-      GOOS=linux  GOARCH=amd64 go build -ldflags "-s -w -X main.Version=${TRAVIS_TAG} -X main.Commit=${TRAVIS_COMMIT} -X main.BuildTime=$(date +'%Y-%m-%d_%T')" -o ebookdownloader_linux_-amd64-http-server
+      GOOS=linux  GOARCH=amd64 go build -ldflags "-s -w -X main.Version=${TRAVIS_TAG} -X main.Commit=${TRAVIS_COMMIT} -X main.BuildTime=$(date +'%Y-%m-%d_%T')" -o ebookdownloader_linux_-amd64-qtgui
       cp ebookdownloader_linux_-amd64-qtgui ../
       ;;
     osx)
