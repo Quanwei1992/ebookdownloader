@@ -152,12 +152,14 @@ after_success: |-
      $TRAVIS_BUILD_DIR/ebookdownloader_linux_-amd64-cli
      echo "Packing ebookdownloader-${TRAVIS_TAG}-${TRAVIS_OS_NAME}-${TRAVIS_ARCH}.zip"
      7z a -tzip ebookdownloader-${TRAVIS_TAG}-${TRAVIS_OS_NAME}-${TRAVIS_ARCH}.zip tools/kindlegenLinux tpls/* fonts/* conf/* qrcode/* LICENSE CHANGELOG README.md ebookdownloader_linux_-amd64-cli ebookdownloader_linux_-amd64-gui ebookdownloader_linux_-amd64-http-server
+     python2 $TRAVIS_BUILD_DIR/scripts/checksum.py ebookdownloader-${TRAVIS_TAG}-${TRAVIS_OS_NAME}-${TRAVIS_ARCH}.zip ebookdownloader-${TRAVIS_TAG}-${TRAVIS_OS_NAME}-${TRAVIS_ARCH}.zip.hash
       ;;
     osx)
      echo "Packing ebookdownloader-${TRAVIS_TAG}-${TRAVIS_OS_NAME}-${TRAVIS_ARCH}.zip"
      cd $TRAVIS_BUILD_DIR/
      $TRAVIS_BUILD_DIR/ebookdownloader_darwin_-amd64-cli
      7z a -tzip ebookdownloader-${TRAVIS_TAG}-darwin-amd64.zip tools/kindlegenMac tpls/* fonts/* conf/* qrcode/* LICENSE CHANGELOG README.md ebookdownloader_darwin_-amd64-cli ebookdownloader_darwin_-amd64-gui ebookdownloader_darwin_-amd64-http-server
+      python2 $TRAVIS_BUILD_DIR/scripts/checksum.py ebookdownloader-${TRAVIS_TAG}-${TRAVIS_OS_NAME}-${TRAVIS_ARCH}.zip ebookdownloader-${TRAVIS_TAG}-${TRAVIS_OS_NAME}-${TRAVIS_ARCH}.zip.hash
       ;;
   esac
 
@@ -172,7 +174,9 @@ deploy:
   token: ${GITHUB_TOKEN}
   file:
     - "$TRAVIS_BUILD_DIR/ebookdownloader-${TRAVIS_TAG}-linux-amd64.zip"
+    - "$TRAVIS_BUILD_DIR/ebookdownloader-${TRAVIS_TAG}-linux-amd64.zip.hash"
     - "$TRAVIS_BUILD_DIR/ebookdownloader-${TRAVIS_TAG}-darwin-amd64.zip"
+    - "$TRAVIS_BUILD_DIR/ebookdownloader-${TRAVIS_TAG}-darwin-amd64.zip.hash"
   skip_cleanup: true
   on:
     tags: true
