@@ -81,7 +81,7 @@ install: |-
         git apply *.patch
         cmake CMakeLists.txt
         make
-        sudo cp  ~/linuxdeployqt/tools/linuxdeployqt /usr/local/bin/
+        sudo cp  ~/linuxdeployqt/tools/linuxdeployqt/linuxdeployqt /usr/local/bin/
         sudo chmod a+x /usr/local/bin/linuxdeployqt
         sudo wget -c "https://github.com/AppImage/AppImageKit/releases/download/continuous/appimagetool-x86_64.AppImage" -O /usr/local/bin/appimagetool
         sudo chmod a+x /usr/local/bin/appimagetool
