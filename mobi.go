@@ -10,19 +10,24 @@ import (
 
 	"github.com/Chain-Zhang/pinyin"
 	"github.com/unknwon/com"
+	"github.com/sndnvaps/ebookdownloader/tpls"
 )
 
+
+func bytes2string(in []byte) string {
+	return string(in)
+}
 //GenerateMobi 生成mobi格式电子书
 func (this BookInfo) GenerateMobi() {
 	chapters := this.Chapters //章节信息
 	Volumes := this.Volumes   //分卷信息
-	//tpl_cover := ReadAllString("./tpls/tpl_cover.html")
-	tplBookToc := ReadAllString("./tpls/tpl_book_toc.html")
-	tplChapter := ReadAllString("./tpls/tpl_chapter.html")
-	tplVolume := ReadAllString("./tpls/tpl_volume.html")
-	tplContent := ReadAllString("./tpls/tpl_content.opf")
-	tplStyle := ReadAllString("./tpls/tpl_style.css")
-	tplToc := ReadAllString("./tpls/tpl_toc.ncx")
+	//tpl_cover := bytes2string(tpls.MustAsset("./tpls/tpl_cover.html")
+	tplBookToc :=   bytes2string(tpls.MustAsset("tpls/tpl_book_toc.html"))
+	tplChapter :=  bytes2string(tpls.MustAsset("tpls/tpl_chapter.html"))
+	tplVolume := bytes2string(tpls.MustAsset("tpls/tpl_volume.html"))
+	tplContent := bytes2string(tpls.MustAsset("tpls/tpl_content.opf"))
+	tplStyle := bytes2string(tpls.MustAsset("tpls/tpl_style.css"))
+	tplToc := bytes2string(tpls.MustAsset("tpls/tpl_toc.ncx"))
 	//将文件名转换成拼音
 	strPinyin, _ := pinyin.New(this.Name).Split("-").Mode(pinyin.WithoutTone).Convert()
 	savepath := "./tmp/" + strPinyin

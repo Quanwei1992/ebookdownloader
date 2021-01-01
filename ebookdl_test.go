@@ -117,7 +117,7 @@ func TestGenerateMobi(t *testing.T) {
 	testbi.GenerateMobi()
 	savename := savePath + "/" + testbi.Name + "-" + testbi.Author + ".mobi"
 	assert.True(t, true, isExist(savename))
-	os.RemoveAll(savePath)
+	//os.RemoveAll(savePath)
 }
 
 func TestGenerateAzw3(t *testing.T) {
@@ -134,7 +134,7 @@ func TestGenerateEPUB(t *testing.T) {
 	testbi.GenerateEPUB()
 	savename := savePath + "/" + testbi.Name + "-" + testbi.Author + ".epub"
 	assert.True(t, true, isExist(savename))
-	os.RemoveAll(savePath)
+	//os.RemoveAll(savePath)
 }
 
 // IsExist checks whether a file or directory exists.

@@ -37,10 +37,12 @@ func (this BookInfo) GenerateEPUB() error {
 	// 生成封面
 	//GenerateCover(this)
 	//下载封面
+	
 	err := this.GetCover()
 	if err != nil {
 		fmt.Println(err.Error())
 	}
+	
 	//把封面复制到 tmp 目录当中
 	coverPath, _ := filepath.Abs("./cover.jpg")
 
@@ -56,8 +58,8 @@ func (this BookInfo) GenerateEPUB() error {
 	e := epub.NewEpub(this.Name)
 	e.SetAuthor(this.Author)
 	epubCover, _ := e.AddImage("./outputs/"+this.Name+"-"+this.Author+"/"+"cover.jpg", "cover.jpg")
-	epubCoverCSS, _ := e.AddCSS("./tpls/epub_cover.css", "cover.css")
-	e.SetCover(epubCover, epubCoverCSS)        //设置封面
+	//epubCoverCSS, _ := e.AddCSS("./tpls/epub_cover.css", "cover.css")
+	e.SetCover(epubCover, "")        //设置封面,使用默认的 cover.css, 不做自定义 
 	e.SetDescription(this.Description)         //设置小说简介
 	e.SetIdentifier("urn:isbn:" + bookISBNStr) //设置小说的urn:isbn编码
 	e.SetLang("zh-CN")                         //设置小说的语言为中文

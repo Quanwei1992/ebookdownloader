@@ -59,8 +59,17 @@ func (w *MainWindowForm) createActions() {
 	aboutQtAct := ui.NewActionWithTextParent("关于QT", w.mw)
 	aboutQtAct.OnTriggered(func() { ui.QApplicationAboutQt() })
 
+	updateCheckAct := ui.NewActionWithTextParent(" 检测更新",w.mw)
+	result, _ := edl.UpdateCheck()
+	CompareResult := result.Compare(Version)
+	updateCheckAct.OnTriggered(func() {
+		ui.QMessageBoxAbout(w.mw,"版本信息",CompareResult)
+	})
+
 	helpMenu := w.mw.MenuBar().AddMenuWithTitle("帮助(H)")
 	helpMenu.AddAction(aboutAct)
+	helpMenu.AddSeparator()
+	helpMenu.AddAction(updateCheckAct)
 	helpMenu.AddSeparator()
 	helpMenu.AddAction(aboutQtAct)
 

@@ -1,0 +1,13 @@
+[Desktop Entry]
+Name=Ebook Downloader
+Comment=Ebookdownloader
+GenericName=Ebookdownloader
+Exec=ebookdownloader_gui
+Icon=ebd
+Type=Application
+StartupNotify=false
+Categories=Utility;
+Keywords=ebookdownloader;
+
+X-Desktop-File-Install-Version=0.23
+X-AppImage-Version=cb86a98
