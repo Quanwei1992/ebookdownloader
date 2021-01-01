@@ -77,6 +77,7 @@ install: |-
         git clone https://github.com/probonopd/linuxdeployqt.git  --depth=1 ~/linuxdeployqt
         cp $TRAVIS_BUILD_DIR/linuxdeployqt-patch/*.patch  ~/linuxdeployqt/
         cd ~/linuxdeployqt
+        sudo git fetch origin --tags
         git apply *.patch
         cmake CMakeLists.txt
         make
