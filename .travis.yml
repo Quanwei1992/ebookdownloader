@@ -115,6 +115,7 @@ script: |-
   case $TRAVIS_OS_NAME in
     linux)
       echo "Run go test -> $TRAVIS_OS_NAME-$TRAVIS_ARCH"
+      export PATH=$PATH:/usr/local/bin
       cd $TRAVIS_BUILD_DIR
       go test
       cd $TRAVIS_BUILD_DIR/cli
