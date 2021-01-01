@@ -44,6 +44,13 @@ before_install: |-
         ;;
       osx)
          brew update
+         export PATH="/usr/local/Cellar/qt/5.14.2/bin:$PATH"
+         export PATH="/usr/local/opt/qt/bin:$PATH"
+         export LDFLAGS="-L/usr/local/opt/qt/lib"
+         export CPPFLAGS="-I/usr/local/opt/qt/include"
+         export PATH="/usr/local/opt/python@3.8/bin:$PATH"
+         export LDFLAGS="-L/usr/local/opt/python@3.8/lib"
+         export PKG_CONFIG_PATH="/usr/local/opt/python@3.8/lib/pkgconfig"
         ;;
       esac
 
@@ -53,6 +60,7 @@ install: |-
       linux)
         sudo apt-get install -y libgl1-mesa-dev xorg-dev p7zip-full
         sudo apt-get install debhelper gcc-7 g++-7 libqrencode-dev libzbar-dev libgl-dev git build-essential python-dev autoconf autotools-dev libicu-dev libbz2-dev checkinstall zlib1g zlib1g-dev python3 pkg-config libsodium-dev libuv1-dev  libssl-dev libyaml-cpp-dev qtbase5-dev qttools5-dev qt5-default -y
+        sudo apt-get install -y patchelf cmake
         git clone https://github.com/visualfc/goqt $GOPATH/src/github.com/visualfc/goqt
         cd $GOPATH/src/github.com/visualfc/goqt/qtdrv
         qmake "CONFIG+=release"
@@ -66,6 +74,16 @@ install: |-
         sudo make
         sudo make install
         sudo install $GOPATH/src/github.com/visualfc/goqt/bin/goqt_rcc /usr/local/bin/goqt_rcc
+        git clone https://github.com/probonopd/linuxdeployqt.git  --depth=1 ~/linuxdeployqt
+        cp $TRAVIS_BUILD_DIR/linuxdeployqt-patch/*.patch  ~/linuxdeployqt/
+        cd ~/linuxdeployqt
+        git apply *.patch
+        cmake CMakeLists.txt
+        make
+        sudo cp ./tools/linuxdeployqt /usr/local/bin/
+        sudo chmod a+x /usr/local/bin/linuxdeployqt
+        sudo wget -c "https://github.com/AppImage/AppImageKit/releases/download/continuous/appimagetool-x86_64.AppImage" -O /usr/local/bin/appimagetool
+        sudo chmod a+x /usr/local/bin/appimagetool
        ;;
       osx)
        brew install glew glfw3 p7zip
@@ -90,16 +108,7 @@ install: |-
      esac
 
 # 运行脚本前
-before_script:
-   - if [ "$TRAVIS_OS_NAME" = "osx" ]; then
-       export PATH="/usr/local/Cellar/qt/5.14.2/bin:$PATH";
-       export PATH="/usr/local/opt/qt/bin:$PATH";
-       export LDFLAGS="-L/usr/local/opt/qt/lib";
-       export CPPFLAGS="-I/usr/local/opt/qt/include";
-       export PATH="/usr/local/opt/python@3.8/bin:$PATH";
-       export LDFLAGS="-L/usr/local/opt/python@3.8/lib";
-       export PKG_CONFIG_PATH="/usr/local/opt/python@3.8/lib/pkgconfig";
-     fi
+#before_script:
 
 # 运行脚本进行编译
 script: |-
@@ -111,15 +120,12 @@ script: |-
       cd $TRAVIS_BUILD_DIR/cli
       GOOS=linux  GOARCH=amd64 go build -ldflags "-s -w -X main.Version=${TRAVIS_TAG} -X main.Commit=${TRAVIS_COMMIT} -X main.BuildTime=$(date +'%Y-%m-%d_%T')" -o ebookdownloader_linux_-amd64-cli
       cp ebookdownloader_linux_-amd64-cli ../
-      cd $TRAVIS_BUILD_DIR/gui
-      GOOS=linux  GOARCH=amd64 go build -ldflags "-s -w -X main.Version=${TRAVIS_TAG} -X main.Commit=${TRAVIS_COMMIT} -X main.BuildTime=$(date +'%Y-%m-%d_%T')" -o ebookdownloader_linux_-amd64-gui
-      cp ebookdownloader_linux_-amd64-gui ../
       cd $TRAVIS_BUILD_DIR/http-server
       GOOS=linux  GOARCH=amd64 go build -ldflags "-s -w -X main.Version=${TRAVIS_TAG} -X main.Commit=${TRAVIS_COMMIT} -X main.BuildTime=$(date +'%Y-%m-%d_%T')" -o ebookdownloader_linux_-amd64-http-server
       cp ebookdownloader_linux_-amd64-http-server ../
-      cd $TRAVIS_BUILD_DIR/qtgui
-      GOOS=linux  GOARCH=amd64 go build -ldflags "-s -w -X main.Version=${TRAVIS_TAG} -X main.Commit=${TRAVIS_COMMIT} -X main.BuildTime=$(date +'%Y-%m-%d_%T')" -o ebookdownloader_linux_-amd64-qtgui
-      cp ebookdownloader_linux_-amd64-qtgui ../
+      cd $TRAVIS_BUILD_DIR
+      chmod a+x ./scripts/BuildAppImage.sh
+      ./scripts/BuildAppImage.sh
       ;;
     osx)
       echo "Run go test -> $TRAVIS_OS_NAME-$TRAVIS_ARCH"
@@ -128,9 +134,6 @@ script: |-
       cd $TRAVIS_BUILD_DIR/cli
       GOOS=darwin  GOARCH=amd64 go build -ldflags "-s -w -X main.Version=${TRAVIS_TAG} -X main.Commit=${TRAVIS_COMMIT} -X main.BuildTime=$(date +'%Y-%m-%d_%T')" -o ebookdownloader_darwin_-amd64-cli
       cp ebookdownloader_darwin_-amd64-cli ../
-      cd $TRAVIS_BUILD_DIR/gui
-      GOOS=darwin  GOARCH=amd64 go build -ldflags "-s -w -X main.Version=${TRAVIS_TAG} -X main.Commit=${TRAVIS_COMMIT} -X main.BuildTime=$(date +'%Y-%m-%d_%T')" -o ebookdownloader_darwin_-amd64-gui
-      cp ebookdownloader_darwin_-amd64-gui ../
       cd $TRAVIS_BUILD_DIR/http-server
       GOOS=darwin  GOARCH=amd64 go build -ldflags "-s -w -X main.Version=${TRAVIS_TAG} -X main.Commit=${TRAVIS_COMMIT} -X main.BuildTime=$(date +'%Y-%m-%d_%T')" -o ebookdownloader_darwin_-amd64-http-server
       cp ebookdownloader_darwin_-amd64-http-server ../
@@ -146,19 +149,18 @@ after_success: |-
      tar -xvJf $TRAVIS_BUILD_DIR/upx-3.96-amd64_linux.tar.xz -C $TRAVIS_BUILD_DIR/ upx-3.96-amd64_linux/upx
      rm -rf upx-3.96-amd64_linux.tar.xz
      $TRAVIS_BUILD_DIR/upx-3.96-amd64_linux/upx -9 ebookdownloader_linux_-amd64-cli
-     $TRAVIS_BUILD_DIR/upx-3.96-amd64_linux/upx -9 ebookdownloader_linux_-amd64-gui
      $TRAVIS_BUILD_DIR/upx-3.96-amd64_linux/upx -9 ebookdownloader_linux_-amd64-http-server
      rm -rf upx-3.96-amd64_linux
      $TRAVIS_BUILD_DIR/ebookdownloader_linux_-amd64-cli
      echo "Packing ebookdownloader-${TRAVIS_TAG}-${TRAVIS_OS_NAME}-${TRAVIS_ARCH}.zip"
-     7z a -tzip ebookdownloader-${TRAVIS_TAG}-${TRAVIS_OS_NAME}-${TRAVIS_ARCH}.zip tools/kindlegenLinux tpls/* fonts/* conf/* qrcode/* LICENSE CHANGELOG README.md ebookdownloader_linux_-amd64-cli ebookdownloader_linux_-amd64-gui ebookdownloader_linux_-amd64-http-server
+     7z a -tzip ebookdownloader-${TRAVIS_TAG}-${TRAVIS_OS_NAME}-${TRAVIS_ARCH}.zip tools/kindlegenLinux  conf/* qrcode/* LICENSE CHANGELOG README.md ebookdownloader_linux_-amd64-cli Ebook_Downloader-*-x86_64.AppImage ebookdownloader_linux_-amd64-http-server
      python2 $TRAVIS_BUILD_DIR/scripts/checksum.py ebookdownloader-${TRAVIS_TAG}-${TRAVIS_OS_NAME}-${TRAVIS_ARCH}.zip ebookdownloader-${TRAVIS_TAG}-${TRAVIS_OS_NAME}-${TRAVIS_ARCH}.zip.hash
       ;;
     osx)
      echo "Packing ebookdownloader-${TRAVIS_TAG}-${TRAVIS_OS_NAME}-${TRAVIS_ARCH}.zip"
      cd $TRAVIS_BUILD_DIR/
      $TRAVIS_BUILD_DIR/ebookdownloader_darwin_-amd64-cli
-     7z a -tzip ebookdownloader-${TRAVIS_TAG}-darwin-amd64.zip tools/kindlegenMac tpls/* fonts/* conf/* qrcode/* LICENSE CHANGELOG README.md ebookdownloader_darwin_-amd64-cli ebookdownloader_darwin_-amd64-gui ebookdownloader_darwin_-amd64-http-server
+     7z a -tzip ebookdownloader-${TRAVIS_TAG}-darwin-amd64.zip tools/kindlegenMac conf/* qrcode/* LICENSE CHANGELOG README.md ebookdownloader_darwin_-amd64-cli ebookdownloader_darwin_-amd64-gui ebookdownloader_darwin_-amd64-http-server
       python2 $TRAVIS_BUILD_DIR/scripts/checksum.py ebookdownloader-${TRAVIS_TAG}-${TRAVIS_OS_NAME}-${TRAVIS_ARCH}.zip ebookdownloader-${TRAVIS_TAG}-${TRAVIS_OS_NAME}-${TRAVIS_ARCH}.zip.hash
       ;;
   esac

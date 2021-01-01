@@ -27,11 +27,6 @@ function Clean {
      fi
 }
 
-# Copy the needed file into Release folder
-function CopyFiles {
-    mkdir -p $desBin/tools
-    cp   $BuildPath/tools/kindlegenLinux $desBin/tools/kindlegenLinux
-}
 
 function PackAppImage {
     cp /usr/bin/desktop-file-validate $desBin/
@@ -41,5 +36,4 @@ function PackAppImage {
 
 Clean
 Build
-CopyFiles
 PackAppImage

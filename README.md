@@ -16,7 +16,7 @@
   ## 安装方法
   ```bash
   go get github.com/sndnvaps/ebookdownloader/cli
-  go get github.com/sndnvaps/ebookdownloader/gui
+  go get github.com/sndnvaps/ebookdownloader/qtgui
   go get github.com/sndnvaps/ebookdownloader/http-server
   ```
   ## 使用方法
@@ -39,18 +39,18 @@
     1. kindlegen.exe 支持windows平台
     2. kindlegenLinux 支持Linux 平台
     3. kindlegenMac 支持 Mac平台
-    4. cli/gui 两个项目，都需要在当前项目的根目录运行
-    5. gui程序，需要依赖 https://github.com/akavel/rsrc ，项目来生成图标
-    6. qemu-i386-static-armhf 支持在linux arm平台上运行 kindlegenLinux
-    7. qemu-i386-static-arm64 支持在linux arm64平台上运行 kindlegenLinux
-    8. http-server 项目依赖：
+    4. cli 项目只需要当前目录存在 ./tools/kindlegen（根据不同的平台，名字有所变化）即可运行
+    5. qemu-i386-static-armhf 支持在linux arm平台上运行 kindlegenLinux
+    6. qemu-i386-static-arm64 支持在linux arm64平台上运行 kindlegenLinux
+    7. http-server 项目依赖：
           github.com/ajvb/kala 项目，用于任务控制和管理
           kala需要与ebookdownloader_cli运行在同一个目录里面
-    9. qtgui项目信赖
+    8. qtgui项目信赖
           goqt
           qt
           gcc
-    10. chromedp 项目，用于捉取小说封面
+          https://github.com/akavel/rsrc ,用于生成windows系统中的图标
+    9. chromedp 项目，用于捉取小说封面
            需要安装chrome浏览器，做支持
 
   ## 后端服务器 API接口
@@ -120,3 +120,4 @@
      [√]  12. 添加处理 作者，书名中包含的特殊字符串的方法
      [√]  13. 使用goqt对界面进行重写
      [ ]  14. 更新顶点小说 23us.la地址为23us.lol ->并重写其爬虫规则
+     [√]  15. 打包需要用到的资源到程序中，减少目录数量，kindlegen程序因为技术和安全性考虑，暂不封装到go程序中

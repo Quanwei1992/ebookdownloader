@@ -5,6 +5,8 @@
           2.  qtgui版本，添加 检测更新 功能
           3.  尝试使用linuxdeployqt + appimagetool对 qtgui项目进行打包，尝试生成 *.AppImage程序
           4.  生成封面功能，直接由go代码来完成，不再使用tpls/cover.jpg做为封面底版
+          5.  qtgui生成windows桌面图标（使用https://github.com/akavel/rsrc项目来实现)
+          6.  删除gui版本，功能与qtgui重复
 
     2020.12.16 go版本
            1. 不再使用小说网站的封面，直接捉取 起点中文网的封面做epub,mobi的封面
