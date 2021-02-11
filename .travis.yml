@@ -159,11 +159,11 @@ after_success: |-
      python2 $TRAVIS_BUILD_DIR/scripts/checksum.py ebookdownloader-${TRAVIS_TAG}-${TRAVIS_OS_NAME}-${TRAVIS_ARCH}.zip ebookdownloader-${TRAVIS_TAG}-${TRAVIS_OS_NAME}-${TRAVIS_ARCH}.zip.hash
       ;;
     osx)
-     echo "Packing ebookdownloader-${TRAVIS_TAG}-${TRAVIS_OS_NAME}-${TRAVIS_ARCH}.zip"
+     echo "Packing ebookdownloader-${TRAVIS_TAG}-darwin-${TRAVIS_ARCH}.zip"
      cd $TRAVIS_BUILD_DIR/
      $TRAVIS_BUILD_DIR/ebookdownloader_darwin_-amd64-cli
      7z a -tzip ebookdownloader-${TRAVIS_TAG}-darwin-amd64.zip tools/kindlegenMac conf/* qrcode/* LICENSE CHANGELOG README.md ebookdownloader_darwin_-amd64-cli ebookdownloader_darwin_-amd64-gui ebookdownloader_darwin_-amd64-http-server
-      python2 $TRAVIS_BUILD_DIR/scripts/checksum.py ebookdownloader-${TRAVIS_TAG}-${TRAVIS_OS_NAME}-${TRAVIS_ARCH}.zip ebookdownloader-${TRAVIS_TAG}-${TRAVIS_OS_NAME}-${TRAVIS_ARCH}.zip.hash
+      python2 $TRAVIS_BUILD_DIR/scripts/checksum.py ebookdownloader-${TRAVIS_TAG}-darwin-${TRAVIS_ARCH}.zip ebookdownloader-${TRAVIS_TAG}-darwin-${TRAVIS_ARCH}.zip.hash
       ;;
   esac
 
