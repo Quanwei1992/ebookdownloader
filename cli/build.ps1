@@ -1,7 +1,7 @@
 
 # 获取系统时间
 $origin_date=Get-Date
-$build_time=$origin_date.ToString('yyyy-MM-dd hh:mm:ss')
+$build_time=$origin_date.ToString('yyyy-MM-dd HH:mm:ss')
 $commit_id=git rev-parse --short HEAD
 
 $last_tag_commit_id=git rev-list --tags --max-count=1

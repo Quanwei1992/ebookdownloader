@@ -59,11 +59,11 @@ func (w *MainWindowForm) createActions() {
 	aboutQtAct := ui.NewActionWithTextParent("关于QT", w.mw)
 	aboutQtAct.OnTriggered(func() { ui.QApplicationAboutQt() })
 
-	updateCheckAct := ui.NewActionWithTextParent(" 检测更新",w.mw)
+	updateCheckAct := ui.NewActionWithTextParent(" 检测更新", w.mw)
 	result, _ := edl.UpdateCheck()
 	CompareResult := result.Compare(Version)
 	updateCheckAct.OnTriggered(func() {
-		ui.QMessageBoxAbout(w.mw,"版本信息",CompareResult)
+		ui.QMessageBoxAbout(w.mw, "版本信息", CompareResult)
 	})
 
 	helpMenu := w.mw.MenuBar().AddMenuWithTitle("帮助(H)")
@@ -124,7 +124,7 @@ func NewEbookDlForm() (*EbookdlForm, error) {
 
 	w.websiteComboBox = ui.NewComboBoxFromDriver(formWidget.FindChild("defWebsiteCB"))
 
-	websiteLists := []string{"xsbiquge.com", "biduo.cc", "xixiwx.com", "booktxt.net", "biquwu.cc", "999xs.com", "23us.la"}
+	websiteLists := []string{"vbiquge.com", "biduo.cc", "xixiwx.com", "booktxt.net", "biquwu.cc", "999xs.com", "23us.la"}
 	w.websiteComboBox.AddItems(websiteLists)
 
 	w.outputTypeLayout = ui.NewGridLayoutFromDriver(formWidget.FindChild("OutputTypeLayout"))
@@ -163,12 +163,15 @@ func NewEbookDlForm() (*EbookdlForm, error) {
 				proxy = w.proxyInput.Text()
 			}
 		*/
-		if w.websiteComboBox.CurrentText() == "xsbiquge.com" {
+		if w.websiteComboBox.CurrentText() == "vbiquge.com" {
 			xsbiquge := ebook.NewXSBiquge()
 			EBDLInterface = xsbiquge //实例化接口
 		} else if w.websiteComboBox.CurrentText() == "biduo.cc" {
 			biduo := ebook.NewBiDuo()
 			EBDLInterface = biduo //实例化接口
+		} else if w.websiteComboBox.CurrentText() == "xixiwx.com" {
+			xixiwx := ebook.NewXixiwx()
+			EBDLInterface = xixiwx //实例化接口
 		} else if w.websiteComboBox.CurrentText() == "booktxt.net" {
 			booktxt := ebook.NewBookTXT()
 			EBDLInterface = booktxt //实例化接口

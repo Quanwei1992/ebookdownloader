@@ -88,7 +88,8 @@
 
   网站名 | 网址 | 是否支持 | 备注 |
   :-: | :-: | :-: | :-: |
-  笔趣阁 | https://www.xsbiquge.com/ | √ |
+  笔趣阁 | <s>https://www.xsbiquge.com/</s> | × | 网站改名 |
+   笔趣阁 | https://www.vbiquge.com/ | √ |
   笔趣阁 | https://www.biduo.cc/ | √ |
   笔趣阁 | https://www.biquwu.cc/ | √ | 网站的速度比较慢 |
   西西文学网 | http://www.xixiwx.com/ | √ |

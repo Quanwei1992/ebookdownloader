@@ -6,6 +6,7 @@ require (
 	github.com/Aiicy/htmlquery v0.0.0-20191217151354-e656ce3100dc
 	github.com/AllenDang/giu v0.0.0-20200122082656-c72804e6577a
 	github.com/Chain-Zhang/pinyin v0.1.3
+	github.com/PuerkitoBio/goquery v1.6.1
 	github.com/ajvb/kala v0.3.2
 	github.com/akavel/rsrc v0.8.0 // indirect
 	github.com/antchfx/xpath v1.1.4 // indirect
@@ -16,6 +17,7 @@ require (
 	github.com/chromedp/cdproto v0.0.0-20201204063249-be40c824ad18
 	github.com/chromedp/chromedp v0.5.4
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
+	github.com/djimenez/iconv-go v0.0.0-20160305225143-8960e66bd3da
 	github.com/gin-gonic/gin v1.5.0
 	github.com/goki/freetype v0.0.0-20181231101311-fa8a33aabaff
 	github.com/hidapple/isbn-gen v1.0.0
@@ -29,7 +31,6 @@ require (
 	github.com/visualfc/goqt v0.0.0-20160901223124-8c774d799233
 	go.etcd.io/bbolt v1.3.4
 	golang.org/x/image v0.0.0-20200119044424-58c23975cae1 // indirect
-	golang.org/x/net v0.0.0-20200114155413-6afb5195e5aa // indirect
 	gopkg.in/dgrijalva/jwt-go.v3 v3.2.0 // indirect
 	gopkg.in/ini.v1 v1.51.1
 	gopkg.in/urfave/cli.v1 v1.20.0
