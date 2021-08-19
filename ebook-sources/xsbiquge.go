@@ -22,7 +22,7 @@ type XSBiquge struct {
 // NewXSBiquge 初始化
 func NewXSBiquge() XSBiquge {
 	return XSBiquge{
-		URL:  "https://www.vbiquge.com/",
+		URL:  "https://www.xxbiquge.net/",
 		Lock: new(sync.Mutex),
 	}
 }

@@ -78,7 +78,7 @@ func CheckUpdate(c *gin.Context) {
 func ParseEbhostAndBookIDPost(c *gin.Context) {
 
 	bookid := c.Query("bookid")
-	ebhost := c.DefaultQuery("ebhost", "xsbiquge.com") //设置默认值为 xsbiquge.com
+	ebhost := c.DefaultQuery("ebhost", "xxbiquge.net") //设置默认值为 xxbiquge.net
 
 	isTxtStr := c.DefaultQuery("istxt", "false")   //需要传入bool值 , 0,1,true,false
 	isMobiStr := c.DefaultQuery("ismobi", "false") //需要传入bool值, 0,1,true,false
@@ -108,7 +108,7 @@ func ParseEbhostAndBookIDPost(c *gin.Context) {
 	}
 	switch ebhost {
 	case "xsbiquge.com":
-		cmdArgs = append(cmdArgs, "--ebhost=xsbiquge.com")
+		cmdArgs = append(cmdArgs, "--ebhost=xxbiquge.net")
 		xsbiquge := ebook.NewXSBiquge()
 		ebdlInterface = xsbiquge //实例化接口
 	case "biduo.cc":
@@ -330,7 +330,7 @@ func main() {
 		},
 	}
 	app.Copyright = "© 2019 - 2020 Jimes Yang<sndnvaps@gmail.com>"
-	app.Usage = "用于下载 笔趣阁(https://www.xsbiquge.com),999小说网(https://www.999xs.com/) ,顶点小说网(https://www.23us.la) 上面的电子书，并保存为txt格式或者(mobi格式,awz3格式)的电子书"
+	app.Usage = "用于下载 笔趣阁(https://www.xxbiquge.net/),999小说网(https://www.999xs.com/) ,顶点小说网(https://www.23us.la) 上面的电子书，并保存为txt格式或者(mobi格式,awz3格式)的电子书"
 	app.Action = ebookHTTPServer
 	app.Flags = []cli.Flag{
 		cli.StringFlag{
