@@ -107,12 +107,12 @@ func ParseEbhostAndBookIDPost(c *gin.Context) {
 		return
 	}
 	switch ebhost {
-	case "xsbiquge.com":
+	case "xxbiquge.net":
 		cmdArgs = append(cmdArgs, "--ebhost=xxbiquge.net")
 		xsbiquge := ebook.NewXSBiquge()
 		ebdlInterface = xsbiquge //实例化接口
-	case "biduo.cc":
-		cmdArgs = append(cmdArgs, "--ebhost=biduo.cc")
+	case "biduoxs.com":
+		cmdArgs = append(cmdArgs, "--ebhost=biduoxs.com")
 		biduo := ebook.NewBiDuo()
 		ebdlInterface = biduo //实例化接口
 	case "xixiwx.com":
@@ -330,7 +330,7 @@ func main() {
 		},
 	}
 	app.Copyright = "© 2019 - 2020 Jimes Yang<sndnvaps@gmail.com>"
-	app.Usage = "用于下载 笔趣阁(https://www.xxbiquge.net/),999小说网(https://www.999xs.com/) ,顶点小说网(https://www.23us.la) 上面的电子书，并保存为txt格式或者(mobi格式,awz3格式)的电子书"
+	app.Usage = "用于下载 笔趣阁(https://www.xxbiquge.net/, https://www.biduoxs.com/),999小说网(https://www.999xs.com/) ,顶点小说网(https://www.23us.la) 上面的电子书，并保存为txt格式或者(mobi格式,awz3格式)的电子书"
 	app.Action = ebookHTTPServer
 	app.Flags = []cli.Flag{
 		cli.StringFlag{

@@ -13,7 +13,7 @@ import (
 
 var _ edl.EBookDLInterface = BiDuo{}
 
-// BiDuo www.biduo.cc小说网
+// BiDuo https://www.biduoxs.com/小说网
 type BiDuo struct {
 	URL  string
 	Lock *sync.Mutex
@@ -22,7 +22,7 @@ type BiDuo struct {
 // NewBiDuo 初始化
 func NewBiDuo() BiDuo {
 	return BiDuo{
-		URL:  "https://www.biduo.cc",
+		URL:  "https://www.biduoxs.com/",
 		Lock: new(sync.Mutex),
 	}
 }
