@@ -124,7 +124,7 @@ func NewEbookDlForm() (*EbookdlForm, error) {
 
 	w.websiteComboBox = ui.NewComboBoxFromDriver(formWidget.FindChild("defWebsiteCB"))
 
-	websiteLists := []string{"xxbiquge.net", "biduoxs.com", "xixiwx.com", "booktxt.net", "biquwu.cc", "999xs.com", "23us.la"}
+	websiteLists := []string{"xxbiquge.net", "biduoxs.com", "xixiwx.com", "booktxt.net", "biquwu.cc", "899zw.com", "23us.la"}
 	w.websiteComboBox.AddItems(websiteLists)
 
 	w.outputTypeLayout = ui.NewGridLayoutFromDriver(formWidget.FindChild("OutputTypeLayout"))

@@ -95,7 +95,8 @@
   笔趣阁 | https://www.biduoxs.com/ | √ |
   笔趣阁 | https://www.biquwu.cc/ | √ | 网站的速度比较慢 |
   西西文学网 | http://www.xixiwx.com/ | √ |
-  999小说 | https://www.999xs.com/ | √ |
+  999小说 | <s> https://www.999xs.com/</s> | × | 网站改名 |
+  899zw小说 | https://www.899zw.com/ | √ |
   顶点小说网 | https://www.booktxt.net/ | √ |
   顶点小说网 | <s>https://www.23us.la</s> | × | 因为网站原因无法打开，暂定无法使用 |
 

@@ -10,30 +10,30 @@ import (
 	edl "github.com/sndnvaps/ebookdownloader"
 )
 
-// https://www.999xs.com/
+// https://www.899zw.com/
 
 /*
 bookid 规则
 
 
 
- https://www.999xs.com/files/article/html/0/591/ -> bookid = 591
+ https://www.899zw.com/files/article/html/0/591/ -> bookid = 591
  591 -> {0,591}
 
- https://www.999xs.com/files/article/html/1/1599/ -> bookid = 1599
+ https://www.899zw.com/files/article/html/1/1599/ -> bookid = 1599
  1599 -> {1,599}
 
-https://www.999xs.com/files/article/html/75/75842/ -> bookid = 75842
+https://www.899zw.com/files/article/html/75/75842/ -> bookid = 75842
  75842 - > {75,842}
 
 
- https://www.999xs.com/files/article/html/113/113582/ -> bookid = 113582
+ https://www.899zw.com/files/article/html/113/113582/ -> bookid = 113582
  113582 -> {113,582}
 */
 
 var _ edl.EBookDLInterface = XS999{}
 
-//999小说网 999xs.com
+//999小说网 899zw.com
 type XS999 struct {
 	URL  string
 	Lock *sync.Mutex
@@ -41,7 +41,7 @@ type XS999 struct {
 
 func New999XS() XS999 {
 	return XS999{
-		URL:  "https://www.999xs.com",
+		URL:  "https://www.899zw.com",
 		Lock: new(sync.Mutex),
 	}
 }
@@ -234,7 +234,7 @@ func (this XS999) GetBookInfo(bookid string, proxy string) edl.BookInfo {
 		for i := 0; i < len(ddNode); i++ {
 			var tmp edl.Chapter
 			aNode, _ := htmlquery.Find(ddNode[i], "//a")
-			tmp.Link = "https://www.999xs.com" + htmlquery.SelectAttr(aNode[0], "href")
+			tmp.Link = this.URL + "/" + htmlquery.SelectAttr(aNode[0], "href")
 			tmp.Title = htmlquery.InnerText(aNode[0])
 			chapters = append(chapters, tmp)
 		}
