@@ -1,5 +1,10 @@
 ## 更新日志文件
 
+    2021.09.30 go版本
+         1. 修改xxbiquge.net地址为biqufan.com(原因网站改网址)
+         2. 尝试使用github.com/andlabs/ui库来构建gui界面
+         3. 发布测试版本到Release v1.7.8 下面
+    
     2021.09.25 go版本
           1. 修改999xs.com地址为899zw.com
 

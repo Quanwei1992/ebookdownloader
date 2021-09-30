@@ -90,7 +90,8 @@
   :-: | :-: | :-: | :-: |
   笔趣阁 | <s>https://www.xsbiquge.com/</s> | × | 网站改名 |
   笔趣阁 | <s>https://www.vbiquge.com/</s>|  × | 网站改名 |
-  笔趣阁 | https://www.xxbiquge.net/ | √ |
+  笔趣阁 | <s>https://www.xxbiquge.net/</s> | × | 网站改名 |
+  笔趣阁 | https://www.biqufan.com/ | √ |
   笔趣阁 | <s>https://www.biduo.cc/</s> |  × | 网站改名 |
   笔趣阁 | https://www.biduoxs.com/ | √ |
   笔趣阁 | https://www.biquwu.cc/ | √ | 网站的速度比较慢 |
@@ -125,3 +126,4 @@
      [√]  13. 使用goqt对界面进行重写
      [ ]  14. 更新顶点小说 23us.la地址为23us.lol ->并重写其爬虫规则
      [√]  15. 打包需要用到的资源到程序中，减少目录数量，kindlegen程序因为技术和安全性考虑，暂不封装到go程序中
+     [√]  16. 减少程序运行时的依赖，尝试使用 github.com/andlabs/ui来构建gui界面

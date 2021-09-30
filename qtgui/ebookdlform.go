@@ -124,7 +124,7 @@ func NewEbookDlForm() (*EbookdlForm, error) {
 
 	w.websiteComboBox = ui.NewComboBoxFromDriver(formWidget.FindChild("defWebsiteCB"))
 
-	websiteLists := []string{"xxbiquge.net", "biduoxs.com", "xixiwx.com", "booktxt.net", "biquwu.cc", "899zw.com", "23us.la"}
+	websiteLists := []string{"biqufan.com", "biduoxs.com", "xixiwx.com", "booktxt.net", "biquwu.cc", "899zw.com", "23us.la"}
 	w.websiteComboBox.AddItems(websiteLists)
 
 	w.outputTypeLayout = ui.NewGridLayoutFromDriver(formWidget.FindChild("OutputTypeLayout"))
@@ -163,7 +163,7 @@ func NewEbookDlForm() (*EbookdlForm, error) {
 				proxy = w.proxyInput.Text()
 			}
 		*/
-		if w.websiteComboBox.CurrentText() == "xxbiquge.net" {
+		if w.websiteComboBox.CurrentText() == "biqufan.com" {
 			xsbiquge := ebook.NewXSBiquge()
 			EBDLInterface = xsbiquge //实例化接口
 		} else if w.websiteComboBox.CurrentText() == "biduoxs.com" {

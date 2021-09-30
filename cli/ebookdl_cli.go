@@ -71,7 +71,7 @@ func EbookDownloader(c *cli.Context) error {
 		(isTxt && isEpub) ||
 		isPV || isJSON {
 
-		if ebhost == "xxbiquge.net" {
+		if ebhost == "biqufan.com" {
 			xsbiquge := ebook.NewXSBiquge()
 			EBDLInterface = xsbiquge //实例化接口
 		} else if ebhost == "biduoxs.com" {
@@ -332,13 +332,13 @@ func main() {
 		},
 	}
 	app.Copyright = "© 2019 - 2021 Jimes Yang<sndnvaps@gmail.com>"
-	app.Usage = "用于下载 笔趣阁(https://www.xxbiquge.net/ ,https://www.biduoxs.com/, https://www.biquwu.cc/),999小说网(https://www.899zw.com/) ,顶点小说网(https://www.23us.la , https://www.booktxt.net) 上面的电子书，并保存为txt格式或者(mobi格式,awz3格式)的电子书"
+	app.Usage = "用于下载 笔趣阁(https://www.biqufan.com/ ,https://www.biduoxs.com/, https://www.biquwu.cc/),999小说网(https://www.899zw.com/) ,顶点小说网(https://www.23us.la , https://www.booktxt.net) 上面的电子书，并保存为txt格式或者(mobi格式,awz3格式)的电子书"
 	app.Action = EbookDownloader
 	app.Flags = []cli.Flag{
 		cli.StringFlag{
 			Name:  "ebhost",
-			Value: "xxbiquge.net",
-			Usage: "定义下载ebook的网站地址(可选择xxbiquge.net,biduoxs.com,xixiwx.com,biquwu.cc,899zw.com,23us.la,booktxt.net)",
+			Value: "biqufan.com",
+			Usage: "定义下载ebook的网站地址(可选择biqufan.com,biduoxs.com,xixiwx.com,biquwu.cc,899zw.com,23us.la,booktxt.net)",
 		},
 		cli.StringFlag{
 			Name:  "bookid,id",

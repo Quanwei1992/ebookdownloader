@@ -9,6 +9,7 @@ require (
 	github.com/PuerkitoBio/goquery v1.6.1
 	github.com/ajvb/kala v0.3.2
 	github.com/akavel/rsrc v0.8.0 // indirect
+	github.com/andlabs/ui v0.0.0-20200610043537-70a69d6ae31e
 	github.com/antchfx/xpath v1.1.4 // indirect
 	github.com/appleboy/gin-jwt v2.5.0+incompatible
 	github.com/appleboy/gin-jwt/v2 v2.6.3
