@@ -1,5 +1,9 @@
 ## 更新日志文件
 
+
+    2021.11.24 gogo
+         1. 添加biqugse.com网站支持（目前只添加cli命令行支持）
+
     2021.09.30 go版本
          1. 修改xxbiquge.net地址为biqufan.com(原因网站改网址)
          2. 尝试使用github.com/andlabs/ui库来构建gui界面
