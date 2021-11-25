@@ -16,8 +16,9 @@
   ## 安装方法
   ```bash
   go get github.com/sndnvaps/ebookdownloader/cli
-  go get github.com/sndnvaps/ebookdownloader/qtgui
-  go get github.com/sndnvaps/ebookdownloader/http-server
+  go get github.com/sndnvaps/ebookdownloader/qtgui #此项目暂停更新，
+  go get github.com/sndnvaps/ebookdownloader/http-server #此项目暂停更新
+  go get github.com/sndnvaps/ebookdownloader/ui
   ```
   ## 使用方法
   ```bash
@@ -52,6 +53,9 @@
           https://github.com/akavel/rsrc ,用于生成windows系统中的图标
     9. chromedp 项目，用于捉取小说封面
            需要安装chrome浏览器，做支持
+    10. ui项目依赖项目
+          github.com/andlabs/ui, 用于生成界面
+          
 
   ## 后端服务器 API接口
     主要目的是部署在vps上面，就可以方便随时下载小说了
@@ -79,7 +83,7 @@
 
 | PayPal打赏 | 微信打赏Pay |
 | :-: | :-: |
-| <a href="https://paypal.me/sndnvaps"> paypal.me/sndnvaps </a>  |  <img src="qrcode/Donate_WeChatPay.jpg" width="250" height="250" alt="给sndnvaps来一杯啤酒"/>|
+| <a href="https://paypal.me/sndnvaps"> paypal.me/sndnvaps </a>  | <img style="width:250px;height:250px" src="https://i.loli.net/2021/11/25/6ZLgDa13yrFiNQ2.jpg" alt="Donate_WeChatPay.jpg">|
 
 
 -------------
