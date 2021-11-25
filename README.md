@@ -83,7 +83,7 @@
 
 | PayPal打赏 | 微信打赏Pay |
 | :-: | :-: |
-| <a href="https://paypal.me/sndnvaps"> paypal.me/sndnvaps </a>  | <img style="width:250px;height:250px" src="https://i.loli.net/2021/11/25/6ZLgDa13yrFiNQ2.jpg" alt="Donate_WeChatPay.jpg">|
+| <a href="https://paypal.me/sndnvaps"> paypal.me/sndnvaps </a>  | <img style="width:300px;height:300px" src="https://i.loli.net/2021/11/25/6ZLgDa13yrFiNQ2.jpg" alt="Donate_WeChatPay.jpg">|
 
 
 -------------
