@@ -1,6 +1,7 @@
 package ebookdownloader
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
@@ -54,8 +55,8 @@ type ProxyChapter struct {
 
 //EBookDLInterface 小说下载器接口interface
 type EBookDLInterface interface {
-	GetBookInfo(bookid string, proxy string) BookInfo      //获取小说的所有信息，包含小说名，作者，简介等信息
-	GetBookBriefInfo(bookid string, proxy string) BookInfo //获取小说最基本的信息，不包含章节信息
+	GetBookInfo(ctx context.Context, bookid string, proxy string) BookInfo //获取小说的所有信息，包含小说名，作者，简介等信息
+	GetBookBriefInfo(bookid string, proxy string) BookInfo                 //获取小说最基本的信息，不包含章节信息
 	DownloaderChapter(ResultChan chan chan Chapter, pc ProxyChapter, wg *sync.WaitGroup)
 	DownloadChapters(Bi BookInfo, proxy string) BookInfo
 }

@@ -1,6 +1,7 @@
 package ebook
 
 import (
+	"context"
 	"fmt"
 	"strings"
 	"sync"
@@ -101,7 +102,7 @@ func (this BookTXT) GetBookBriefInfo(bookid string, proxy string) edl.BookInfo {
 }
 
 //GetBookInfo 下载小说信息
-func (this BookTXT) GetBookInfo(bookid string, proxy string) edl.BookInfo {
+func (this BookTXT) GetBookInfo(ctx context.Context, bookid string, proxy string) edl.BookInfo {
 
 	var bi edl.BookInfo
 	var volumes []edl.Volume

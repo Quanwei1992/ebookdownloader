@@ -1,9 +1,11 @@
 package main
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"strings"
+	"time"
 
 	"github.com/visualfc/goqt/ui"
 
@@ -98,6 +100,11 @@ type EbookdlForm struct {
 }
 
 func NewEbookDlForm() (*EbookdlForm, error) {
+
+	ctx := context.Background()
+	ctx, cancel := context.WithTimeout(ctx, time.Second)
+	defer cancel()
+
 	w := &EbookdlForm{}
 	w.QWidget = ui.NewWidget()
 
@@ -182,7 +189,7 @@ func NewEbookDlForm() (*EbookdlForm, error) {
 		}
 
 		w.downloadProgressBar.SetRange(0, 100)
-		bookinfo = EBDLInterface.GetBookInfo(bookid, "")
+		bookinfo = EBDLInterface.GetBookInfo(ctx, bookid, "")
 
 		w.downloadProgressBar.SetValue(1)
 		bookinfo = EBDLInterface.DownloadChapters(bookinfo, "") //下载小说章节内容

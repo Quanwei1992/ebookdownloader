@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"strings"
 
@@ -113,6 +114,10 @@ func makeHomeWindow() ui.Control {
 	runBtn.OnClicked(func(*ui.Button) {
 		bookid := ""
 		proxy := ""
+		ctx := context.Background()
+		ctx, cancel := context.WithTimeout(ctx, time.Second)
+		defer cancel()
+
 		if strings.Compare(bookIDInputEntry.Text(), "") != 0 {
 			bookid = bookIDInputEntry.Text()
 		}
@@ -132,7 +137,7 @@ func makeHomeWindow() ui.Control {
 			EBDLInterface = xs999 //实例化接口
 		}
 
-		bookinfo = EBDLInterface.GetBookInfo(bookid, proxy)
+		bookinfo = EBDLInterface.GetBookInfo(ctx,bookid, proxy)
 		bookinfo = EBDLInterface.DownloadChapters(bookinfo, proxy) //下载小说章节内容
 		if checkboxTxt.Checked() {                                 //当被选择时，生成txt格式
 			bookinfo.GenerateTxt()

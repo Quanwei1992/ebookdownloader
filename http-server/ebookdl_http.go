@@ -14,7 +14,7 @@ import (
 	edl "github.com/sndnvaps/ebookdownloader"
 	ebook "github.com/sndnvaps/ebookdownloader/ebook-sources"
 	"github.com/sndnvaps/ebookdownloader/http-server/middleware"
-	"gopkg.in/urfave/cli.v1"
+	cli "gopkg.in/urfave/cli.v1"
 )
 
 var (

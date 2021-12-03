@@ -1,9 +1,11 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"log"
 	"os"
+	"time"
 
 	"github.com/asdine/storm/v3"
 	edl "github.com/sndnvaps/ebookdownloader"
@@ -22,6 +24,11 @@ var (
 
 // EbookDownloader 下载电子书的接口
 func EbookDownloader(c *cli.Context) error {
+
+	ctx := context.Background()
+	ctx, cancel := context.WithTimeout(ctx, time.Second)
+	defer cancel()
+
 	//bookid := "91_91345" //91_91345, 0_642
 	bookid := c.String("bookid")
 	if bookid == "" {
@@ -104,7 +111,7 @@ func EbookDownloader(c *cli.Context) error {
 			cli.ShowAppHelpAndExit(c, 0)
 			return nil
 		}
-		bookinfo = EBDLInterface.GetBookInfo(bookid, proxy)
+		bookinfo = EBDLInterface.GetBookInfo(ctx, bookid, proxy)
 		//fmt.Println(bookinfo.Chapters) //只用于测试
 
 		//打印分卷信息，只用于调试
