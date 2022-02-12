@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"strings"
+	"time"
 
 	"github.com/andlabs/ui"
 
@@ -15,9 +16,9 @@ var (
 	//Version 版本信息
 	Version string = "dev"
 	//Commit git commit信息
-	Commit string = "7caf59d"
+	Commit string = "06d3fcf"
 	//BuildTime 编译时间
-	BuildTime string = "2020-05-01 20:50"
+	BuildTime string = "2022-02-12 21:42"
 )
 
 func makeAboutWindow() ui.Control {
@@ -87,7 +88,8 @@ func makeHomeWindow() ui.Control {
 	fictionWebsiteCombox := ui.NewCombobox()
 	fictionWebsiteCombox.Append("biqufan.com")
 	fictionWebsiteCombox.Append("booktxt.com")
-	fictionWebsiteCombox.Append("899zw.com")
+	fictionWebsiteCombox.Append("6zw.net")
+	fictionWebsiteCombox.Append("biqugse.com")
 	fictionWebsiteCombox.SetSelected(0) //设置默认选择为 biqufan.com
 	fictionWebsiteLabel := ui.NewLabel("请选择要用到的下载源")
 
@@ -135,9 +137,12 @@ func makeHomeWindow() ui.Control {
 		case 2:
 			xs999 := ebook.New999XS()
 			EBDLInterface = xs999 //实例化接口
+		case 3:
+			biqugse := ebook.NewBiqugse()
+			EBDLInterface = biqugse //实例化接口
 		}
 
-		bookinfo = EBDLInterface.GetBookInfo(ctx,bookid, proxy)
+		bookinfo = EBDLInterface.GetBookInfo(ctx, bookid, proxy)
 		bookinfo = EBDLInterface.DownloadChapters(bookinfo, proxy) //下载小说章节内容
 		if checkboxTxt.Checked() {                                 //当被选择时，生成txt格式
 			bookinfo.GenerateTxt()

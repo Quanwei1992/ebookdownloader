@@ -17,9 +17,9 @@ var (
 	//Version 版本信息
 	Version string = "dev"
 	//Commit git commit信息
-	Commit string = "7caf59d"
+	Commit string = "06d3fcf"
 	//BuildTime 编译时间
-	BuildTime string = "2020-05-01 20:50"
+	BuildTime string = "2022-02-12 21:42"
 )
 
 // EbookDownloader 下载电子书的接口
@@ -96,7 +96,7 @@ func EbookDownloader(c *cli.Context) error {
 		} else if ebhost == "biqugse.com" {
 			biqugse := ebook.NewBiqugse()
 			EBDLInterface = biqugse
-		} else if ebhost == "899zw.com" {
+		} else if ebhost == "6zw.net" {
 			xs999 := ebook.New999XS()
 			EBDLInterface = xs999 //实例化接口
 		} else if ebhost == "23us.la" {
@@ -342,13 +342,13 @@ func main() {
 		},
 	}
 	app.Copyright = "© 2019 - 2021 Jimes Yang<sndnvaps@gmail.com>"
-	app.Usage = "用于下载 笔趣阁(https://www.biqufan.com/ ,http://www.biqugse.com/,https://www.biduoxs.com/, https://www.biquwu.cc/),999小说网(https://www.899zw.com/) ,顶点小说网(https://www.23us.la , https://www.booktxt.net) 上面的电子书，并保存为txt格式或者(mobi格式,awz3格式)的电子书"
+	app.Usage = "用于下载 笔趣阁(https://www.biqufan.com/ ,http://www.biqugse.com/,https://www.biduoxs.com/, https://www.biquwu.cc/),999小说网(https://www.6zw.net/) ,顶点小说网(https://www.23us.la , https://www.booktxt.net) 上面的电子书，并保存为txt格式或者(mobi格式,awz3格式)的电子书"
 	app.Action = EbookDownloader
 	app.Flags = []cli.Flag{
 		cli.StringFlag{
 			Name:  "ebhost",
 			Value: "biqufan.com",
-			Usage: "定义下载ebook的网站地址(可选择biqufan.com,biqugse.com,biduoxs.com,xixiwx.com,biquwu.cc,899zw.com,23us.la,booktxt.net)",
+			Usage: "定义下载ebook的网站地址(可选择biqufan.com,biqugse.com,biduoxs.com,xixiwx.com,biquwu.cc,6zw.net,23us.la,booktxt.net)",
 		},
 		cli.StringFlag{
 			Name:  "bookid,id",

@@ -11,30 +11,30 @@ import (
 	edl "github.com/sndnvaps/ebookdownloader"
 )
 
-// https://www.899zw.com/
+// https://www.6zw.net/
 
 /*
 bookid 规则
 
 
 
- https://www.899zw.com/files/article/html/0/591/ -> bookid = 591
+ https://www.6zw.net/files/article/html/0/591/ -> bookid = 591
  591 -> {0,591}
 
- https://www.899zw.com/files/article/html/1/1599/ -> bookid = 1599
+ https://www.6zw.net/files/article/html/1/1599/ -> bookid = 1599
  1599 -> {1,599}
 
-https://www.899zw.com/files/article/html/75/75842/ -> bookid = 75842
+https://www.6zw.net/files/article/html/75/75842/ -> bookid = 75842
  75842 - > {75,842}
 
 
- https://www.899zw.com/files/article/html/113/113582/ -> bookid = 113582
+ https://www.6zw.net/files/article/html/113/113582/ -> bookid = 113582
  113582 -> {113,582}
 */
 
 var _ edl.EBookDLInterface = XS999{}
 
-//999小说网 899zw.com
+//999小说网 6zw.net
 type XS999 struct {
 	URL  string
 	Lock *sync.Mutex
@@ -42,7 +42,7 @@ type XS999 struct {
 
 func New999XS() XS999 {
 	return XS999{
-		URL:  "https://www.899zw.com",
+		URL:  "https://www.6zw.net",
 		Lock: new(sync.Mutex),
 	}
 }
