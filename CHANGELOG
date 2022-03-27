@@ -1,5 +1,9 @@
 ## 更新日志文件
 
+     2022.03.27 go版本
+        1. Linux 版本，打包生成*.AppImage格式
+        2. kindlegenLinux程序需要安装到/usr/bin/目录，不然无法生成mobi格式的电子书
+
     2022.02.12 go版本
          1. 修改899zw.com地址为6zw.net
          2. ui界面，添加biqugse.com下载支持

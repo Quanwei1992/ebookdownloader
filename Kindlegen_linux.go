@@ -5,13 +5,16 @@
 package ebookdownloader
 
 import (
+	//"fmt"
+	//"os"
 	"os/exec"
-	"path/filepath"
+	//"path/filepath"
 )
 
 //KindlegenCmd 执行外部kindlegen命令
 func KindlegenCmd(args ...string) *exec.Cmd {
-	path, _ := filepath.Abs("./tools/kindlegenLinux")
-	cmd := exec.Command(path, args...)
+	//path, _ := filepath.Abs("./tools/kindlegenLinux")
+	//mt.Println("KindlegenLinux path=",path)
+	cmd := exec.Command("kindlegenLinux" ,args...)
 	return cmd
 }
