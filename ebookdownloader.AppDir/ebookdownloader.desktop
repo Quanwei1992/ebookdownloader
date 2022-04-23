@@ -2,7 +2,7 @@
 Name=Ebook Downloader
 Comment=Ebookdownloader
 GenericName=Ebookdownloader
-Exec=ebookdownloader_gui
+Exec=ebookdl_ui
 Icon=ebd
 Type=Application
 StartupNotify=false

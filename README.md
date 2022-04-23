@@ -41,6 +41,7 @@
     2. kindlegenLinux 支持Linux 平台
     3. kindlegenMac 支持 Mac平台
     4. cli 项目只需要当前目录存在 ./tools/kindlegen（根据不同的平台，名字有所变化）即可运行
+       4.1 Linux平台，需要将tools/kindlegenLinux 复制到/usr/bin/目录里面
     5. qemu-i386-static-armhf 支持在linux arm平台上运行 kindlegenLinux
     6. qemu-i386-static-arm64 支持在linux arm64平台上运行 kindlegenLinux
     7. http-server 项目依赖：
@@ -55,7 +56,12 @@
            需要安装chrome浏览器，做支持
     10. ui项目依赖项目
           github.com/andlabs/ui, 用于生成界面
+          gtk-3.0，用于构建ui界面
           
+
+  ## 生成AppImage应用程序，主要是Linux系统支持
+         1. 需要安装appimagetool程序支持(https://github.com/AppImage/AppImageKit/releases)
+         2. 生成的Ebook_Downloader-x86_64.AppImage应用程序，无法在程序运行目录查找到kindlegenLinux,所以需要把tools/kindlegenLinux程序，复制到/usr/bin/目录下面。
 
   ## 后端服务器 API接口
     主要目的是部署在vps上面，就可以方便随时下载小说了
