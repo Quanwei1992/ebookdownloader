@@ -320,7 +320,7 @@ func ConvJSON2Ebook(c *cli.Context) error {
 }
 
 //UpdateCheck 检查更新
-func UpdateCheck(c *cli.Context) error {
+func UpdateCheck(*cli.Context) error {
 	result, err := edl.UpdateCheck()
 	if err == nil {
 		CompareResult := result.Compare(Version)

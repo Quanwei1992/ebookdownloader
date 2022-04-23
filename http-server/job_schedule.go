@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"net/http"
 	"strconv"
@@ -14,6 +15,11 @@ import (
 
 //EbookDLCreateJob 基于kala Job Schedule创建的下载任务
 func EbookDLCreateJob(c *gin.Context) {
+
+	ctx := context.Background()
+	ctx, cancel := context.WithTimeout(ctx, time.Second)
+	defer cancel()
+
 	bookid := c.Query("bookid")
 	ebhost := c.DefaultQuery("ebhost", "xsbiquge.com") //设置默认值为 xsbiquge.com
 
@@ -58,7 +64,7 @@ func EbookDLCreateJob(c *gin.Context) {
 	//add --bookid={{.bookid}}
 	cmdArgs = append(cmdArgs, fmt.Sprintf("--bookid=%s", bookid))
 
-	bookinfo = ebdlInterface.GetBookInfo(bookid, "")
+	bookinfo = ebdlInterface.GetBookInfo(ctx, bookid, "")
 
 	if isTxt {
 		cmdArgs = append(cmdArgs, "--txt")

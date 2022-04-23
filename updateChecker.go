@@ -21,10 +21,8 @@ func (ri LatestReleasesInfo) String() string {
 
 //Compare 对版本进行对比
 func (ri LatestReleasesInfo) Compare(CurVersion string) string {
-	if CurVersion != "dev" {
-		if !strings.HasPrefix(CurVersion, ri.Tag) {
-			return fmt.Sprintf("Running version %s. Latest version is %s: %s\n", CurVersion, ri.Tag, ri.URL)
-		}
+	if CurVersion != "dev" && !strings.HasPrefix(CurVersion, ri.Tag) {
+		return fmt.Sprintf("Running version %s. Latest version is %s: %s\n", CurVersion, ri.Tag, ri.URL)
 	}
 	return fmt.Sprintf("Not need to update! Running version %s. Latest version is %s: %s\n", CurVersion, ri.Tag, ri.URL)
 }

@@ -67,17 +67,14 @@ func (this Boltdb) FindOneByFieldName(fieldname string, val string) (Meta, error
 	fn := fieldname
 	switch fn {
 	case "BookUUID":
-		err := this.db.One(fn, val, &metainfo)
-		return metainfo, err
 	case "BookName":
-		err := this.db.One(fn, val, &metainfo)
-		return metainfo, err
 	case "Author":
 		err := this.db.One(fn, val, &metainfo)
 		return metainfo, err
 	default:
 		return metainfo, errors.New("查询条件出错，你不应该出现在这里")
 	}
+	return Meta{}, nil
 }
 
 //FindAllByAuthor 查询当前作者author在blotdb中所有的作品
