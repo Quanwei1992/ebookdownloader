@@ -87,7 +87,7 @@ func EbookDownloader(c *cli.Context) error {
 		} else if ebhost == "xixiwx.net" {
 			xixiwx := ebook.NewXixiwx()
 			EBDLInterface = xixiwx
-		}
+
 		} else {
 			cli.ShowAppHelpAndExit(c, 0)
 			return nil

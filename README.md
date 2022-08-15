@@ -108,7 +108,7 @@
   笔趣阁 | <s><https://www.biduoxs.com/></s> |  × | 网站改名 |
   笔趣阁 | <https://www.biquwu.cc/> | × | 网站改名 |
   笔趣阁 | <http://www.biqugse.com/> | √ |
-    笔趣阁 | <http://www.biqugei.net/> | √ |
+  笔趣阁 | <http://www.biqugei.net/> | √ |
   西西文学网 | <http://www.xixiwx.net/> | √ |
   999小说 | <s> <https://www.999xs.com/></s> | × | 网站改名 |
   999小说 | <s> <https://www.899zw.net/></s> | × | 网站改名 |
