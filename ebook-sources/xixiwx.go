@@ -23,7 +23,7 @@ type Xixiwx struct {
 // NewXixiwx 初始化
 func NewXixiwx() Xixiwx {
 	return Xixiwx{
-		URL:  "http://www.xixiwx.com/",
+		URL:  "http://www.xixiwx.net/",
 		Lock: new(sync.Mutex),
 	}
 }

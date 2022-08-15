@@ -78,30 +78,16 @@ func EbookDownloader(c *cli.Context) error {
 		(isTxt && isEpub) ||
 		isPV || isJSON {
 
-		if ebhost == "biqufan.com" {
-			xsbiquge := ebook.NewXSBiquge()
+		if ebhost == "biqugei.net" {
+			xsbiquge := ebook.NewBiqugei()
 			EBDLInterface = xsbiquge //实例化接口
-		} else if ebhost == "biduoxs.com" {
-			biduo := ebook.NewBiDuo()
-			EBDLInterface = biduo //实例化接口
-		} else if ebhost == "xixiwx.com" {
-			xixiwx := ebook.NewXixiwx()
-			EBDLInterface = xixiwx //实例化接口
-		} else if ebhost == "booktxt.net" {
-			booktxt := ebook.NewBookTXT()
-			EBDLInterface = booktxt //实例化接口
-		} else if ebhost == "biquwu.cc" {
-			biquwu := ebook.NewBiquwu()
-			EBDLInterface = biquwu
 		} else if ebhost == "biqugse.com" {
 			biqugse := ebook.NewBiqugse()
 			EBDLInterface = biqugse
-		} else if ebhost == "6zw.net" {
-			xs999 := ebook.New999XS()
-			EBDLInterface = xs999 //实例化接口
-		} else if ebhost == "23us.la" {
-			xs23 := ebook.New23US()
-			EBDLInterface = xs23 //实例化接口
+		} else if ebhost == "xixiwx.net" {
+			xixiwx := ebook.NewXixiwx()
+			EBDLInterface = xixiwx
+		}
 		} else {
 			cli.ShowAppHelpAndExit(c, 0)
 			return nil
@@ -342,13 +328,13 @@ func main() {
 		},
 	}
 	app.Copyright = "© 2019 - 2022 Jimes Yang<sndnvaps@gmail.com>"
-	app.Usage = "用于下载 笔趣阁(https://www.biqufan.com/ ,http://www.biqugse.com/,https://www.biduoxs.com/, https://www.biquwu.cc/),999小说网(https://www.6zw.net/) ,顶点小说网(https://www.23us.la , https://www.booktxt.net) 上面的电子书，并保存为txt格式或者(mobi格式,awz3格式)的电子书"
+	app.Usage = "用于下载 笔趣阁(http://www.biqugse.com/,http://www.biqugei.net) 上面的电子书，并保存为txt格式或者(mobi格式,awz3格式)的电子书"
 	app.Action = EbookDownloader
 	app.Flags = []cli.Flag{
 		cli.StringFlag{
 			Name:  "ebhost",
-			Value: "biqufan.com",
-			Usage: "定义下载ebook的网站地址(可选择biqufan.com,biqugse.com,biduoxs.com,xixiwx.com,biquwu.cc,6zw.net,23us.la,booktxt.net)",
+			Value: "biqugse.com",
+			Usage: "定义下载ebook的网站地址(可选择biqugse.com,biqugei.net),西西文学(http://www.xixiwx.net/)",
 		},
 		cli.StringFlag{
 			Name:  "bookid,id",

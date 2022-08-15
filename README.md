@@ -1,4 +1,5 @@
 # ebookdownloader
+
 网文下载器
 
  [![GitHub license](https://img.shields.io/github/license/sndnvaps/ebookdownloader)](https://github.com/sndnvaps/ebookdownloader/blob/master/LICENSE)
@@ -7,20 +8,21 @@
 
 [![Donate on PayPal](https://img.shields.io/badge/support-PayPal-blue?style=flat-square&logo=PayPal)](https://paypal.me/sndnvaps)
 
-
-
 [![godoc](https://img.shields.io/badge/godoc-reference-blue.svg)](https://godoc.org/github.com/sndnvaps/ebookdownloader/)
 
 # ebookdl 网文下载器，go语言版本
 
-  ## 安装方法
+## 安装方法
+
   ```bash
   go get github.com/sndnvaps/ebookdownloader/cli
   go get github.com/sndnvaps/ebookdownloader/qtgui #此项目暂停更新，
   go get github.com/sndnvaps/ebookdownloader/http-server #此项目暂停更新
   go get github.com/sndnvaps/ebookdownloader/ui
   ```
-  ## 使用方法
+
+## 使用方法
+
   ```bash
   .\ebookdownloader.exe --bookid=0_642 --txt #只生成txt文本
   .\ebookdownloader.exe --bookid=0_642 --mobi #只生成mobi电子书
@@ -36,7 +38,8 @@
   .\ebookdownloader.exe --help #显示帮助信息
   ```
 
-  ## 依赖程序 
+## 依赖程序
+
     1. kindlegen.exe 支持windows平台
     2. kindlegenLinux 支持Linux 平台
     3. kindlegenMac 支持 Mac平台
@@ -57,20 +60,21 @@
     10. ui项目依赖项目
           github.com/andlabs/ui, 用于生成界面
           gtk-3.0，用于构建ui界面
-          
 
-  ## 生成AppImage应用程序，主要是Linux系统支持
+## 生成AppImage应用程序，主要是Linux系统支持
+
          1. 需要安装appimagetool程序支持(https://github.com/AppImage/AppImageKit/releases)
          2. 生成的Ebook_Downloader-x86_64.AppImage应用程序，无法在程序运行目录查找到kindlegenLinux,所以需要把tools/kindlegenLinux程序，复制到/usr/bin/目录下面。
 
-  ## 后端服务器 API接口
+## 后端服务器 API接口
+
     主要目的是部署在vps上面，就可以方便随时下载小说了
    API接口文档
 [ebookdownloader_http_api](http-server/ebookdownloader_http_api.md)
 
 配置文件[ebdl_conf.ini](conf/ebdl_conf.ini)
 
-  ## 懒人模式，直接下载编译好的程序
+## 懒人模式，直接下载编译好的程序
   
   墙里面使用gitee
 
@@ -82,47 +86,45 @@
 
 ---------------------
 
-
-
 ## ❤️ 赞助
+
 如果你觉得EbookDownloader项目对你有帮助。你可以给我来一杯啤酒！
 
 | PayPal打赏 | 微信打赏Pay |
 | :-: | :-: |
 | <a href="https://paypal.me/sndnvaps"> paypal.me/sndnvaps </a>  | <img style="width:300px;height:300px" src="https://i.loli.net/2021/11/25/6ZLgDa13yrFiNQ2.jpg" alt="Donate_WeChatPay.jpg">|
 
-
 -------------
 
-  ## 支持的小说网站
+## 支持的小说网站
 
   网站名 | 网址 | 是否支持 | 备注 |
   :-: | :-: | :-: | :-: |
-  笔趣阁 | <s>https://www.xsbiquge.com/</s> | × | 网站改名 |
-  笔趣阁 | <s>https://www.vbiquge.com/</s>|  × | 网站改名 |
-  笔趣阁 | <s>https://www.xxbiquge.net/</s> | × | 网站改名 |
-  笔趣阁 | https://www.biqufan.com/ | √ |
-  笔趣阁 | <s>https://www.biduo.cc/</s> |  × | 网站改名 |
-  笔趣阁 | https://www.biduoxs.com/ | √ |
-  笔趣阁 | https://www.biquwu.cc/ | √ | 网站的速度比较慢 |
-  笔趣阁 | http://www.biqugse.com/ | √ | 
-  笔趣阁 | https://www.biquge.so/ |  | 准备添加支持 |
-  西西文学网 | http://www.xixiwx.com/ | √ |
-  999小说 | <s> https://www.999xs.com/</s> | × | 网站改名 |
-  999小说 | <s> https://www.899zw.net/</s> | × | 网站改名 |
-  999小说 | https://www.6zw.net/ | √ |
-  顶点小说网 | https://www.booktxt.net/ | √ |
-  顶点小说网 | <s>https://www.23us.la</s> | × | 因为网站原因无法打开，暂定无法使用 |
+  笔趣阁 | <s><https://www.xsbiquge.com/></s> | × | 网站改名 |
+  笔趣阁 | <s><https://www.vbiquge.com/></s>|  × | 网站改名 |
+  笔趣阁 | <s><https://www.xxbiquge.net/></s> | × | 网站改名 |
+  笔趣阁 | <s><https://www.biqufan.com/></s> | × | 网站改名 |
+  笔趣阁 | <s><https://www.biduo.cc/></s> |  × | 网站改名 |
+  笔趣阁 | <s><https://www.biduoxs.com/></s> |  × | 网站改名 |
+  笔趣阁 | <https://www.biquwu.cc/> | × | 网站改名 |
+  笔趣阁 | <http://www.biqugse.com/> | √ |
+    笔趣阁 | <http://www.biqugei.net/> | √ |
+  西西文学网 | <http://www.xixiwx.net/> | √ |
+  999小说 | <s> <https://www.999xs.com/></s> | × | 网站改名 |
+  999小说 | <s> <https://www.899zw.net/></s> | × | 网站改名 |
+  999小说 | <s><https://www.6zw.net/></s>|  × | 网站改名 |
+  顶点小说网 | <s><https://www.booktxt.net/></s> | × | 网站改名 |
+  顶点小说网 | <s><https://www.23us.la></s> | × | 因为网站原因无法打开，暂定无法使用 |
 
 ------------
 
-  ## 更新日志
+## 更新日志
 
   [CHANGELOG](./CHANGELOG "日志文件")
 
   -----------
 
-  ## To Do List
+## To Do List
 
      [√]  1. 添加生成封面功能
      [√]  2. 添加不同平台的接口实现
@@ -140,3 +142,4 @@
      [ ]  14. 更新顶点小说 23us.la地址为23us.lol ->并重写其爬虫规则
      [√]  15. 打包需要用到的资源到程序中，减少目录数量，kindlegen程序因为技术和安全性考虑，暂不封装到go程序中
      [√]  16. 减少程序运行时的依赖，尝试使用 github.com/andlabs/ui来构建gui界面
+     [√]  17. 添加 http://www.biqugei.net/ 小说网站支持

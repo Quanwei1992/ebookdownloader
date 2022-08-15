@@ -1,5 +1,8 @@
 ## 更新日志文件
 
+     2022.08.15 go版本
+        1. 添加biqugei.net网站支持
+
      2022.03.27 go版本
         1. Linux 版本，打包生成*.AppImage格式
         2. kindlegenLinux程序需要安装到/usr/bin/目录，不然无法生成mobi格式的电子书
