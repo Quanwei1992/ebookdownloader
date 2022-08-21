@@ -1,5 +1,10 @@
 ## 更新日志文件
 
+     2022.08.21 go版本
+        1. 删除qtgui版本
+        2. 删除http-server
+        3. 删除AppImage构建脚本及相关文件
+
      2022.08.15 go版本
         1. 添加biqugei.net网站支持
 
