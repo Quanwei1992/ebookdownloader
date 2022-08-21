@@ -16,8 +16,8 @@
 
   ```bash
   go get github.com/sndnvaps/ebookdownloader/cli
-  go get github.com/sndnvaps/ebookdownloader/qtgui #此项目暂停更新，
-  go get github.com/sndnvaps/ebookdownloader/http-server #此项目暂停更新
+  go get github.com/sndnvaps/ebookdownloader/qtgui #此项目暂停更新，备份在backup分支当中
+  go get github.com/sndnvaps/ebookdownloader/http-server #此项目暂停更新，备份在backup分支当中
   go get github.com/sndnvaps/ebookdownloader/ui
   ```
 
@@ -47,32 +47,11 @@
        4.1 Linux平台，需要将tools/kindlegenLinux 复制到/usr/bin/目录里面
     5. qemu-i386-static-armhf 支持在linux arm平台上运行 kindlegenLinux
     6. qemu-i386-static-arm64 支持在linux arm64平台上运行 kindlegenLinux
-    7. http-server 项目依赖：
-          github.com/ajvb/kala 项目，用于任务控制和管理
-          kala需要与ebookdownloader_cli运行在同一个目录里面
-    8. qtgui项目信赖
-          goqt
-          qt
-          gcc
-          https://github.com/akavel/rsrc ,用于生成windows系统中的图标
-    9. chromedp 项目，用于捉取小说封面
+    7. chromedp 项目，用于捉取小说封面
            需要安装chrome浏览器，做支持
-    10. ui项目依赖项目
+    8. ui项目依赖项目
           github.com/andlabs/ui, 用于生成界面
           gtk-3.0，用于构建ui界面
-
-## 生成AppImage应用程序，主要是Linux系统支持
-
-         1. 需要安装appimagetool程序支持(https://github.com/AppImage/AppImageKit/releases)
-         2. 生成的Ebook_Downloader-x86_64.AppImage应用程序，无法在程序运行目录查找到kindlegenLinux,所以需要把tools/kindlegenLinux程序，复制到/usr/bin/目录下面。
-
-## 后端服务器 API接口
-
-    主要目的是部署在vps上面，就可以方便随时下载小说了
-   API接口文档
-[ebookdownloader_http_api](http-server/ebookdownloader_http_api.md)
-
-配置文件[ebdl_conf.ini](conf/ebdl_conf.ini)
 
 ## 懒人模式，直接下载编译好的程序
   
