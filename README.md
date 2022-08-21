@@ -65,6 +65,25 @@
 
 ---------------------
 
+## 验证下载的文件的完整性（使用gpg签名验证)
+
+   在releases页面下载的文件，将会包含ebookdownloader_$version_$arch.zip,ebookdownloader_$version_$arch.zip.sig
+   验证方法
+
+ ```
+$gpg --verify ebookdownloader_v2.0.0_Win_x86_64.zip.sig ebookdownloader_v2.0.0_Win_x86_64.zip
+```
+
+   得到的信息如下
+
+```
+F:\gowork\src\github.com\sndnvaps\ebookdownloader>gpg --verify ebookdownloader_v
+2.0.0_Win_x86_64.zip.sig ebookdownloader_v2.0.0_Win_x86_64.zip
+gpg: Signature made Sun Aug 21 12:11:09 2022
+gpg:                using RSA key DA60862463A0D9F2569EF65A309C3FC08F9C9F57
+gpg: Good signature from "JimesYang (sndnvaps) <sndnvaps@gmail.com>" [ultimate]
+```
+
 ## ❤️ 赞助
 
 如果你觉得EbookDownloader项目对你有帮助。你可以给我来一杯啤酒！
