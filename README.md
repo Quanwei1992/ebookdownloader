@@ -67,16 +67,26 @@
 
 ## 验证下载的文件的完整性（使用gpg签名验证)
 
-   在releases页面下载的文件，将会包含ebookdownloader_$version_$arch.zip,ebookdownloader_$version_$arch.zip.sig
+下载./scripts/gpg_pub_key.gpg到/home/username/
+
+导入公钥到系统中，以用于验证文件的完整性
+
+```bash
+    $gpg --import gpg_pub_key.gpg
+```
+
+在releases页面下载的文件，将会包含ebookdownloader_$version_$arch.zip,ebookdownloader_$version_$arch.zip.sig
    验证方法
 
- ```
-$gpg --verify ebookdownloader_v2.0.0_Win_x86_64.zip.sig ebookdownloader_v2.0.0_Win_x86_64.zip
+验证文件完整性
+
+ ```bash
+    $gpg --verify ebookdownloader_v2.0.0_Win_x86_64.zip.sig ebookdownloader_v2.0.0_Win_x86_64.zip
 ```
 
    得到的信息如下
 
-```
+```bash
 F:\gowork\src\github.com\sndnvaps\ebookdownloader>gpg --verify ebookdownloader_v
 2.0.0_Win_x86_64.zip.sig ebookdownloader_v2.0.0_Win_x86_64.zip
 gpg: Signature made Sun Aug 21 12:11:09 2022
