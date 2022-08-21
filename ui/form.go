@@ -14,11 +14,11 @@ import (
 
 var (
 	//Version 版本信息
-	Version string = "dev"
+	Version string = "dirty"
 	//Commit git commit信息
-	Commit string = "06d3fcf"
+	Commit string = "d26837e"
 	//BuildTime 编译时间
-	BuildTime string = "2022-02-12 21:42"
+	BuildTime string = "2022-08-21 11:38:21"
 )
 
 func makeAboutWindow() ui.Control {
