@@ -1,0 +1,1 @@
+gpg --detach-sign %1
