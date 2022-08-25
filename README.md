@@ -12,6 +12,11 @@
 
 # ebookdl 网文下载器，go语言版本
 
+## 编译版本依赖条件
+
+   1. go >= 1.16
+   2. gcc 必须要安装，用于编译 github.com/andlabs/ui库
+
 ## 安装方法
 
   ```bash

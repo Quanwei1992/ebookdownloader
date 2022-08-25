@@ -17,7 +17,6 @@ import (
 	"github.com/chromedp/cdproto/cdp"
 	"github.com/chromedp/chromedp"
 	"github.com/goki/freetype"
-	"github.com/sndnvaps/ebookdownloader/fonts"
 )
 
 const (
@@ -36,15 +35,13 @@ func GenerateCover(this BookInfo) {
 	}
 	defer imgfile.Close()
 
+	img := image.NewNRGBA(image.Rect(0, 0, 617, 822))
 
-	
-	img := image.NewNRGBA(image.Rect(0,0,617,822))
-
-	fg,bg   :=  image.Black,image.White
+	fg, bg := image.Black, image.White
 
 	//需要一个ttf字体文件
 	//fontAbs, _ := filepath.Abs("./fonts/WenQuanYiMicroHei.ttf")
-	fontBytes := fonts.MustAsset("fonts/WenQuanYiMicroHei.ttf")
+	fontBytes, _ := fontFS.ReadFile("fonts/WenQuanYiMicroHei.ttf")
 	if err != nil {
 		log.Println(err.Error())
 	}
@@ -54,7 +51,7 @@ func GenerateCover(this BookInfo) {
 		log.Println(err.Error())
 	}
 
-	draw.Draw(img,img.Bounds(),bg,image.ZP,draw.Src)
+	draw.Draw(img, img.Bounds(), bg, image.ZP, draw.Src)
 
 	f := freetype.NewContext()
 	f.SetDPI(72)
@@ -76,7 +73,6 @@ func GenerateCover(this BookInfo) {
 	f.SetFontSize(35)                                                     //重新设置 字体大小为35
 	ptAuthor := freetype.Pt(img.Bounds().Dx()-320, img.Bounds().Dy()-500) //字体出现的位置
 	f.DrawString(this.Author+" ©著", ptAuthor)                             //写入小说作者名
-
 
 	err = jpeg.Encode(imgfile, img, &jpeg.Options{Quality: 100})
 	if err != nil {
@@ -125,7 +121,7 @@ func (this BookInfo) GetCover() error {
 	c, _ := chromedp.NewExecAllocator(context.Background(), options...)
 
 	// create context
-	chromeCtx, cancel := chromedp.NewContext(c, chromedp.WithLogf(log.Printf))
+	chromeCtx, cancel := chromedp.NewContext(c)
 	// 执行一个空task, 用提前创建Chrome实例
 	chromedp.Run(chromeCtx, make([]chromedp.Action, 0, 1)...)
 	timeoutCtx, cancel := context.WithTimeout(chromeCtx, 20*time.Second)
