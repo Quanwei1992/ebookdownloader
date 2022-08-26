@@ -15,24 +15,25 @@ import (
 	"github.com/unknwon/com"
 )
 
-//BookInfo 小说信息
+// BookInfo 小说信息
 type BookInfo struct {
-	EBHost      string    `json:"ebook_host"`        //下载小说的网站
-	EBookID     string    `json:"ebook_id"`          //对应小说网站的bookid
-	BookISBN    string    `json:"isbn"`              //生成一个isbn码
-	BookUUID    string    `json:"uuid"`              //生成一个uuid码，准备用于boltdb
-	Name        string    `json:"bookname"`          //小说名字
-	Author      string    `json:"author"`            //小说作者
-	Description string    `json:"novel_description"` //小说简介
-	CoverURL    string    `json:"cover_url"`         //小说封面图片地址
-	IsMobi      bool      `json:"is_mobi"`           //当为true的时候生成mobi
-	IsAzw3      bool      `json:"is_azw3"`           //当为true的时候生成azw3,
-	HasVolume   bool      `json:"has_volume"`        //是否有小说分卷，默认为false；当设置为true的时候，Volumes里面需要包含分卷信息
-	Volumes     []Volume  `json:"volumes"`           //小说分卷信息，一般不设置
-	Chapters    []Chapter `json:"chapters"`          //小说章节信息
+	EBHost         string    `json:"ebook_host"`        //下载小说的网站
+	EBookID        string    `json:"ebook_id"`          //对应小说网站的bookid
+	BookISBN       string    `json:"isbn"`              //生成一个isbn码
+	BookUUID       string    `json:"uuid"`              //生成一个uuid码，准备用于boltdb
+	Name           string    `json:"bookname"`          //小说名字
+	Author         string    `json:"author"`            //小说作者
+	Description    string    `json:"novel_description"` //小说简介
+	CoverURL       string    `json:"cover_url"`         //小说封面图片地址
+	DlCoverFromWeb bool      `json:"dl_cover_from_web`  //小说封面是否网上下载，或者自动生成
+	IsMobi         bool      `json:"is_mobi"`           //当为true的时候生成mobi
+	IsAzw3         bool      `json:"is_azw3"`           //当为true的时候生成azw3,
+	HasVolume      bool      `json:"has_volume"`        //是否有小说分卷，默认为false；当设置为true的时候，Volumes里面需要包含分卷信息
+	Volumes        []Volume  `json:"volumes"`           //小说分卷信息，一般不设置
+	Chapters       []Chapter `json:"chapters"`          //小说章节信息
 }
 
-//Volume 定义小说分卷信息
+// Volume 定义小说分卷信息
 type Volume struct {
 	PrevChapterID int     `json:"prev_chapter_id"`
 	PrevChapter   Chapter `json:"prev_chapter"`
@@ -53,7 +54,7 @@ type ProxyChapter struct {
 	C     Chapter
 }
 
-//EBookDLInterface 小说下载器接口interface
+// EBookDLInterface 小说下载器接口interface
 type EBookDLInterface interface {
 	GetBookInfo(ctx context.Context, bookid string, proxy string) BookInfo //获取小说的所有信息，包含小说名，作者，简介等信息
 	GetBookBriefInfo(bookid string, proxy string) BookInfo                 //获取小说最基本的信息，不包含章节信息
@@ -61,21 +62,21 @@ type EBookDLInterface interface {
 	DownloadChapters(Bi BookInfo, proxy string) BookInfo
 }
 
-//ReadAllString 读取文件内容，并存入string,最终返回
+// ReadAllString 读取文件内容，并存入string,最终返回
 func ReadAllString(filename string) string {
 	filepathAbs, _ := filepath.Abs(filename)
 	tmp, _ := ioutil.ReadFile(filepathAbs)
 	return string(tmp)
 }
 
-//WriteFile 写入文件操作
+// WriteFile 写入文件操作
 func WriteFile(filename string, data []byte) error {
 	filepathAbs, _ := filepath.Abs(filename)
 	os.MkdirAll(path.Dir(filename), os.ModePerm)
 	return ioutil.WriteFile(filepathAbs, data, 0655)
 }
 
-//GenerateISBN GenerateISBN
+// GenerateISBN GenerateISBN
 func (this *BookInfo) GenerateISBN() {
 	//bookISBN 设置小说的urn码
 	bookISBN, _ := isbn.NewISBN("cn", "")
@@ -84,17 +85,23 @@ func (this *BookInfo) GenerateISBN() {
 	//fmt.Printf("bookISBN = %s\n", bookISBNStr)
 }
 
-//SetISBN 对小说的ISBN码进行设置
+// SetISBN 对小说的ISBN码进行设置
 func (this *BookInfo) SetISBN(value string) {
 	this.BookISBN = value
 }
 
-//ISBN 返回小说的ISBN码
+// SetDownloadCoverMethod 设置小说封面的获取方式
+func (this *BookInfo) SetDownloadCoverMethod(DlCoverFromWeb bool) {
+	this.DlCoverFromWeb = DlCoverFromWeb
+
+}
+
+// ISBN 返回小说的ISBN码
 func (this BookInfo) ISBN() string {
 	return this.BookISBN
 }
 
-//SetKindleEbookType 现在设置，mobi和awz3格式不能同时设置为true
+// SetKindleEbookType 现在设置，mobi和awz3格式不能同时设置为true
 func (this *BookInfo) SetKindleEbookType(isMobi bool, isAzw3 bool) {
 	this.IsMobi = isMobi
 	this.IsAzw3 = isAzw3
@@ -105,14 +112,14 @@ func (this *BookInfo) ChangeVolumeState(hasVolume bool) {
 	this.HasVolume = hasVolume
 }
 
-//VolumeState 返回 HasVolume的状态，true,false
+// VolumeState 返回 HasVolume的状态，true,false
 func (this BookInfo) VolumeState() bool {
 	return this.HasVolume
 }
 
-//Split BookInfo里面的Chapter,以300章为一组进行分割
-//当少于300章的里面，全部分为一卷；当有1000卷的时候，分为4卷；
-//当分割有n个卷的时候，剩下的章节大于50章，重开一个分卷，当少于50的时候，分割到最后一个分卷里面
+// Split BookInfo里面的Chapter,以300章为一组进行分割
+// 当少于300章的里面，全部分为一卷；当有1000卷的时候，分为4卷；
+// 当分割有n个卷的时候，剩下的章节大于50章，重开一个分卷，当少于50的时候，分割到最后一个分卷里面
 func (this BookInfo) Split() []BookInfo {
 	chapters := this.Chapters       //小说的章节信息
 	volumes := this.Volumes         //小说的分卷信息
@@ -177,7 +184,7 @@ func (this BookInfo) Split() []BookInfo {
 	return bis
 }
 
-//PrintVolumeInfo 用于打印 小说分卷信息
+// PrintVolumeInfo 用于打印 小说分卷信息
 func (this BookInfo) PrintVolumeInfo() {
 	volumes := this.Volumes
 	if this.VolumeState() {
@@ -194,7 +201,7 @@ func (this BookInfo) PrintVolumeInfo() {
 	}
 }
 
-//GenerateTxt 生成txt电子书
+// GenerateTxt 生成txt电子书
 func (this BookInfo) GenerateTxt() {
 	chapters := this.Chapters //小说的章节信息
 	volumes := this.Volumes   //小说的分卷信息
@@ -237,7 +244,7 @@ func (this BookInfo) GenerateTxt() {
 	//WriteFile(outfname, []byte(content))
 }
 
-//GenerateJSON 生成json格式的数据
+// GenerateJSON 生成json格式的数据
 func (this BookInfo) GenerateJSON() error {
 	outfpath := "./outputs/" + this.Name + "-" + this.Author + "/"
 	outfname := outfpath + this.Name + "-" + this.Author + ".json"

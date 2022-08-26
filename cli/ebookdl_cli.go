@@ -7,7 +7,6 @@ import (
 	"os"
 	"time"
 
-	"github.com/asdine/storm/v3"
 	edl "github.com/sndnvaps/ebookdownloader"
 	ebook "github.com/sndnvaps/ebookdownloader/ebook-sources"
 	cli "gopkg.in/urfave/cli.v1"
@@ -46,30 +45,9 @@ func EbookDownloader(c *cli.Context) error {
 	isEpub := c.Bool("epub")
 	isJSON := c.Bool("json")      //把下载到的小说信息保存到json数据当中
 	isPV := c.Bool("printvolume") //打印分卷信息，只用做调试时使用
-	isMeta := c.Bool("meta")      //保存meta信息到 小说目录当中
-
-	var boltdb edl.Boltdb //初始化 boltdb选项
-
-	if isMeta {
-		boltdb, _ = edl.InitBoltDB("ebookdownloader.db") //设置boltdb名字为ebookdownloader.db,存储于程序执行目录
-		defer boltdb.Close()                             //关闭boltdb
-	}
 
 	var bookinfo edl.BookInfo              //初始化变量
 	var EBDLInterface edl.EBookDLInterface //初始化接口
-
-	var metainfo edl.Meta //用于保存小说的meta信息
-	txtfilepath := ""     //定义 txt下载后，获取得到的 地址
-	mobifilepath := ""    //定义 mobi下载后，获取得到的 地址
-	azw3filepath := ""    //定义 azw3下载后，获取得到的 地址
-	epubfilepath := ""    //定义 epub下载后，获取得到的 地址
-
-	txtMD5Str := ""  //定义txt小说的md5信息
-	mobiMD5Str := "" //定义mobi小说的md5信息
-	epubMD5Str := "" //定义epub小说的md5信息
-	azw3MD5Str := "" //定义azw3小说的md5信息
-
-	coverURLPath := "" //定义下载小说后，封面的url地址
 
 	//isTxt 或者 isMobi必须一个为真，或者两个都为真
 	if (isTxt || isMobi || isAzw3 || isEpub) ||
@@ -119,72 +97,30 @@ func EbookDownloader(c *cli.Context) error {
 		//生成txt文件
 		if isTxt {
 			fmt.Printf("\n正在生成txt版本的电子书，请耐心等待！\n")
+			bookinfo.SetDownloadCoverMethod(false)
 			bookinfo.GenerateTxt()
-			if isMeta { //配置meta信息
-				txtfilepath = "public/" + bookinfo.Name + "-" + bookinfo.Author + "/" + bookinfo.Name + "-" + bookinfo.Author + ".txt"
-				txtMD5Str, _ = edl.CreateMD5("./outputs/" + bookinfo.Name + "-" + bookinfo.Author + "/" + bookinfo.Name + "-" + bookinfo.Author + ".txt")
-			}
 		}
 		//生成mobi格式电子书
 		if isMobi {
 			fmt.Printf("\n正在生成mobi版本的电子书，请耐心等待！\n")
 			bookinfo.SetKindleEbookType(true /* isMobi */, false /* isAzw3 */)
+			bookinfo.SetDownloadCoverMethod(true)
 			bookinfo.GenerateMobi()
-			if isMeta { //配置meta信息
-				mobifilepath = "public/" + bookinfo.Name + "-" + bookinfo.Author + "/" + bookinfo.Name + "-" + bookinfo.Author + ".mobi"
-				mobiMD5Str, _ = edl.CreateMD5("./outputs/" + bookinfo.Name + "-" + bookinfo.Author + "/" + bookinfo.Name + "-" + bookinfo.Author + ".mobi")
-				coverURLPath = "public/" + bookinfo.Name + "-" + bookinfo.Author + "/" + "cover.jpg"
-			}
 
 		}
 		//生成awz3格式电子书
 		if isAzw3 {
 			fmt.Printf("\n正在生成Azw3版本的电子书，请耐心等待！\n")
 			bookinfo.SetKindleEbookType(false /* isMobi */, true /* isAzw3 */)
+			bookinfo.SetDownloadCoverMethod(true)
 			bookinfo.GenerateMobi()
-			if isMeta { //配置meta信息
-				azw3filepath = "public/" + bookinfo.Name + "-" + bookinfo.Author + "/" + bookinfo.Name + "-" + bookinfo.Author + ".azw3"
-				azw3MD5Str, _ = edl.CreateMD5("./outputs/" + bookinfo.Name + "-" + bookinfo.Author + "/" + bookinfo.Name + "-" + bookinfo.Author + ".azw3")
-				coverURLPath = "public/" + bookinfo.Name + "-" + bookinfo.Author + "/" + "cover.jpg"
-			}
 		}
 
 		//生成epub格式电子书
 		if isEpub {
 			fmt.Printf("\n正在生成EPUB版本的电子书，请耐心等待！\n")
+			bookinfo.SetDownloadCoverMethod(true)
 			bookinfo.GenerateEPUB()
-			if isMeta { //配置meta信息
-				epubfilepath = "public/" + bookinfo.Name + "-" + bookinfo.Author + "/" + bookinfo.Name + "-" + bookinfo.Author + ".epub"
-				epubMD5Str, _ = edl.CreateMD5("./outputs/" + bookinfo.Name + "-" + bookinfo.Author + "/" + bookinfo.Name + "-" + bookinfo.Author + ".epub")
-				coverURLPath = "public/" + bookinfo.Name + "-" + bookinfo.Author + "/" + "cover.jpg"
-			}
-		}
-
-		if isMeta {
-			metainfo = edl.Meta{
-				Ebhost:      ebhost,
-				Bookid:      bookid,
-				BookName:    bookinfo.Name,
-				BookISBN:    bookinfo.ISBN(),
-				BookUUID:    bookinfo.UUID(),
-				Author:      bookinfo.Author,
-				CoverURL:    coverURLPath,
-				Description: bookinfo.Description,
-				TxtURLPath:  txtfilepath,
-				MobiURLPath: mobifilepath,
-				AZW3URLPath: azw3filepath,
-				EPUBURLPath: epubfilepath,
-				TxtMD5:      txtMD5Str,
-				MobiMD5:     mobiMD5Str,
-				AZW3MD5:     azw3MD5Str,
-				EPUBMD5:     epubMD5Str,
-			}
-
-			metainfo.WriteFile("./outputs/" + bookinfo.Name + "-" + bookinfo.Author + "/meta.json")
-			err := boltdb.Save(metainfo)       //保存数据到boltdb中
-			if err == storm.ErrAlreadyExists { //如果uuid信息已经存在；启用更新模式
-				boltdb.Update(metainfo)
-			}
 		}
 
 	} else {
@@ -196,7 +132,7 @@ func EbookDownloader(c *cli.Context) error {
 	return nil
 }
 
-//ConvJSON2Ebook 转换json文件到ebook格式
+// ConvJSON2Ebook 转换json文件到ebook格式
 func ConvJSON2Ebook(c *cli.Context) error {
 
 	jsonPath := c.String("json")
@@ -209,13 +145,6 @@ func ConvJSON2Ebook(c *cli.Context) error {
 	isMobi := c.Bool("mobi")
 	isAzw3 := c.Bool("azw3")
 	isEpub := c.Bool("epub")
-	isMeta := c.Bool("meta") //保存meta信息到 小说目录当中
-
-	var metainfo edl.Meta //用于保存小说的meta信息
-	txtfilepath := ""     //定义 txt下载后，获取得到的 地址
-	mobifilepath := ""    //定义 mobi下载后，获取得到的 地址
-	epubfilepath := ""    //定义 epub下载后，获取得到的 地址
-	coverURLPath := ""    //定义下载小说后，封面的url地址
 
 	//isTxt 或者 isMobi必须一个为真，或者两个都为真
 	if (isTxt || isMobi || isAzw3 || isEpub) ||
@@ -242,57 +171,30 @@ func ConvJSON2Ebook(c *cli.Context) error {
 		//生成txt文件
 		if isTxt {
 			fmt.Printf("\n正在生成txt版本的电子书，请耐心等待！\n")
+			bookinfo.SetDownloadCoverMethod(false)
 			bookinfo.GenerateTxt()
-			if isMeta { //配置meta信息
-				txtfilepath = "public/" + bookinfo.Name + "-" + bookinfo.Author + "/" + bookinfo.Name + "-" + bookinfo.Author + ".txt"
-			}
 		}
 		//生成mobi格式电子书
 		if isMobi {
 			fmt.Printf("\n正在生成mobi版本的电子书，请耐心等待！\n")
 			bookinfo.SetKindleEbookType(true /* isMobi */, false /* isAzw3 */)
+			bookinfo.SetDownloadCoverMethod(true)
 			bookinfo.GenerateMobi()
-			if isMeta { //配置meta信息
-				mobifilepath = "public/" + bookinfo.Name + "-" + bookinfo.Author + "/" + bookinfo.Name + "-" + bookinfo.Author + ".mobi"
-				coverURLPath = "public/" + bookinfo.Name + "-" + bookinfo.Author + "/" + "cover.jpg"
-			}
 
 		}
 		//生成awz3格式电子书
 		if isAzw3 {
 			fmt.Printf("\n正在生成Azw3版本的电子书，请耐心等待！\n")
 			bookinfo.SetKindleEbookType(false /* isMobi */, true /* isAzw3 */)
+			bookinfo.SetDownloadCoverMethod(true)
 			bookinfo.GenerateMobi()
-			if isMeta { //配置meta信息
-				mobifilepath = "public/" + bookinfo.Name + "-" + bookinfo.Author + "/" + bookinfo.Name + "-" + bookinfo.Author + ".azw3"
-				coverURLPath = "public/" + bookinfo.Name + "-" + bookinfo.Author + "/" + "cover.jpg"
-			}
 		}
 
 		//生成epub格式电子书
 		if isEpub {
 			fmt.Printf("\n正在生成EPUB版本的电子书，请耐心等待！\n")
+			bookinfo.SetDownloadCoverMethod(true)
 			bookinfo.GenerateEPUB()
-			if isMeta { //配置meta信息
-				epubfilepath = "public/" + bookinfo.Name + "-" + bookinfo.Author + "/" + bookinfo.Name + "-" + bookinfo.Author + ".epub"
-				coverURLPath = "public/" + bookinfo.Name + "-" + bookinfo.Author + "/" + "cover.jpg"
-			}
-		}
-		if isMeta {
-			metainfo = edl.Meta{
-				Ebhost:      bookinfo.EBHost,
-				Bookid:      bookinfo.EBookID,
-				BookName:    bookinfo.Name,
-				BookISBN:    bookinfo.ISBN(),
-				Author:      bookinfo.Author,
-				CoverURL:    coverURLPath,
-				Description: bookinfo.Description,
-				TxtURLPath:  txtfilepath,
-				MobiURLPath: mobifilepath,
-				EPUBURLPath: epubfilepath,
-			}
-
-			metainfo.WriteFile("./outputs/" + bookinfo.Name + "-" + bookinfo.Author + "/meta.json")
 		}
 
 	} else {
@@ -304,7 +206,7 @@ func ConvJSON2Ebook(c *cli.Context) error {
 	return nil
 }
 
-//UpdateCheck 检查更新
+// UpdateCheck 检查更新
 func UpdateCheck(*cli.Context) error {
 	result, err := edl.UpdateCheck()
 	if err == nil {
@@ -362,10 +264,6 @@ func main() {
 		cli.BoolFlag{
 			Name:  "json",
 			Usage: "当使用的时候，把下载得到的小说内容写入到json文件当中",
-		},
-		cli.BoolFlag{
-			Name:  "meta",
-			Usage: "把小说的meta信息写入到文件当中",
 		},
 		cli.BoolFlag{
 			Name:  "printvolume,pv",

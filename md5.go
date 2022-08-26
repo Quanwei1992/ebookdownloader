@@ -7,7 +7,7 @@ import (
 	"os"
 )
 
-//CreateMD5 根据filename生成md5信息
+// CreateMD5 根据filename生成md5信息
 func CreateMD5(filename string) (md5Str string, err error) {
 
 	f, err := os.Open(filename)

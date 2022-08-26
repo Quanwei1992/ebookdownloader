@@ -56,7 +56,7 @@ func makeAboutWindow() ui.Control {
 	return vbox
 }
 
-//主页
+// 主页
 func makeHomeWindow() ui.Control {
 	vbox := ui.NewVerticalBox()
 	vbox.SetPadded(true)
@@ -141,13 +141,16 @@ func makeHomeWindow() ui.Control {
 		bookinfo = EBDLInterface.GetBookInfo(ctx, bookid, proxy)
 		bookinfo = EBDLInterface.DownloadChapters(bookinfo, proxy) //下载小说章节内容
 		if checkboxTxt.Checked() {                                 //当被选择时，生成txt格式
+			bookinfo.SetDownloadCoverMethod(false)
 			bookinfo.GenerateTxt()
 		}
 		if checkboxMobi.Checked() { //当被选择时，生成mobi格式
 			bookinfo.SetKindleEbookType(true /* isMobi */, false /* isAzw3 */)
+			bookinfo.SetDownloadCoverMethod(true)
 			bookinfo.GenerateMobi()
 		}
 		if checkboxEpub.Checked() { //当被选择时，生成epub格式
+			bookinfo.SetDownloadCoverMethod(true)
 			bookinfo.GenerateEPUB()
 		}
 

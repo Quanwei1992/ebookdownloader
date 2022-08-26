@@ -28,7 +28,7 @@ func NewBiqugei() Biqugei {
 	}
 }
 
-//GetBookDownloadLinkPages 获取小说每个部分的下载页面，以50章为一个下载页面
+// GetBookDownloadLinkPages 获取小说每个部分的下载页面，以50章为一个下载页面
 func (this Biqugei) GetBookDownloadLinkPages(bookid string, proxy string) []string {
 	var chaptersPages []string
 	pollURL := this.URL + "/book/" + bookid + ".html"
@@ -49,7 +49,7 @@ func (this Biqugei) GetBookDownloadLinkPages(bookid string, proxy string) []stri
 
 }
 
-//GetBookBriefInfo 获取小说的信息
+// GetBookBriefInfo 获取小说的信息
 func (this Biqugei) GetBookBriefInfo(bookid string, proxy string) edl.BookInfo {
 	var bi edl.BookInfo
 	pollURL := this.URL + "/book/" + bookid + ".html"
@@ -133,7 +133,7 @@ func (this Biqugei) GetBookBriefInfo(bookid string, proxy string) edl.BookInfo {
 	return bi
 }
 
-//GetBookInfo 获取小说的信息
+// GetBookInfo 获取小说的信息
 func (this Biqugei) GetBookInfo(ctx context.Context, bookid string, proxy string) edl.BookInfo {
 
 	bi := this.GetBookBriefInfo(bookid, proxy)
@@ -181,7 +181,7 @@ func (this Biqugei) GetBookInfo(ctx context.Context, bookid string, proxy string
 	return bookinfo
 }
 
-//DownloadChapters 下载所有章节
+// DownloadChapters 下载所有章节
 func (this Biqugei) DownloadChapters(Bi edl.BookInfo, proxy string) edl.BookInfo {
 	result := Bi //先进行赋值，把数据
 	var chapters []edl.Chapter
@@ -201,7 +201,7 @@ func (this Biqugei) DownloadChapters(Bi edl.BookInfo, proxy string) edl.BookInfo
 	return result
 }
 
-//根据每个章节的 URL连接，下载每章对应的内容Content当中
+// 根据每个章节的 URL连接，下载每章对应的内容Content当中
 func (this Biqugei) downloadChapters(Bi edl.BookInfo, proxy string) edl.BookInfo {
 	chapters := Bi.Chapters
 
@@ -263,7 +263,7 @@ ForEnd:
 	return result
 }
 
-//DownloaderChapter 一个章节一个章节得下载
+// DownloaderChapter 一个章节一个章节得下载
 func (this Biqugei) DownloaderChapter(ResultChan chan chan edl.Chapter, pc edl.ProxyChapter, wg *sync.WaitGroup) {
 	wg.Add(1)
 	defer wg.Done()

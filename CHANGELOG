@@ -1,5 +1,9 @@
 ## 更新日志文件
 
+	 2022.08.26 go版本
+	    1. windows平台，使用embed内嵌kindlegen.exe到程序中，运行时使用go-memexec来加载程序
+		2. windows平台，实现单个文件可执行，不需要其它依赖文件
+
      2022.08.25 go版本
         1. 更新go版本为v1.16+
         2. 采用embed模式来内嵌tpls/fonts文件

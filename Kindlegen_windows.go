@@ -1,17 +1,33 @@
-// +build windows
+//go:build windows
 
 package ebookdownloader
 
 import (
-	"os/exec"
-	"path/filepath"
+	_ "embed"
+	"fmt"
 	"syscall"
+
+	"github.com/amenzhinsky/go-memexec"
 )
 
-//KindlegenCmd 执行外部kindlegen命令
-func KindlegenCmd(args ...string) *exec.Cmd {
-	path, _ := filepath.Abs("./tools/kindlegen.exe")
-	cmd := exec.Command(path, args...)
+/* Embedding one file into a slice of bytes */
+//go:embed tools/win32/kindlegen.exe
+var kindleBinary []byte
+
+// KindlegenCmd 执行外部kindlegen命令
+func KindlegenCmd(args ...string) {
+
+	exe, err := memexec.New(kindleBinary)
+
+	if err != nil {
+		fmt.Println(err.Error())
+	}
+	defer exe.Close()
+
+	cmd := exe.Command(args...)
+
 	cmd.SysProcAttr = &syscall.SysProcAttr{HideWindow: true}
-	return cmd
+
+	cmd.Run()
+
 }

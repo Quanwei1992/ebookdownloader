@@ -12,21 +12,29 @@ import (
 	"github.com/unknwon/com"
 )
 
-func bytes2string(in []byte, e error) string {
+func bytes2string(in []byte) string {
 	return string(in)
 }
 
-//GenerateMobi 生成mobi格式电子书
+// GenerateMobi 生成mobi格式电子书
 func (this BookInfo) GenerateMobi() {
 	chapters := this.Chapters //章节信息
 	Volumes := this.Volumes   //分卷信息
 	//tpl_cover := bytes2string(templateFS.ReadFile("./tpls/tpl_cover.html")
-	tplBookToc := bytes2string(templateFS.ReadFile("tpls/tpl_book_toc.html"))
-	tplChapter := bytes2string(templateFS.ReadFile("tpls/tpl_chapter.html"))
-	tplVolume := bytes2string(templateFS.ReadFile("tpls/tpl_volume.html"))
-	tplContent := bytes2string(templateFS.ReadFile("tpls/tpl_content.opf"))
-	tplStyle := bytes2string(templateFS.ReadFile("tpls/tpl_style.css"))
-	tplToc := bytes2string(templateFS.ReadFile("tpls/tpl_toc.ncx"))
+	tplBookTocBytes, _ := templateFS.ReadFile("tpls/tpl_book_toc.html")
+	tplChapterBytes, _ := templateFS.ReadFile("tpls/tpl_chapter.html")
+	tplVolumeBytes, _ := templateFS.ReadFile("tpls/tpl_volume.html")
+	tplContentBytes, _ := templateFS.ReadFile("tpls/tpl_content.opf")
+	tplStyleBytes, _ := templateFS.ReadFile("tpls/tpl_style.css")
+	tplTocBytes, _ := templateFS.ReadFile("tpls/tpl_toc.ncx")
+
+	tplBookToc := bytes2string(tplBookTocBytes)
+	tplChapter := bytes2string(tplChapterBytes)
+	tplVolume := bytes2string(tplVolumeBytes)
+	tplContent := bytes2string(tplContentBytes)
+	tplStyle := bytes2string(tplStyleBytes)
+	tplToc := bytes2string(tplTocBytes)
+
 	//将文件名转换成拼音
 	strPinyin, _ := pinyin.New(this.Name).Split("-").Mode(pinyin.WithoutTone).Convert()
 	savepath := "./tmp/" + strPinyin
@@ -202,8 +210,8 @@ func (this BookInfo) GenerateMobi() {
 	}
 	//-dont_append_source ,禁止mobi 文件中附加源文件
 	//cmd := exec.Command("./tools/kindlegen.exe", "-dont_append_source", savepath+"/content.opf", "-c1", "-o", outfname)
-	cmd := KindlegenCmd("-dont_append_source", savepath+"/content.opf", "-c1", "-o", outfname)
-	cmd.Run()
+	//cmd := KindlegenCmd("-dont_append_source", savepath+"/content.opf", "-c1", "-o", outfname)
+	KindlegenCmd("-dont_append_source", savepath+"/content.opf", "-c1", "-o", outfname)
 
 	// 把生成的mobi文件复制到 outputs/目录下面
 	com.Copy(savepath+string(os.PathSeparator)+outfname, outputpath+string(os.PathSeparator)+outfname)

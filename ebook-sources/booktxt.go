@@ -13,13 +13,13 @@ import (
 
 var _ edl.EBookDLInterface = BookTXT{}
 
-//BookTXT 顶点小说网 www.booktxt.net
+// BookTXT 顶点小说网 www.booktxt.net
 type BookTXT struct {
 	URL  string
 	Lock *sync.Mutex
 }
 
-//NewBookTXT 初始化
+// NewBookTXT 初始化
 func NewBookTXT() BookTXT {
 	return BookTXT{
 		URL:  "https://www.booktxt.net/",
@@ -27,7 +27,7 @@ func NewBookTXT() BookTXT {
 	}
 }
 
-//GetBookBriefInfo 获取小说的信息
+// GetBookBriefInfo 获取小说的信息
 func (this BookTXT) GetBookBriefInfo(bookid string, proxy string) edl.BookInfo {
 
 	var bi edl.BookInfo
@@ -101,7 +101,7 @@ func (this BookTXT) GetBookBriefInfo(bookid string, proxy string) edl.BookInfo {
 	return bi
 }
 
-//GetBookInfo 下载小说信息
+// GetBookInfo 下载小说信息
 func (this BookTXT) GetBookInfo(ctx context.Context, bookid string, proxy string) edl.BookInfo {
 
 	var bi edl.BookInfo
@@ -310,7 +310,7 @@ func (this BookTXT) GetBookInfo(ctx context.Context, bookid string, proxy string
 	return bi
 }
 
-//DownloadChapters 下载小说章节
+// DownloadChapters 下载小说章节
 func (this BookTXT) DownloadChapters(Bi edl.BookInfo, proxy string) edl.BookInfo {
 	result := Bi //先进行赋值，把数据
 	var chapters []edl.Chapter
@@ -330,7 +330,7 @@ func (this BookTXT) DownloadChapters(Bi edl.BookInfo, proxy string) edl.BookInfo
 	return result
 }
 
-//根据每个章节的 url连接，下载每章对应的内容Content当中
+// 根据每个章节的 url连接，下载每章对应的内容Content当中
 func (this BookTXT) downloadChapters(Bi edl.BookInfo, proxy string) edl.BookInfo {
 	chapters := Bi.Chapters
 

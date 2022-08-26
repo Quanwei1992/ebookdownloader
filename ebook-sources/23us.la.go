@@ -20,13 +20,13 @@ import (
 
 var _ edl.EBookDLInterface = US23{}
 
-//US23 顶点小说网 23us.la
+// US23 顶点小说网 23us.la
 type US23 struct {
 	URL  string
 	Lock *sync.Mutex
 }
 
-//New23US 初始化
+// New23US 初始化
 func New23US() US23 {
 	return US23{
 		URL:  "https://www.23us.la",
@@ -34,7 +34,7 @@ func New23US() US23 {
 	}
 }
 
-//GetBookBriefInfo 获取小说的信息
+// GetBookBriefInfo 获取小说的信息
 func (this US23) GetBookBriefInfo(bookid string, proxy string) edl.BookInfo {
 
 	var bi edl.BookInfo
@@ -119,7 +119,7 @@ func (this US23) GetBookBriefInfo(bookid string, proxy string) edl.BookInfo {
 	return bi
 }
 
-//GetBookInfo 下载小说信息
+// GetBookInfo 下载小说信息
 func (this US23) GetBookInfo(ctx context.Context, bookid string, proxy string) edl.BookInfo {
 
 	var bi edl.BookInfo
@@ -328,7 +328,7 @@ func (this US23) GetBookInfo(ctx context.Context, bookid string, proxy string) e
 	return bi
 }
 
-//DownloadChapters 下载小说章节
+// DownloadChapters 下载小说章节
 func (this US23) DownloadChapters(Bi edl.BookInfo, proxy string) edl.BookInfo {
 	result := Bi //先进行赋值，把数据
 	var chapters []edl.Chapter
@@ -348,7 +348,7 @@ func (this US23) DownloadChapters(Bi edl.BookInfo, proxy string) edl.BookInfo {
 	return result
 }
 
-//根据每个章节的 url连接，下载每章对应的内容Content当中
+// 根据每个章节的 url连接，下载每章对应的内容Content当中
 func (this US23) downloadChapters(Bi edl.BookInfo, proxy string) edl.BookInfo {
 	chapters := Bi.Chapters
 
@@ -469,7 +469,7 @@ func (this US23) DownloaderChapter(ResultChan chan chan edl.Chapter, pc edl.Prox
 	}(pc)
 }
 
-//TestContainVolume 检测是 第一个 dt标签是否包含 “正文卷”，如果不包含就表示是分卷
+// TestContainVolume 检测是 第一个 dt标签是否包含 “正文卷”，如果不包含就表示是分卷
 func TestContainVolume(src string) bool {
 	return !strings.Contains(src, "正文")
 }

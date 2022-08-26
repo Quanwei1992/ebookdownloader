@@ -28,7 +28,7 @@ func NewXSBiquge() XSBiquge {
 	}
 }
 
-//GetBookBriefInfo 获取小说的信息
+// GetBookBriefInfo 获取小说的信息
 func (this XSBiquge) GetBookBriefInfo(bookid string, proxy string) edl.BookInfo {
 	var bi edl.BookInfo
 	pollURL := this.URL + "/" + bookid + "/"
@@ -112,7 +112,7 @@ func (this XSBiquge) GetBookBriefInfo(bookid string, proxy string) edl.BookInfo 
 	return bi
 }
 
-//GetBookInfo 获取小说的信息
+// GetBookInfo 获取小说的信息
 func (this XSBiquge) GetBookInfo(ctx context.Context, bookid string, proxy string) edl.BookInfo {
 
 	var bi edl.BookInfo
@@ -225,7 +225,7 @@ func (this XSBiquge) GetBookInfo(ctx context.Context, bookid string, proxy strin
 	return bi
 }
 
-//DownloadChapters 下载所有章节
+// DownloadChapters 下载所有章节
 func (this XSBiquge) DownloadChapters(Bi edl.BookInfo, proxy string) edl.BookInfo {
 	result := Bi //先进行赋值，把数据
 	var chapters []edl.Chapter
@@ -245,7 +245,7 @@ func (this XSBiquge) DownloadChapters(Bi edl.BookInfo, proxy string) edl.BookInf
 	return result
 }
 
-//根据每个章节的 URL连接，下载每章对应的内容Content当中
+// 根据每个章节的 URL连接，下载每章对应的内容Content当中
 func (this XSBiquge) downloadChapters(Bi edl.BookInfo, proxy string) edl.BookInfo {
 	chapters := Bi.Chapters
 
@@ -307,7 +307,7 @@ ForEnd:
 	return result
 }
 
-//DownloaderChapter 一个章节一个章节得下载
+// DownloaderChapter 一个章节一个章节得下载
 func (this XSBiquge) DownloaderChapter(ResultChan chan chan edl.Chapter, pc edl.ProxyChapter, wg *sync.WaitGroup) {
 	wg.Add(1)
 	defer wg.Done()

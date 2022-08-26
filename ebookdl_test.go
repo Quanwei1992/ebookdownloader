@@ -8,11 +8,12 @@ import (
 )
 
 var testbi = BookInfo{
-	Name:        "我是谁",
-	Author:      "sndnvaps",
-	Description: "这是我随便写的测试内容简介！",
-	Volumes:     V, //分卷信息
-	Chapters:    C,
+	Name:           "我是谁",
+	Author:         "sndnvaps",
+	Description:    "这是我随便写的测试内容简介！",
+	Volumes:        V, //分卷信息
+	Chapters:       C,
+	DlCoverFromWeb: false, //使用直接生成的封面
 }
 
 var V = []Volume{
@@ -89,52 +90,62 @@ var savePath = "./outputs/" + testbi.Name + "-" + testbi.Author
 
 func TestBookInfo(t *testing.T) {
 	bookname := "我是谁"
-	assert.Equal(t, bookname, testbi.Name)
+	assert := assert.New(t)
+
+	assert.Equal(bookname, testbi.Name)
 
 	author := "sndnvaps"
-	assert.Equal(t, author, testbi.Author)
+	assert.Equal(author, testbi.Author)
 
 	Size := len(testbi.Chapters)
-	assert.Equal(t, 10, Size)
+	assert.Equal(10, Size)
 
 	link := "https://github.com/sndnvaps/ebookdownloader"
-	assert.Equal(t, link, testbi.Chapters[0].Link)
+	assert.Equal(link, testbi.Chapters[0].Link)
 }
 
 func TestGenerateTxt(t *testing.T) {
+	assert := assert.New(t)
+
 	testbi.ChangeVolumeState(true /* hasVolume */)
 	testbi.GenerateTxt()
 	savename := savePath + "/" + testbi.Name + "-" + testbi.Author + ".txt"
-	assert.True(t, true, isExist(savename))
+	assert.True(isExist(savename))
 	os.RemoveAll(savePath)
 
 }
 
 func TestGenerateMobi(t *testing.T) {
+	assert := assert.New(t)
+
 	testbi.ChangeVolumeState(true /* hasVolume */)
 	testbi.SetKindleEbookType(true /* isMobi */, false /* isAwz3 */)
 	testbi.GenerateISBN() //先生成ISBN码
 	testbi.GenerateMobi()
 	savename := savePath + "/" + testbi.Name + "-" + testbi.Author + ".mobi"
-	assert.True(t, true, isExist(savename))
+	assert.True(isExist(savename))
 	//os.RemoveAll(savePath)
 }
 
 func TestGenerateAzw3(t *testing.T) {
+	assert := assert.New(t)
+
 	testbi.ChangeVolumeState(true /* hasVolume */)
 	testbi.SetKindleEbookType(false /* isMobi */, true /* isAzw3 */)
 	testbi.GenerateISBN() //先生成ISBN码
 	testbi.GenerateMobi()
 	savename := savePath + "/" + testbi.Name + "-" + testbi.Author + ".azw3"
-	assert.True(t, true, isExist(savename))
+	assert.True(isExist(savename))
 	os.RemoveAll(savePath)
 }
 func TestGenerateEPUB(t *testing.T) {
+	assert := assert.New(t)
+
 	testbi.GenerateISBN() //先生成ISBN码
 	testbi.GenerateEPUB()
 	savename := savePath + "/" + testbi.Name + "-" + testbi.Author + ".epub"
-	assert.True(t, true, isExist(savename))
-	//os.RemoveAll(savePath)
+	assert.True(isExist(savename))
+	os.RemoveAll(savePath)
 }
 
 // IsExist checks whether a file or directory exists.

@@ -34,7 +34,7 @@ https://www.6zw.net/files/article/html/75/75842/ -> bookid = 75842
 
 var _ edl.EBookDLInterface = XS999{}
 
-//999小说网 6zw.net
+// 999小说网 6zw.net
 type XS999 struct {
 	URL  string
 	Lock *sync.Mutex
@@ -62,7 +62,7 @@ func handleBookid(bookid string) string {
 	return (string(tmp[:len(tmp)-3]) + "/" + string(tmp))
 }
 
-//GetBookBriefInfo 获取小说的信息
+// GetBookBriefInfo 获取小说的信息
 func (this XS999) GetBookBriefInfo(bookid string, proxy string) edl.BookInfo {
 
 	var bi edl.BookInfo
@@ -276,7 +276,7 @@ func (this XS999) DownloadChapters(Bi edl.BookInfo, proxy string) edl.BookInfo {
 	return result
 }
 
-//根据每个章节的 URL连接，下载每章对应的内容Content当中
+// 根据每个章节的 URL连接，下载每章对应的内容Content当中
 func (this XS999) downloadChapters(Bi edl.BookInfo, proxy string) edl.BookInfo {
 	chapters := Bi.Chapters
 
@@ -338,7 +338,7 @@ ForEnd:
 	return result
 }
 
-//DownloaderChapter 下载小说
+// DownloaderChapter 下载小说
 func (this XS999) DownloaderChapter(ResultChan chan chan edl.Chapter, pc edl.ProxyChapter, wg *sync.WaitGroup) {
 	c := make(chan edl.Chapter)
 	ResultChan <- c

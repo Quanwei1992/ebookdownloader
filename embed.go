@@ -4,8 +4,8 @@ import (
 	"embed"
 )
 
-//go:embed tpls
+//go:embed tpls/*
 var templateFS embed.FS
 
-//go:embed fonts
+//go:embed fonts/*
 var fontFS embed.FS
