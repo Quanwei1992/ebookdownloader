@@ -29,5 +29,4 @@ func KindlegenCmd(args ...string) {
 	cmd := exe.Command(args...)
 
 	cmd.Run()
-
 }

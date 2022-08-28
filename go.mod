@@ -7,7 +7,6 @@ require (
 	github.com/Chain-Zhang/pinyin v0.1.3
 	github.com/amenzhinsky/go-memexec v0.7.0
 	github.com/andlabs/ui v0.0.0-20200610043537-70a69d6ae31e
-	github.com/asdine/storm/v3 v3.1.1
 	github.com/chromedp/cdproto v0.0.0-20201204063249-be40c824ad18
 	github.com/chromedp/chromedp v0.5.4
 	github.com/goki/freetype v0.0.0-20181231101311-fa8a33aabaff
@@ -30,13 +29,14 @@ require (
 	github.com/gobwas/ws v1.0.4 // indirect
 	github.com/gofrs/uuid v3.1.0+incompatible // indirect
 	github.com/josharian/intern v1.0.0 // indirect
+	github.com/kr/pretty v0.1.0 // indirect
 	github.com/mailru/easyjson v0.7.6 // indirect
 	github.com/mitchellh/colorstring v0.0.0-20190213212951-d06e56a500db // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
-	go.etcd.io/bbolt v1.3.4 // indirect
 	golang.org/x/image v0.0.0-20200119044424-58c23975cae1 // indirect
 	golang.org/x/net v0.0.0-20210505024714-0287a6fb4125 // indirect
 	golang.org/x/sys v0.0.0-20210903071746-97244b99971b // indirect
 	golang.org/x/text v0.3.6 // indirect
+	gopkg.in/check.v1 v1.0.0-20190902080502-41f04d3bba15 // indirect
 	gopkg.in/yaml.v3 v3.0.0-20200313102051-9f266ea9e77c // indirect
 )
