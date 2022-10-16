@@ -89,6 +89,7 @@ func makeHomeWindow() ui.Control {
 	fictionWebsiteCombox.Append("biqugei.net")
 	fictionWebsiteCombox.Append("biqugse.com")
 	fictionWebsiteCombox.Append("xixiwx.net")
+	fictionWebsiteCombox.Append("zhhbq.com")
 	fictionWebsiteCombox.SetSelected(0) //设置默认选择为 biqugei.net
 	fictionWebsiteLabel := ui.NewLabel("请选择要用到的下载源")
 
@@ -136,6 +137,9 @@ func makeHomeWindow() ui.Control {
 		case 2:
 			xixiwx := ebook.NewXixiwx()
 			EBDLInterface = xixiwx //实例化接口
+		case 3:
+			zhhbq := ebook.NewZhhbq()
+			EBDLInterface = zhhbq //实例化接口
 		}
 
 		bookinfo = EBDLInterface.GetBookInfo(ctx, bookid, proxy)

@@ -25,7 +25,7 @@ type BookInfo struct {
 	Author         string    `json:"author"`            //小说作者
 	Description    string    `json:"novel_description"` //小说简介
 	CoverURL       string    `json:"cover_url"`         //小说封面图片地址
-	DlCoverFromWeb bool      `json:"dl_cover_from_web`  //小说封面是否网上下载，或者自动生成
+	DlCoverFromWeb bool      `json:"dl_cover_from_web"` //小说封面是否网上下载，或者自动生成
 	IsMobi         bool      `json:"is_mobi"`           //当为true的时候生成mobi
 	IsAzw3         bool      `json:"is_azw3"`           //当为true的时候生成azw3,
 	HasVolume      bool      `json:"has_volume"`        //是否有小说分卷，默认为false；当设置为true的时候，Volumes里面需要包含分卷信息

@@ -4,7 +4,7 @@ import (
 	"os"
 	"testing"
 
-	"github.com/stretchr/testify/assert"
+	. "gopkg.in/check.v1"
 )
 
 var testbi = BookInfo{
@@ -12,7 +12,7 @@ var testbi = BookInfo{
 	Author:         "sndnvaps",
 	Description:    "这是我随便写的测试内容简介！",
 	Volumes:        V, //分卷信息
-	Chapters:       C,
+	Chapters:       Chapters,
 	DlCoverFromWeb: false, //使用直接生成的封面
 }
 
@@ -33,7 +33,7 @@ var V = []Volume{
 		NextChapterID: 6,
 	},
 }
-var C = []Chapter{
+var Chapters = []Chapter{
 	{
 		Title:   "第一章",
 		Content: "这是第一章\r\n内容测试\r\n",
@@ -88,63 +88,59 @@ var C = []Chapter{
 
 var savePath = "./outputs/" + testbi.Name + "-" + testbi.Author
 
-func TestBookInfo(t *testing.T) {
+// Hook up gocheck into the "go test" runner.
+func Test(t *testing.T) { TestingT(t) }
+
+type MySuite struct{}
+
+var _ = Suite(&MySuite{})
+
+func (s *MySuite) TestBookInfo(c *C) {
+
 	bookname := "我是谁"
-	assert := assert.New(t)
 
-	assert.Equal(bookname, testbi.Name)
-
+	c.Assert(bookname, Equals, testbi.Name)
 	author := "sndnvaps"
-	assert.Equal(author, testbi.Author)
-
-	Size := len(testbi.Chapters)
-	assert.Equal(10, Size)
+	c.Assert(author, Equals, testbi.Author)
+	size := len(testbi.Chapters)
+	c.Assert(size, Equals, 10)
 
 	link := "https://github.com/sndnvaps/ebookdownloader"
-	assert.Equal(link, testbi.Chapters[0].Link)
+	c.Assert(link, Equals, testbi.Chapters[0].Link)
 }
 
-func TestGenerateTxt(t *testing.T) {
-	assert := assert.New(t)
-
+func (s *MySuite) TestGenerateTxt(c *C) {
 	testbi.ChangeVolumeState(true /* hasVolume */)
 	testbi.GenerateTxt()
 	savename := savePath + "/" + testbi.Name + "-" + testbi.Author + ".txt"
-	assert.True(isExist(savename))
+	c.Assert(isExist(savename), Equals, true)
 	os.RemoveAll(savePath)
-
 }
 
-func TestGenerateMobi(t *testing.T) {
-	assert := assert.New(t)
-
+func (s *MySuite) TestGenerateMobi(c *C) {
 	testbi.ChangeVolumeState(true /* hasVolume */)
 	testbi.SetKindleEbookType(true /* isMobi */, false /* isAwz3 */)
 	testbi.GenerateISBN() //先生成ISBN码
 	testbi.GenerateMobi()
 	savename := savePath + "/" + testbi.Name + "-" + testbi.Author + ".mobi"
-	assert.True(isExist(savename))
+	c.Assert(isExist(savename), Equals, true)
 	//os.RemoveAll(savePath)
 }
 
-func TestGenerateAzw3(t *testing.T) {
-	assert := assert.New(t)
-
+func (s *MySuite) TestGenerateAzw3(c *C) {
 	testbi.ChangeVolumeState(true /* hasVolume */)
 	testbi.SetKindleEbookType(false /* isMobi */, true /* isAzw3 */)
 	testbi.GenerateISBN() //先生成ISBN码
 	testbi.GenerateMobi()
 	savename := savePath + "/" + testbi.Name + "-" + testbi.Author + ".azw3"
-	assert.True(isExist(savename))
+	c.Assert(isExist(savename), Equals, true)
 	os.RemoveAll(savePath)
 }
-func TestGenerateEPUB(t *testing.T) {
-	assert := assert.New(t)
-
+func (s *MySuite) TestGenerateEPUB(c *C) {
 	testbi.GenerateISBN() //先生成ISBN码
 	testbi.GenerateEPUB()
 	savename := savePath + "/" + testbi.Name + "-" + testbi.Author + ".epub"
-	assert.True(isExist(savename))
+	c.Assert(isExist(savename), Equals, true)
 	os.RemoveAll(savePath)
 }
 

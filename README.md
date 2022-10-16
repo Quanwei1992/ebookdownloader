@@ -2,7 +2,7 @@
 
 网文下载器
 
- [![GitHub license](https://img.shields.io/github/license/sndnvaps/ebookdownloader)](https://github.com/sndnvaps/ebookdownloader/blob/master/LICENSE)
+[![GitHub license](https://img.shields.io/github/license/sndnvaps/ebookdownloader)](https://github.com/sndnvaps/ebookdownloader/blob/master/LICENSE)
 
 [![Build Status](https://travis-ci.org/sndnvaps/ebookdownloader.svg?branch=master)](https://travis-ci.org/sndnvaps/ebookdownloader)[![release_version](https://img.shields.io/github/release/sndnvaps/ebookdownloader.svg)](https://github.com/sndnvaps/ebookdownloader/releases)[![Download Count](https://img.shields.io/github/downloads/sndnvaps/ebookdownloader/total.svg)](https://github.com/sndnvaps/ebookdownloader/releases)
 
@@ -10,38 +10,38 @@
 
 [![godoc](https://img.shields.io/badge/godoc-reference-blue.svg)](https://godoc.org/github.com/sndnvaps/ebookdownloader/)
 
-# ebookdl 网文下载器，go语言版本
+# ebookdl 网文下载器，go 语言版本
 
 ## 编译版本依赖条件
 
-   1. go >= 1.16
-   2. gcc 必须要安装，用于编译 github.com/andlabs/ui库
+1.  go >= 1.16
+2.  gcc 必须要安装，用于编译 github.com/andlabs/ui 库
 
 ## 安装方法
 
-  ```bash
-  go get github.com/sndnvaps/ebookdownloader/cli
-  go get github.com/sndnvaps/ebookdownloader/qtgui #此项目暂停更新，备份在backup分支当中
-  go get github.com/sndnvaps/ebookdownloader/http-server #此项目暂停更新，备份在backup分支当中
-  go get github.com/sndnvaps/ebookdownloader/ui
-  ```
+```bash
+go get github.com/sndnvaps/ebookdownloader/cli
+go get github.com/sndnvaps/ebookdownloader/qtgui #此项目暂停更新，备份在backup分支当中
+go get github.com/sndnvaps/ebookdownloader/http-server #此项目暂停更新，备份在backup分支当中
+go get github.com/sndnvaps/ebookdownloader/ui
+```
 
 ## 使用方法
 
-  ```bash
-  .\ebookdownloader.exe --bookid=0_642 --txt #只生成txt文本
-  .\ebookdownloader.exe --bookid=0_642 --mobi #只生成mobi电子书
-  .\ebookdownloader.exe --bookid=0_642 --txt --mobi #生成txt 和 mobi
-  .\ebookdownloader.exe --bookid=0_642 --txt --awz3 #生成txt 和 awz3
-  .\ebookdownloader.exe --proxy="http://proxyip:proxyport" --bookid=0_642 --mobi #生成mobi电子书，在下载章节的过程中使用 Proxy
-  .\ebookdownloader.exe --ebhost=xsbiquge.com --bookid=0_642 --txt --mobi #使用xsbiquge.com做为下载源，生成txt 和 mobi
-  .\ebookdownloader.exe --ebhost=999xs.com --bookid=0_642 --txt --mobi #使用999xs.com做为下载源，生成txt 和 mobi
-   .\ebookdownloader.exe --ebhost=999xs.com --bookid=0_642 --txt --mobi --meta #使用999xs.com做为下载源，生成txt,mobi电子书，并生成meta.json文件于小说目录当中
-  .\ebookdownloader.exe --ebhost=23us.la --bookid=127064 --pv #新功能，用于打印小说的分卷信息，此时不下载小说任何内容
-  .\ebookdownloader.exe --bookid=0_0642 --json #生成json格式的小说数据
-  .\ebookdownloader.exe conv --json=".\outputs\我是谁-sndnvaps\我是谁-sndnvaps.json" --txt --mobi #新功能，转换json格式到txt,mobi格式
-  .\ebookdownloader.exe --help #显示帮助信息
-  ```
+```bash
+.\ebookdownloader.exe --bookid=0_642 --txt #只生成txt文本
+.\ebookdownloader.exe --bookid=0_642 --mobi #只生成mobi电子书
+.\ebookdownloader.exe --bookid=0_642 --txt --mobi #生成txt 和 mobi
+.\ebookdownloader.exe --bookid=0_642 --txt --awz3 #生成txt 和 awz3
+.\ebookdownloader.exe --proxy="http://proxyip:proxyport" --bookid=0_642 --mobi #生成mobi电子书，在下载章节的过程中使用 Proxy
+.\ebookdownloader.exe --ebhost=xsbiquge.com --bookid=0_642 --txt --mobi #使用xsbiquge.com做为下载源，生成txt 和 mobi
+.\ebookdownloader.exe --ebhost=999xs.com --bookid=0_642 --txt --mobi #使用999xs.com做为下载源，生成txt 和 mobi
+ .\ebookdownloader.exe --ebhost=999xs.com --bookid=0_642 --txt --mobi --meta #使用999xs.com做为下载源，生成txt,mobi电子书，并生成meta.json文件于小说目录当中
+.\ebookdownloader.exe --ebhost=23us.la --bookid=127064 --pv #新功能，用于打印小说的分卷信息，此时不下载小说任何内容
+.\ebookdownloader.exe --bookid=0_0642 --json #生成json格式的小说数据
+.\ebookdownloader.exe conv --json=".\outputs\我是谁-sndnvaps\我是谁-sndnvaps.json" --txt --mobi #新功能，转换json格式到txt,mobi格式
+.\ebookdownloader.exe --help #显示帮助信息
+```
 
 ## 依赖程序
 
@@ -59,20 +59,20 @@
           gtk-3.0，用于构建ui界面
 
 ## 懒人模式，直接下载编译好的程序
-  
-  墙里面使用gitee
 
-  [gitee ebookdownloader release page](https://gitee.com/sndnvaps/ebookdownloader/releases "https://gitee.com/sndnvaps/ebookdownloader/releases")
+墙里面使用 gitee
 
-墙外面使用github
+[gitee ebookdownloader release page](https://gitee.com/sndnvaps/ebookdownloader/releases "https://gitee.com/sndnvaps/ebookdownloader/releases")
 
-  [github ebookdownloader release page](https://github.com/sndnvaps/ebookdownloader/releases "https://github.com/sndnvaps/ebookdownloader/releases")
+墙外面使用 github
 
----------------------
+[github ebookdownloader release page](https://github.com/sndnvaps/ebookdownloader/releases "https://github.com/sndnvaps/ebookdownloader/releases")
 
-## 验证下载的文件的完整性（使用gpg签名验证)
+---
 
-下载./scripts/gpg_pub_key.gpg到/home/username/
+## 验证下载的文件的完整性（使用 gpg 签名验证)
+
+下载./scripts/gpg_pub_key.gpg 到/home/username/
 
 导入公钥到系统中，以用于验证文件的完整性
 
@@ -80,16 +80,16 @@
     $gpg --import gpg_pub_key.gpg
 ```
 
-在releases页面下载的文件，将会包含ebookdownloader_$version_$arch.zip,ebookdownloader_$version_$arch.zip.sig
-   验证方法
+在 releases 页面下载的文件，将会包含 ebookdownloader*$version*$arch.zip,ebookdownloader_$version\_$arch.zip.sig
+验证方法
 
 验证文件完整性
 
- ```bash
-    $gpg --verify ebookdownloader_v2.0.0_Win_x86_64.zip.sig ebookdownloader_v2.0.0_Win_x86_64.zip
+```bash
+   $gpg --verify ebookdownloader_v2.0.0_Win_x86_64.zip.sig ebookdownloader_v2.0.0_Win_x86_64.zip
 ```
 
-   得到的信息如下
+得到的信息如下
 
 ```bash
 F:\gowork\src\github.com\sndnvaps\ebookdownloader>gpg --verify ebookdownloader_v
@@ -101,41 +101,42 @@ gpg: Good signature from "JimesYang (sndnvaps) <sndnvaps@gmail.com>" [ultimate]
 
 ## ❤️ 赞助
 
-如果你觉得EbookDownloader项目对你有帮助。你可以给我来一杯啤酒！
+如果你觉得 EbookDownloader 项目对你有帮助。你可以给我来一杯啤酒！
 
-| PayPal打赏 | 微信打赏Pay |
-| :-: | :-: |
-| <a href="https://paypal.me/sndnvaps"> paypal.me/sndnvaps </a>  | <img style="width:300px;height:300px" src="https://i.loli.net/2021/11/25/6ZLgDa13yrFiNQ2.jpg" alt="Donate_WeChatPay.jpg">|
+|                          PayPal 打赏                          |                                                       微信打赏 Pay                                                        |
+| :-----------------------------------------------------------: | :-----------------------------------------------------------------------------------------------------------------------: |
+| <a href="https://paypal.me/sndnvaps"> paypal.me/sndnvaps </a> | <img style="width:300px;height:300px" src="https://i.loli.net/2021/11/25/6ZLgDa13yrFiNQ2.jpg" alt="Donate_WeChatPay.jpg"> |
 
--------------
+---
 
 ## 支持的小说网站
 
-  网站名 | 网址 | 是否支持 | 备注 |
-  :-: | :-: | :-: | :-: |
-  笔趣阁 | <s><https://www.xsbiquge.com/></s> | × | 网站改名 |
-  笔趣阁 | <s><https://www.vbiquge.com/></s>|  × | 网站改名 |
-  笔趣阁 | <s><https://www.xxbiquge.net/></s> | × | 网站改名 |
-  笔趣阁 | <s><https://www.biqufan.com/></s> | × | 网站改名 |
-  笔趣阁 | <s><https://www.biduo.cc/></s> |  × | 网站改名 |
-  笔趣阁 | <s><https://www.biduoxs.com/></s> |  × | 网站改名 |
-  笔趣阁 | <https://www.biquwu.cc/> | × | 网站改名 |
-  笔趣阁 | <http://www.biqugse.com/> | √ |
-  笔趣阁 | <http://www.biqugei.net/> | √ |
-  西西文学网 | <http://www.xixiwx.net/> | √ |
-  999小说 | <s> <https://www.999xs.com/></s> | × | 网站改名 |
-  999小说 | <s> <https://www.899zw.net/></s> | × | 网站改名 |
-  999小说 | <s><https://www.6zw.net/></s>|  × | 网站改名 |
-  顶点小说网 | <s><https://www.booktxt.net/></s> | × | 网站改名 |
-  顶点小说网 | <s><https://www.23us.la></s> | × | 因为网站原因无法打开，暂定无法使用 |
+|   网站名   |                网址                | 是否支持 |                备注                |
+| :--------: | :--------------------------------: | :------: | :--------------------------------: |
+|   笔趣阁   | <s><https://www.xsbiquge.com/></s> |    ×     |              网站改名              |
+|   笔趣阁   | <s><https://www.vbiquge.com/></s>  |    ×     |              网站改名              |
+|   笔趣阁   | <s><https://www.xxbiquge.net/></s> |    ×     |              网站改名              |
+|   笔趣阁   | <s><https://www.biqufan.com/></s>  |    ×     |              网站改名              |
+|   笔趣阁   |   <s><https://www.biduo.cc/></s>   |    ×     |              网站改名              |
+|   笔趣阁   | <s><https://www.biduoxs.com/></s>  |    ×     |              网站改名              |
+|   笔趣阁   |      <https://www.biquwu.cc/>      |    ×     |              网站改名              |
+|   笔趣阁   |     <http://www.biqugse.com/>      |    √     |
+|   笔趣阁   |     <http://www.biqugei.net/>      |    √     |
+|   笔趣阁   |      <https://www.zhhbq.com/>      |    √     |
+| 西西文学网 |      <http://www.xixiwx.net/>      |    √     |
+|  999 小说  |  <s> <https://www.999xs.com/></s>  |    ×     |              网站改名              |
+|  999 小说  |  <s> <https://www.899zw.net/></s>  |    ×     |              网站改名              |
+|  999 小说  |   <s><https://www.6zw.net/></s>    |    ×     |              网站改名              |
+| 顶点小说网 | <s><https://www.booktxt.net/></s>  |    ×     |              网站改名              |
+| 顶点小说网 |    <s><https://www.23us.la></s>    |    ×     | 因为网站原因无法打开，暂定无法使用 |
 
-------------
+---
 
 ## 更新日志
 
-  [CHANGELOG](./CHANGELOG "日志文件")
+[CHANGELOG](./CHANGELOG "日志文件")
 
-  -----------
+---
 
 ## To Do List
 
@@ -156,3 +157,4 @@ gpg: Good signature from "JimesYang (sndnvaps) <sndnvaps@gmail.com>" [ultimate]
      [√]  15. 打包需要用到的资源到程序中，减少目录数量，kindlegen程序因为技术和安全性考虑，暂不封装到go程序中
      [√]  16. 减少程序运行时的依赖，尝试使用 github.com/andlabs/ui来构建gui界面
      [√]  17. 添加 http://www.biqugei.net/ 小说网站支持
+     [√]  18. i添加https://www.zhhbq.com/ 小说网站支持
