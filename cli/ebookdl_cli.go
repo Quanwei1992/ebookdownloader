@@ -232,7 +232,7 @@ func main() {
 		},
 	}
 	app.Copyright = "© 2019 - 2023 Jimes Yang<sndnvaps@gmail.com>"
-	app.Usage = "用于下载 笔趣阁(http://www.biqugse.com/,http://www.biqugei.net,https://www.zhhbq.com/) 上面的电子书，并保存为txt格式或者(mobi格式,awz3格式)的电子书"
+	app.Usage = "用于下载 笔趣阁(http://www.biqugse.com/,http://www.biqugei.net,https://www.zhhbq.com/) 上面的电子书，并保存为txt格式或者{mobi,awz3,epub}格式的电子书"
 	app.Action = EbookDownloader
 	app.Flags = []cli.Flag{
 		&cli.StringFlag{
@@ -271,8 +271,9 @@ func main() {
 			Usage: "当使用的时候，把下载得到的小说内容写入到json文件当中",
 		},
 		&cli.BoolFlag{
-			Name:  "printvolume,pv",
-			Usage: "打印分卷信息，只于调试时使用！(使用此功能的时候，不会下载章节内容)",
+			Name:    "printvolume",
+			Aliases: []string{"pv"},
+			Usage:   "打印分卷信息，只于调试时使用！(使用此功能的时候，不会下载章节内容)",
 		},
 	}
 	app.Commands = []*cli.Command{
