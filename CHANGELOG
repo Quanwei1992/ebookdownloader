@@ -1,5 +1,36 @@
 ## 更新日志文件
 
+      2022.10.16 go版本
+            1. 添加https://www.zhhbq.com/小说网站支持
+            2. 更新单元测试ebookdl_test.go,使用 gopkg.in/check.v1 做为测试框架
+
+	2022.8.28 go版本
+	       1. windows平台，ui界面，重新生成syso文件，对应用windows平台386,x86_64
+		 2. 修改ui界面生成的版本号为v2.0.0.0
+		 3. 删除ui/resource.syso以解决在Linux系统的编译连接时问题
+		 4. Linux平台，内嵌kindlegen到程序中，索马里时使用go-memexec来加载程序
+		 5. Linux平台，实现单个文件可执行，不需要其它依赖文件
+
+	2022.08.26 go版本
+	    1. windows平台，使用embed内嵌kindlegen.exe到程序中，运行时使用go-memexec来加载程序
+	    2. windows平台，实现单个文件可执行，不需要其它依赖文件
+
+     2022.08.25 go版本
+        1. 更新go版本为v1.16+
+        2. 采用embed模式来内嵌tpls/fonts文件
+        
+     2022.08.21 go版本
+        1. 删除qtgui版本
+        2. 删除http-server
+        3. 删除AppImage构建脚本及相关文件
+
+     2022.08.15 go版本
+        1. 添加biqugei.net网站支持
+
+     2022.03.27 go版本
+        1. Linux 版本，打包生成*.AppImage格式
+        2. kindlegenLinux程序需要安装到/usr/bin/目录，不然无法生成mobi格式的电子书
+
     2022.02.12 go版本
          1. 修改899zw.com地址为6zw.net
          2. ui界面，添加biqugse.com下载支持

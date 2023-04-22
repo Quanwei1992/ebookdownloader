@@ -10,7 +10,8 @@ Write-Host "BuildTime = $build_time"
 Write-Host "CommitID = $commit_id"
 Write-Host "last_tag = $last_tag"
 
-goversioninfo
+# 用于生成reource_windows_$arch.syso文件，文件描述库
+#goversioninfo -64 -platform-specific 
 
 go build -ldflags "-H windowsgui -w -s -X 'main.Commit=$commit_id' -X 'main.BuildTime=$build_time' -X 'main.Version=$last_tag'" -o ebookdl_ui.exe
 Copy-Item ebookdl_ui.exe ..\

@@ -14,7 +14,7 @@ import (
 
 var _ edl.EBookDLInterface = Biquwu{}
 
-//Biquwu www.biquwu.cc 小说网
+// Biquwu www.biquwu.cc 小说网
 type Biquwu struct {
 	URL  string
 	Lock *sync.Mutex
@@ -28,7 +28,7 @@ func NewBiquwu() Biquwu {
 	}
 }
 
-//GetBookBriefInfo 获取小说的信息
+// GetBookBriefInfo 获取小说的信息
 func (this Biquwu) GetBookBriefInfo(bookid string, proxy string) edl.BookInfo {
 	var bi edl.BookInfo
 	pollURL := this.URL + "/biquge/" + bookid + "/"
@@ -113,7 +113,7 @@ func (this Biquwu) GetBookBriefInfo(bookid string, proxy string) edl.BookInfo {
 	return bi
 }
 
-//GetBookInfo 获取小说的信息
+// GetBookInfo 获取小说的信息
 func (this Biquwu) GetBookInfo(ctx context.Context, bookid string, proxy string) edl.BookInfo {
 
 	var bi edl.BookInfo
@@ -227,7 +227,7 @@ func (this Biquwu) GetBookInfo(ctx context.Context, bookid string, proxy string)
 	return bi
 }
 
-//DownloadChapters 下载所有章节
+// DownloadChapters 下载所有章节
 func (this Biquwu) DownloadChapters(Bi edl.BookInfo, proxy string) edl.BookInfo {
 	result := Bi //先进行赋值，把数据
 	var chapters []edl.Chapter
@@ -247,7 +247,7 @@ func (this Biquwu) DownloadChapters(Bi edl.BookInfo, proxy string) edl.BookInfo 
 	return result
 }
 
-//根据每个章节的 URL连接，下载每章对应的内容Content当中
+// 根据每个章节的 URL连接，下载每章对应的内容Content当中
 func (this Biquwu) downloadChapters(Bi edl.BookInfo, proxy string) edl.BookInfo {
 	chapters := Bi.Chapters
 
@@ -309,7 +309,7 @@ ForEnd:
 	return result
 }
 
-//DownloaderChapter 一个章节一个章节得下载
+// DownloaderChapter 一个章节一个章节得下载
 func (this Biquwu) DownloaderChapter(ResultChan chan chan edl.Chapter, pc edl.ProxyChapter, wg *sync.WaitGroup) {
 	wg.Add(1)
 	defer wg.Done()

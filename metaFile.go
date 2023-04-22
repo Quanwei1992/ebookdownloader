@@ -6,7 +6,7 @@ import (
 	"path/filepath"
 )
 
-//Meta 小说的metainfo
+// Meta 小说的metainfo
 type Meta struct {
 	Ebhost      string `json:"ebhost" storm:"index"`
 	Bookid      string `json:"bookid"`
@@ -26,7 +26,7 @@ type Meta struct {
 	AZW3MD5     string `json:"azw3_md5_info"`
 }
 
-//WriteFile 把json数据写入 filename定义的文件中
+// WriteFile 把json数据写入 filename定义的文件中
 func (this Meta) WriteFile(filename string) error {
 	// 创建文件
 	fileAbs, _ := filepath.Abs(filename) //使用相对路径
@@ -48,7 +48,7 @@ func (this Meta) WriteFile(filename string) error {
 	return nil
 }
 
-//GetMetaData 从文件中读取meta信息，并返回
+// GetMetaData 从文件中读取meta信息，并返回
 func GetMetaData(filename string) (Meta, error) {
 	fileAbs, _ := filepath.Abs(filename)
 	filePtr, _ := os.Open(fileAbs)

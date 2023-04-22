@@ -12,7 +12,7 @@ import (
 	"os"
 )
 
-//对文件生成md5验证信息
+// 对文件生成md5验证信息
 func md5f(file string) string {
 	f, err := os.Open(file)
 	if err != nil {
@@ -88,7 +88,7 @@ func sha512f(file string) string {
 	return hex.EncodeToString(h.Sum(nil))
 }
 
-//Output 把得到的验证信息，全部写入到文件中
+// Output 把得到的验证信息，全部写入到文件中
 func Output(infile, outfile string) {
 	w, err := os.Create(outfile)
 	if err != nil {

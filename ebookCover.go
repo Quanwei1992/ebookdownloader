@@ -17,15 +17,14 @@ import (
 	"github.com/chromedp/cdproto/cdp"
 	"github.com/chromedp/chromedp"
 	"github.com/goki/freetype"
-	"github.com/sndnvaps/ebookdownloader/fonts"
 )
 
 const (
 	fontSize = 40 //字体尺寸
 )
 
-//GenerateCover 生成封面 cover.jpg
-func GenerateCover(this BookInfo) {
+// GenerateCover 生成封面 cover.jpg
+func (this BookInfo) GenerateCover() error {
 
 	//需要添加内容的图片
 	coverAbs, _ := filepath.Abs("./cover.jpg")
@@ -33,28 +32,29 @@ func GenerateCover(this BookInfo) {
 	imgfile, err := os.Create(coverAbs)
 	if err != nil {
 		fmt.Println(err.Error())
+		return err
 	}
 	defer imgfile.Close()
 
+	img := image.NewNRGBA(image.Rect(0, 0, 617, 822))
 
-	
-	img := image.NewNRGBA(image.Rect(0,0,617,822))
-
-	fg,bg   :=  image.Black,image.White
+	fg, bg := image.Black, image.White
 
 	//需要一个ttf字体文件
 	//fontAbs, _ := filepath.Abs("./fonts/WenQuanYiMicroHei.ttf")
-	fontBytes := fonts.MustAsset("fonts/WenQuanYiMicroHei.ttf")
+	fontBytes, _ := fontFS.ReadFile("fonts/WenQuanYiMicroHei.ttf")
 	if err != nil {
 		log.Println(err.Error())
+		return err
 	}
 
 	font, err := freetype.ParseFont(fontBytes)
 	if err != nil {
 		log.Println(err.Error())
+		return err
 	}
 
-	draw.Draw(img,img.Bounds(),bg,image.ZP,draw.Src)
+	draw.Draw(img, img.Bounds(), bg, image.ZP, draw.Src)
 
 	f := freetype.NewContext()
 	f.SetDPI(72)
@@ -77,14 +77,15 @@ func GenerateCover(this BookInfo) {
 	ptAuthor := freetype.Pt(img.Bounds().Dx()-320, img.Bounds().Dy()-500) //字体出现的位置
 	f.DrawString(this.Author+" ©著", ptAuthor)                             //写入小说作者名
 
-
 	err = jpeg.Encode(imgfile, img, &jpeg.Options{Quality: 100})
 	if err != nil {
 		fmt.Println(err.Error())
+		return err
 	}
+	return nil
 }
 
-//DownloadCoverImage 下载小说的封面图片
+// DownloadCoverImage 下载小说的封面图片
 func (this BookInfo) DownloadCoverImage(coverURL string) error {
 	res, err := http.Get(coverURL)
 	if err != nil {
@@ -93,7 +94,7 @@ func (this BookInfo) DownloadCoverImage(coverURL string) error {
 	defer res.Body.Close()
 	if res.StatusCode != http.StatusOK {
 		fmt.Printf("封面地址[%s]下载失败，改为直接生成封面!\n", coverURL)
-		GenerateCover(this)
+		this.GenerateCover()
 		//直接在此处结束进程，返回到上级进程中
 		return errors.New("封面下载失败，改为直接生成封面")
 	}
@@ -101,7 +102,7 @@ func (this BookInfo) DownloadCoverImage(coverURL string) error {
 	body, err := ioutil.ReadAll(res.Body)
 	if err != nil {
 		fmt.Printf("封面地址[%s]下载失败，改为直接生成封面!\n", coverURL)
-		GenerateCover(this)
+		this.GenerateCover()
 		//直接在此处结束进程，返回到上级进程中
 		return err
 	}
@@ -113,8 +114,11 @@ func (this BookInfo) DownloadCoverImage(coverURL string) error {
 
 }
 
-//GetCover 主要用于从 起点中文网上提取小说的封面
+// GetCover 主要用于从 起点中文网上提取小说的封面
 func (this BookInfo) GetCover() error {
+	if this.DlCoverFromWeb != true {
+		return this.GenerateCover()
+	}
 	options := []chromedp.ExecAllocatorOption{
 		//chromedp.Flag("headless", false), // debug使用
 		chromedp.Flag("blink-settings", "imagesEnabled=false"),
@@ -125,7 +129,7 @@ func (this BookInfo) GetCover() error {
 	c, _ := chromedp.NewExecAllocator(context.Background(), options...)
 
 	// create context
-	chromeCtx, cancel := chromedp.NewContext(c, chromedp.WithLogf(log.Printf))
+	chromeCtx, cancel := chromedp.NewContext(c)
 	// 执行一个空task, 用提前创建Chrome实例
 	chromedp.Run(chromeCtx, make([]chromedp.Action, 0, 1)...)
 	timeoutCtx, cancel := context.WithTimeout(chromeCtx, 20*time.Second)
@@ -140,12 +144,12 @@ func (this BookInfo) GetCover() error {
 	)
 	//当执行出错的时候，优化执行生成封面，再返回错误信息
 	if err != nil {
-		GenerateCover(this)
+		this.GenerateCover()
 		return err
 	}
 	//当执行出错的时候，优化执行生成封面，再返回错误信息
 	if len(nodes) < 1 {
-		GenerateCover(this)
+		this.GenerateCover()
 		return errors.New("无法获取到封面地址，或者小说名字错误！")
 	}
 	CoverURL := "https:" + nodes[0].AttributeValue("src")

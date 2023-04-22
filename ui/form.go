@@ -14,11 +14,11 @@ import (
 
 var (
 	//Version 版本信息
-	Version string = "dev"
+	Version string = "dirty"
 	//Commit git commit信息
-	Commit string = "06d3fcf"
+	Commit string = "b035048"
 	//BuildTime 编译时间
-	BuildTime string = "2022-02-12 21:42"
+	BuildTime string = "2023-04-22 22:35:21"
 )
 
 func makeAboutWindow() ui.Control {
@@ -56,7 +56,7 @@ func makeAboutWindow() ui.Control {
 	return vbox
 }
 
-//主页
+// 主页
 func makeHomeWindow() ui.Control {
 	vbox := ui.NewVerticalBox()
 	vbox.SetPadded(true)
@@ -86,11 +86,11 @@ func makeHomeWindow() ui.Control {
 	hboxProxy.Append(proxyInputEntry, false)
 
 	fictionWebsiteCombox := ui.NewCombobox()
-	fictionWebsiteCombox.Append("biqufan.com")
-	fictionWebsiteCombox.Append("booktxt.com")
-	fictionWebsiteCombox.Append("6zw.net")
+	fictionWebsiteCombox.Append("biqugei.net")
 	fictionWebsiteCombox.Append("biqugse.com")
-	fictionWebsiteCombox.SetSelected(0) //设置默认选择为 biqufan.com
+	fictionWebsiteCombox.Append("xixiwx.net")
+	fictionWebsiteCombox.Append("zhhbq.com")
+	fictionWebsiteCombox.SetSelected(0) //设置默认选择为 biqugei.net
 	fictionWebsiteLabel := ui.NewLabel("请选择要用到的下载源")
 
 	hboxChooseWebsite.Append(fictionWebsiteCombox, false)
@@ -129,29 +129,32 @@ func makeHomeWindow() ui.Control {
 		}
 		switch fictionWebsiteCombox.Selected() {
 		case 0:
-			xsbiquge := ebook.NewXSBiquge()
-			EBDLInterface = xsbiquge //实例化接口
+			biqugei := ebook.NewBiqugei()
+			EBDLInterface = biqugei //实例化接口
 		case 1:
-			booktxt := ebook.NewBookTXT()
-			EBDLInterface = booktxt //实例化接口
-		case 2:
-			xs999 := ebook.New999XS()
-			EBDLInterface = xs999 //实例化接口
-		case 3:
 			biqugse := ebook.NewBiqugse()
 			EBDLInterface = biqugse //实例化接口
+		case 2:
+			xixiwx := ebook.NewXixiwx()
+			EBDLInterface = xixiwx //实例化接口
+		case 3:
+			zhhbq := ebook.NewZhhbq()
+			EBDLInterface = zhhbq //实例化接口
 		}
 
 		bookinfo = EBDLInterface.GetBookInfo(ctx, bookid, proxy)
 		bookinfo = EBDLInterface.DownloadChapters(bookinfo, proxy) //下载小说章节内容
 		if checkboxTxt.Checked() {                                 //当被选择时，生成txt格式
+			bookinfo.SetDownloadCoverMethod(false)
 			bookinfo.GenerateTxt()
 		}
 		if checkboxMobi.Checked() { //当被选择时，生成mobi格式
 			bookinfo.SetKindleEbookType(true /* isMobi */, false /* isAzw3 */)
+			bookinfo.SetDownloadCoverMethod(true)
 			bookinfo.GenerateMobi()
 		}
 		if checkboxEpub.Checked() { //当被选择时，生成epub格式
+			bookinfo.SetDownloadCoverMethod(true)
 			bookinfo.GenerateEPUB()
 		}
 
