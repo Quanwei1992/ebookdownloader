@@ -9,7 +9,7 @@ import (
 
 	edl "github.com/sndnvaps/ebookdownloader"
 	ebook "github.com/sndnvaps/ebookdownloader/ebook-sources"
-	cli "gopkg.in/urfave/cli.v1"
+	"github.com/urfave/cli/v2"
 )
 
 var (
@@ -225,80 +225,82 @@ func main() {
 	app := cli.NewApp()
 	app.Name = "golang EBookDownloader"
 	app.Version = Version + "-" + Commit + "-" + BuildTime
-	app.Authors = []cli.Author{
+	app.Authors = []*cli.Author{
 		{
 			Name:  "Jimes Yang",
 			Email: "sndnvaps@gmail.com",
 		},
 	}
-	app.Copyright = "© 2019 - 2022 Jimes Yang<sndnvaps@gmail.com>"
+	app.Copyright = "© 2019 - 2023 Jimes Yang<sndnvaps@gmail.com>"
 	app.Usage = "用于下载 笔趣阁(http://www.biqugse.com/,http://www.biqugei.net,https://www.zhhbq.com/) 上面的电子书，并保存为txt格式或者(mobi格式,awz3格式)的电子书"
 	app.Action = EbookDownloader
 	app.Flags = []cli.Flag{
-		cli.StringFlag{
+		&cli.StringFlag{
 			Name:  "ebhost",
 			Value: "biqugse.com",
 			Usage: "定义下载ebook的网站地址(可选择biqugse.com,biqugei.net,zhhbq.com),西西文学(http://www.xixiwx.net/)",
 		},
-		cli.StringFlag{
-			Name:  "bookid,id",
-			Usage: "对应小说网链接最后一串数字,例如：1_1902",
+		&cli.StringFlag{
+			Name:    "bookid,id",
+			Aliases: []string{"id"},
+			Usage:   "对应小说网链接最后一串数字,例如：1_1902",
 		},
-		cli.StringFlag{
-			Name:  "proxy,p",
-			Usage: "ip代理(http://ip:ipport),减少本机ip被小说网站封的可能性",
+		&cli.StringFlag{
+			Name:    "proxy,p",
+			Aliases: []string{"p"},
+			Usage:   "ip代理(http://ip:ipport),减少本机ip被小说网站封的可能性",
 		},
-		cli.BoolFlag{
+		&cli.BoolFlag{
 			Name:  "txt",
 			Usage: "当使用的时候，生成txt文件",
 		},
-		cli.BoolFlag{
+		&cli.BoolFlag{
 			Name:  "mobi",
 			Usage: "当使用的时候，生成mobi文件(不可与--azw3同时使用)",
 		},
-		cli.BoolFlag{
+		&cli.BoolFlag{
 			Name:  "azw3",
 			Usage: "当使用的时候，生成azw3文件(不可与--mobi同时使用)",
 		},
-		cli.BoolFlag{
+		&cli.BoolFlag{
 			Name:  "epub",
 			Usage: "当使用的时候，生成epub文件(不可与--mobi同时使用)",
 		},
-		cli.BoolFlag{
+		&cli.BoolFlag{
 			Name:  "json",
 			Usage: "当使用的时候，把下载得到的小说内容写入到json文件当中",
 		},
-		cli.BoolFlag{
+		&cli.BoolFlag{
 			Name:  "printvolume,pv",
 			Usage: "打印分卷信息，只于调试时使用！(使用此功能的时候，不会下载章节内容)",
 		},
 	}
-	app.Commands = []cli.Command{
+	app.Commands = []*cli.Command{
 		{
 			Name:  "conv",
 			Usage: " 转换json格式到其它格式，支持txt,mobi,azw3,epub",
 			Flags: []cli.Flag{
-				cli.StringFlag{
+				&cli.StringFlag{
 					Name:  "json",
 					Usage: "需要转换的json文件",
 				},
-				cli.BoolFlag{
+				&cli.BoolFlag{
 					Name:  "txt",
 					Usage: " 生成txt文件",
 				},
-				cli.BoolFlag{
+				&cli.BoolFlag{
 					Name:  "mobi",
 					Usage: "生成mobi文件",
 				},
-				cli.BoolFlag{
+				&cli.BoolFlag{
 					Name:  "azw3",
 					Usage: "生成azw3文件",
 				},
-				cli.BoolFlag{
+				&cli.BoolFlag{
 					Name:  "epub",
 					Usage: "当使用的时候，生成epub文件",
 				},
-				cli.BoolFlag{
+				&cli.BoolFlag{
 					Name:  "meta",
 					Usage: "生成meta文件",
 				},
