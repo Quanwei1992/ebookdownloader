@@ -16,9 +16,9 @@ var (
 	//Version 版本信息
 	Version string = "dirty"
 	//Commit git commit信息
-	Commit string = "d26837e"
+	Commit string = "b035048"
 	//BuildTime 编译时间
-	BuildTime string = "2022-08-21 11:38:21"
+	BuildTime string = "2023-04-22 22:35:21"
 )
 
 func makeAboutWindow() ui.Control {
